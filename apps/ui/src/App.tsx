@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import brandIcon from "../../../assets/branding/icon.svg?url";
 import { DesignShowcase } from "./components/DesignShowcase";
 import { isBridgeResponse, makeRequest } from "../../../src/contracts/ipc";
 import { initialShellState, SHELL_ROUTES, shortcutRoute, transitionShellRoute, type ShellRoute } from "../../../src/web/routes";
@@ -49,7 +50,7 @@ export function App() {
   }, []);
   return <div className="shell">
     <aside className="shell-nav" aria-label="主导航">
-      <div className="shell-brand"><span className="brand-mark" aria-hidden="true">M</span><div>MOSEN <small>GROUP SCHEDULER</small></div></div>
+      <div className="shell-brand"><span className="brand-mark" aria-hidden="true"><img alt="" src={brandIcon} /></span><div>MOSEN <small>GROUP SCHEDULER</small></div></div>
       <nav className="shell-navigation" aria-label="页面">
         {SHELL_ROUTES.map(page =>
           <button key={page.id} type="button" className={"nav-action" + (shell.active === page.id ? " is-active" : "")}
