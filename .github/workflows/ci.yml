@@ -136,3 +136,17 @@ jobs:
           path: artifacts/visual/*.png
           retention-days: 7
           if-no-files-found: error
+  settings:
+    name: Settings SQLite revision and recovery - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: Run settings concurrency and recovery tests
+        run: dotnet run --project tests/Settings/Mosen.GroupScheduler.Settings.Tests.csproj --configuration Release
