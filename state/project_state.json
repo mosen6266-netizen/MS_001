@@ -5,8 +5,8 @@
   "default_branch": "main",
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
-  "current_step": "22",
-  "current_step_status": "in_progress",
+  "current_step": "23",
+  "current_step_status": "not_started",
   "phase": 5,
   "total_steps": 32,
   "completed_steps": [
@@ -30,7 +30,8 @@
     "18",
     "19",
     "20",
-    "21"
+    "21",
+    "22"
   ],
   "development_started": true,
   "functional_code_started": true,
@@ -39,13 +40,13 @@
   "icon_source_received": true,
   "icon_asset_upload_verified": true,
   "exact_timing_contract": "wait preSendDelayMs -> typing typingDurationMs -> send; 30s+5s=35s; no overlap",
-  "last_verified_commit_sha": "e330b85f3f8ea4eb3fccb5329e695be9046f7e27",
+  "last_verified_commit_sha": "76270f9b9be8a5619f298a896ff52a4341933b15",
   "last_updated": "2026-10-16",
   "blocking_issues": [
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step22 Windows native tray/topmost alert history plus emergency stop policy implemented and pushed. Alert history bounded/deduplicated; safety latch stops in-memory permit gate before attempting disk persistence and 50 mock groups durable stop. Test build typo fixed 76f6384; GitHub CI 38965847886 PENDING; completion remains 21/32 until all 39 jobs verified successful. No real TDLib sender, Win10/11 live behavior deferred.",
+  "notes": "Step22: Windows WPF always-on-top unowned alert window (visible when main minimized), debounced tray balloons and redacted 500-item persistent alert history with dedup; green-left confirm/red-right cancel emergency-stop dialog and native tray menu. EmergencyStopController first closes outbound permit gate, then durable stop latch then atomically StopAll across 50 mock groups; disk I/O failure retains current gate closure and reports partial failure; restart reads persistent latch. Window close disposes tray/timers, no background sender. Windows/Linux Step22 each 38 assertions; full GitHub CI 38966422700 39/39 SUCCESS including win-x64 WPF publish. Real TDLib and Windows physical behavior deferred. Dev progress 22/32=68.75%, 10 remain.",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
@@ -172,6 +173,11 @@
       "id": "RUNTIME-DASHBOARD-REAL-LIVE",
       "status": "DEFERRED",
       "detail": "Step21 UI displays only local durable simulation states. Actual real TDLib live sender integration/official callbacks/permissions, 50-group rapid runtime performance and display correctness on Windows10/11, and 72h stability require later development and final on-device acceptance."
+    },
+    {
+      "id": "ALERTS-REAL-WINDOWS-TDLIB",
+      "status": "DEFERRED",
+      "detail": "Step22 Windows notify icon/topmost dialog compiled and published but Win10/11 actual tray and lockscreen/minimize behavior not physically tested. Actual TDLib sender is not connected; future transport must consult emergency latch before every send, with actual active scheduler cancellation and server receipt reconciliation, plus 50 legal groups and long-running stability acceptance."
     }
   ],
   "step03_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38921641970",
@@ -236,6 +242,8 @@
   "step21_source_commit": "e330b85f3f8ea4eb3fccb5329e695be9046f7e27",
   "step21_dashboard_checks_per_os": 23,
   "step21_total_ci_jobs": 37,
-  "step22_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38965847886",
-  "step22_source_commit": "76f63848db3a4424b1917ad74d7b9aabf92ee696"
+  "step22_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38966422700",
+  "step22_source_commit": "76f63848db3a4424b1917ad74d7b9aabf92ee696",
+  "step22_notifications_checks_per_os": 38,
+  "step22_total_ci_jobs": 39
 }

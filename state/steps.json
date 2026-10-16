@@ -491,7 +491,7 @@
     "step": "22",
     "title": "Windows 提醒与紧急停止",
     "phase": 6,
-    "status": "in_progress",
+    "status": "done_dev",
     "acceptance_evidence": [
       "src/Desktop/Notifications/NotificationCenter.cs",
       "src/Desktop/Notifications/AlertHistoryStore.cs",
@@ -501,9 +501,18 @@
       "tests/Notifications/Program.cs",
       "docs/STEP_22_NOTIFICATIONS.md",
       "docs/STEP_22_TEST_MATRIX.md",
-      "https://github.com/mosen6266-netizen/MS_001/actions/runs/38965847886"
+      "docs/STEP_22_ACCEPTANCE.md",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/38966422700"
     ],
-    "last_commit_sha": "76f63848db3a4424b1917ad74d7b9aabf92ee696"
+    "last_commit_sha": "76270f9b9be8a5619f298a896ff52a4341933b15",
+    "deferred_release_acceptance": [
+      "ALERTS-REAL-WINDOWS-TDLIB",
+      "RUNTIME-DASHBOARD-REAL-LIVE",
+      "RECOVERY-REAL-POWER-NETWORK",
+      "DELIVERY-OFFICIAL-TDLIB-REAL",
+      "AUTH-REAL-ACCOUNT",
+      "TDLIB-NATIVE-BINARY"
+    ]
   },
   {
     "step": "23",

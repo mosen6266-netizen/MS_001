@@ -218,3 +218,12 @@
 - 初始前端 SSR 预览空态在 CI 发现文案预期错误，修复后重新运行全量 CI 通过。主源码提交 [`4b1580b1`](https://github.com/mosen6266-netizen/MS_001/commit/4b1580b1e534846b3f17cd491dceda3460c05412)，测试预览修正 [`e330b85f`](https://github.com/mosen6266-netizen/MS_001/commit/e330b85f3f8ea4eb3fccb5329e695be9046f7e27)；交付与限制见 `docs/STEP_21_RUNTIME_DASHBOARD.md`、`docs/STEP_21_TEST_MATRIX.md`、`docs/STEP_21_ACCEPTANCE.md`。
 - **DEFERRED**：真实 TDLib 发送/官方回执数据源、Windows10/11实机交互与真实50群高频更新、72小时长稳测试。当前数据为离线模拟记录，并非真实 Telegram 运行证明。MS002、现有卡密后台无更改。
 - 开发进度 **21/32（65.625%），剩余11步**；下一步 **22：Windows提醒与紧急停止**。
+
+## Step22 — Windows异常提醒、托盘与全局紧急停止（2026-10-16）
+- **开发阶段 done_dev**：`src/Desktop/Notifications/` 实现脱敏告警历史、时间窗口内同键去重（带发生次数、最多500条）、原子本地历史JSON保存；不记录 Telegram 消息文本、手机号、登录凭据或原始异常堆栈。
+- 原生 Windows WPF 顶部增加紧急停止与历史查看；系统托盘可打开主窗体、查看异常历史、停止及退出；严重异常复用一个始终置顶的独立提醒窗口，主窗体最小化仍能看到，托盘气泡20秒批量节流避免多错误刷屏。**确认按钮在左（绿）、取消在右（红）**。关闭程序销毁托盘、窗口与计时器，不留后台继续执行。
+- **安全停止顺序**：立即关闭本地出站许可 → 原子记录 `emergency-stop.latch` → 50个模拟任务经SQLite单事务停止（含重启识别闩锁）；磁盘失败明确显示并保持当前进程许可封锁，禁止将部分失败误认作全面成功。当前无正式 TDLib 消息发送入口，不宣称已控制真实官方发送。
+- 自动化：跨平台 `tests/Notifications/Program.cs` Windows/Linux **各38项断言通过**，并检查200并发错误合并、1000错误容量、持久历史、50群停止、重复触发与磁盘失败。Windows完整 WPF x64 实际构建及发布通过。完整 [CI 38966422700](https://github.com/mosen6266-netizen/MS_001/actions/runs/38966422700) **39/39 SUCCESS**，原有安全、恢复、运行中心、预检、剧本和SQLite 回归未受影响。
+- 开发期间首次测试C#变量声明错误，随后WPF/WinForms类型重名，均修复并重新全量CI验证。源码主要提交 [`28fefa70`](https://github.com/mosen6266-netizen/MS_001/commit/28fefa70516e80c4dd75d3d0de8d55feb45ba3c3)，最终构建修复 [`76270f9b`](https://github.com/mosen6266-netizen/MS_001/commit/76270f9b9be8a5619f298a896ff52a4341933b15)；详细见 `docs/STEP_22_NOTIFICATIONS.md`、`docs/STEP_22_TEST_MATRIX.md`、`docs/STEP_22_ACCEPTANCE.md`。
+- **DEFERRED**：真实Win10/11托盘/休眠/锁屏置顶表现、TDLib官方发送前统一停止闩锁核对、正式账号与群交互、50群压力和72小时运行。Signal MS002、Cloudflare生产授权后台未修改。
+- **进度22/32（68.75%），剩余10步，下一步23：历史、审计与安全导出**。
