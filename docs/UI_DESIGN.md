@@ -48,3 +48,6 @@
 
 ## 用户图标接入
 顶部品牌图标读取 `assets/branding/icon.svg`（基于用户上传原图的 SVG 转换），不随设置页局部切换而重建。展示用白色衬底使 SVG 的透明纸飞机形状显示为白色；正式发布前仍必须完成第三方客户端商标合规审查，不能暗示是 Telegram 官方软件。
+
+## 第06步实际自动化验收
+[GitHub Actions 38926182509](https://github.com/mosen6266-netizen/MS_001/actions/runs/38926182509) 7项job全部成功；15项UI单测、16项CSS规范、Windows/Linux各10项几何及27项数据库回归通过；桌面1440和窄窗口700的真实Chromium截图 artifact 12057250812。初次截图Linux缺失CJK字体已修复并复查；真实Windows视觉/DPI、复杂交互及品牌最终合法使用待统一验收，见 [第06步验收记录](STEP_06_ACCEPTANCE.md)。

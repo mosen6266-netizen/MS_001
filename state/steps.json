@@ -97,9 +97,22 @@
     "step": "06",
     "title": "深色 UI 设计系统",
     "phase": 2,
-    "status": "in_progress",
-    "acceptance_evidence": [],
-    "last_commit_sha": null
+    "status": "done_dev",
+    "acceptance_evidence": [
+      "docs/STEP_06_ACCEPTANCE.md",
+      "docs/UI_DESIGN.md",
+      "src/web/design/tokens.css",
+      "src/web/design/primitives.css",
+      "apps/ui/src/components/DesignSystem.tsx",
+      "apps/ui/src/design.test.tsx",
+      "tests/UI/Visual/check-design.mjs",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/38926182509"
+    ],
+    "last_commit_sha": "645f26b9a7aaefff3e2a15fd470900b2cb78b8f1",
+    "deferred_release_acceptance": [
+      "DESIGN-INTERACTION",
+      "SHELL-UX"
+    ]
   },
   {
     "step": "07",

@@ -83,3 +83,10 @@
 - Windows 主窗体实现启动暗色遮罩、离线资源可信域名导航保护、首次初始化单次执行、关闭WebView2清理与窗口几何原子保存；损坏窗口配置自动纠正。
 - [CI 38924326676](https://github.com/mosen6266-netizen/MS_001/actions/runs/38924326676) **SUCCESS**；前端8项测试通过，几何Windows/Linux各10项，原数据库回归及Windows编译通过。对“无视觉闪烁”的结论只限设计与SSR，真机视觉测试留到用户统一验收。
 - **状态 done_dev，下一步06待开始，开发进度 5/32 = 15.625%，剩余27步**；真实运行、DPI与多屏切换仍DEFERRED。
+
+## Step06 — 深色 UI 设计系统（2026-10-16）
+- 已交付可复用的 dark CSS tokens、Button/Field/Select/Status/Dialog/Toast 组件；标准按钮左绿确认/右红取消，Esc/Tab焦点控制，提示单一展示槽；设置页提供离线交互演示。
+- 用户提供的图标 SVG 已接入软件导航区；品牌发布合规仍待正式审核。
+- Chromium 截图测试第一次发现 Linux 缺中文字体出现方框，补齐 Noto CJK 字体重新生成宽1440/窄700截图，人工复查中文已正确显示；只是初始工作台，后续需完整浏览器/UI交互测试。
+- [CI 38926182509](https://github.com/mosen6266-netizen/MS_001/actions/runs/38926182509) 7个作业**SUCCESS**；UI15项、静态设计16项、Windows/Linux各10项几何及27项数据库测试、Windows x64云端编译均通过。
+- 结论：`done_dev`，真机 WebView2/DPI/模态键盘交互与正式发布审查 `DEFERRED`；下一步 **07**，开发进度 **6/32（18.75%），剩余26步**。详见 `docs/STEP_06_ACCEPTANCE.md`。

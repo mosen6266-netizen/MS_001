@@ -5,8 +5,8 @@
   "default_branch": "main",
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
-  "current_step": "06",
-  "current_step_status": "in_progress",
+  "current_step": "07",
+  "current_step_status": "not_started",
   "phase": 2,
   "total_steps": 32,
   "completed_steps": [
@@ -14,7 +14,8 @@
     "02",
     "03",
     "04",
-    "05"
+    "05",
+    "06"
   ],
   "development_started": true,
   "functional_code_started": true,
@@ -23,13 +24,13 @@
   "icon_source_received": true,
   "icon_asset_upload_verified": true,
   "exact_timing_contract": "wait preSendDelayMs -> typing typingDurationMs -> send; 30s+5s=35s; no overlap",
-  "last_verified_commit_sha": "9249f6b01a8b443c448f1211fa7fb61ca32de392",
+  "last_verified_commit_sha": "645f26b9a7aaefff3e2a15fd470900b2cb78b8f1",
   "last_updated": "2026-10-16",
   "blocking_issues": [
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step06 in progress: implement reusable dark design tokens, semantic controls, confirmation modal left/green/right/red, non-stacking notifications, high DPI layout and CI checks.",
+  "notes": "Step06 CSS设计令牌、React通用控件/左绿确认右红取消/Toast单例、离线预览页、用户图标接入已通过CI；UI 15单测+16静态检查+Windows/Linux回归、Chromium中文截图审查。WebView2真实视觉交互和品牌使用检查DEFERRED。开发进度6/32。",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
@@ -76,6 +77,11 @@
       "id": "SHELL-UX",
       "status": "DEFERRED",
       "detail": "Windows10/11真实GUI页面切换闪屏、滚轮/DPI、多屏/窗口状态/关闭后进程资源测试"
+    },
+    {
+      "id": "DESIGN-INTERACTION",
+      "status": "DEFERRED",
+      "detail": "Win10/11 WebView2中弹窗Tab/ESC、下拉滚轮、提示/页面闪屏及DPI 100/125/150/200%最终验收"
     }
   ],
   "step03_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38921641970",
@@ -85,5 +91,9 @@
   "step04_checks_per_os": 27,
   "step05_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38924326676",
   "step05_ui_test_count": 8,
-  "step05_window_geometry_tests_per_os": 10
+  "step05_window_geometry_tests_per_os": 10,
+  "step06_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38926182509",
+  "step06_ui_test_count": 15,
+  "step06_css_checks": 16,
+  "step06_visual_artifact_id": 12057250812
 }
