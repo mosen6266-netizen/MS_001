@@ -5,8 +5,11 @@ using Microsoft.Data.Sqlite;
 namespace Mosen.GroupScheduler.Persistence;
 
 /// <summary>Local account metadata only; no phone numbers, auth tokens or TDLib databases.</summary>
-public sealed record AccountEntry(Guid Id,string Alias,string GroupTag,string DisplayName,
-    long Revision,string? VerifiedUserId,bool Removed);
+public sealed record AccountEntry(string Id,string Alias,string GroupTag,string DisplayName,
+    long Revision,string? VerifiedUserId,bool Removed)
+{
+    public bool CanAttachSession => Guid.TryParseExact(Id,"D",out var id) && id!=Guid.Empty;
+}
 public sealed record AccountPage(IReadOnlyList<AccountEntry> Items,int Total,int Page,int PageSize);
 public sealed class AccountVersionConflict : Exception
 {
@@ -61,7 +64,7 @@ public sealed class AccountRegistry
         insert.Parameters.AddWithValue("$now",now);
         insert.ExecuteNonQuery();
         tx.Commit();
-        return new(id,alias.Trim(),groupTag.Trim(),"",1,null,false);
+        return new(id.ToString("D"),alias.Trim(),groupTag.Trim(),"",1,null,false);
     }
     public AccountEntry? Get(Guid id,bool includeRemoved=false)
     {
@@ -175,9 +178,7 @@ public sealed class AccountRegistry
     }
     private static AccountEntry Map(SqliteDataReader r)
     {
-        if(!Guid.TryParse(r.GetString(0),out var id))
-            throw new InvalidDataException("Legacy account slot has non-GUID ID; migrate explicitly before attaching secrets.");
-        return new(id,r.GetString(1),r.GetString(2),r.GetString(3),r.GetInt64(4),
+        return new(r.GetString(0),r.GetString(1),r.GetString(2),r.GetString(3),r.GetInt64(4),
             r.IsDBNull(5)?null:r.GetString(5),!r.IsDBNull(6));
     }
 }
