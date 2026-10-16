@@ -5,8 +5,8 @@
   "default_branch": "main",
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
-  "current_step": "26",
-  "current_step_status": "in_progress",
+  "current_step": "27",
+  "current_step_status": "not_started",
   "phase": 5,
   "total_steps": 32,
   "completed_steps": [
@@ -34,7 +34,8 @@
     "22",
     "23",
     "24",
-    "25"
+    "25",
+    "26"
   ],
   "development_started": true,
   "functional_code_started": true,
@@ -43,13 +44,13 @@
   "icon_source_received": true,
   "icon_asset_upload_verified": true,
   "exact_timing_contract": "wait preSendDelayMs -> typing typingDurationMs -> send; 30s+5s=35s; no overlap",
-  "last_verified_commit_sha": "2f72fd45a07fdcbf915472072f7af2b45604b0f3",
+  "last_verified_commit_sha": "c875ff3ca997a43389dc13bded5868334c3a2a3e",
   "last_updated": "2026-10-17",
   "blocking_issues": [
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step26 IN_PROGRESS. Telegram-only admin MFA short-lived session, TOTP and one-time recovery codes, CSRF/origin checks, D1 rate limits/security audit, P256 two-key publisher pinning, staged HMAC pepper rotation and offline monotonic time guard. First CI exposed old Worker main router still permitting static admin bearer; corrected in dab8ef2 before next CI 38976515140. Do not advance 25/32 until complete 47 CI jobs successful. No Cloudflare D1/Worker deployed; Signal MS002 production untouched.",
+  "notes": "Step26 done_dev: Telegram-only Worker admin short-lived sessions (15m) with master token+TOTP 30s/6-digit or consumed one-time recovery code, independent CSRF, origin check, D1 atomic IP-HMAC fixed-window rate limits, security audit and session generation revocation. P-256 publisher dual pin-key rotation, optional prior HMAC pepper with new cards issued only by current key, and signed 1h offline protection using monotonic Stopwatch and high-water wall clock. Node24 isolated D1-compatible real SQLite tests 10/10 per OS, .NET P256 checks 54/54 per OS; GitHub CI 38976961308 completed success 47/47 including win-x64 WPF publish and all earlier regressions. No Cloudflare live production/staging deployment or UI/Tdlib real send. Progress 26/32=81.25%, 6 steps left, next step27 Windows installer.",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
@@ -201,6 +202,16 @@
       "id": "LICENSE-WPF-REAL-GATE",
       "status": "DEFERRED",
       "detail": "Signed .NET gate and HTTPS client library compile/tests pass but have not been wired to WPF startup/real TDLib send. Final Windows build must embed publisher-controlled public key and trusted HTTPS endpoint and require valid license on every real send, with revocation and backup recovery."
+    },
+    {
+      "id": "LICENSE-STEP26-CLOUDFLARE-PRODUCTION",
+      "status": "DEFERRED",
+      "detail": "Step26 MFA, TOTP, recovery, CSRF and D1 rate limits passed local Node24/SQLite tests but NOT live Cloudflare D1/Worker staging or public HTTPS. Need isolated real Telegram Worker/D1 with secrets, WAF and migration, real signed pubkey deployment, TOTP recovery runbook, fail-closed sender integration. Signal MS002 unchanged."
+    },
+    {
+      "id": "LICENSE-STEP26-MANUAL-KEY-ROTATION",
+      "status": "DEFERRED",
+      "detail": "Step26 staged previous-pepper lookup and two pinned public keys implemented/tests green; no actual Cloudflare secret rotation or production device upgrade test performed. Must verify 2-key client deployed before signing switch, real revoke and 1h leases on Windows."
     }
   ],
   "step03_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38921641970",
@@ -283,6 +294,9 @@
   "step25_total_ci_jobs": 47,
   "step25_client_checks_per_os": 39,
   "step25_worker_scenarios_per_os": 4,
-  "step26_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38976515140",
-  "step26_source_commit": "dab8ef2a55fa0b8fd5f3e94ac3a547f374d0a965"
+  "step26_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38976961308",
+  "step26_source_commit": "c875ff3ca997a43389dc13bded5868334c3a2a3e",
+  "step26_total_ci_jobs": 47,
+  "step26_worker_scenarios_per_os": 10,
+  "step26_client_checks_per_os": 54
 }

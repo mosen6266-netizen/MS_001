@@ -258,3 +258,14 @@
 - 源码初版 [`f394b334`](https://github.com/mosen6266-netizen/MS_001/commit/f394b334054881b171abb2c54c872b28c0b01c06)；最终续费修正 [`2f72fd45`](https://github.com/mosen6266-netizen/MS_001/commit/2f72fd45a07fdcbf915472072f7af2b45604b0f3)；文档见 `docs/STEP_25_LICENSING.md`、`docs/STEP_25_TEST_MATRIX.md`、`docs/STEP_25_ACCEPTANCE.md`。
 - **DEFERRED**：独立Cloudflare staging真实创建和部署、Signing Secrets与公钥绑定、WPF卡密激活界面、管理员TOTP/恢复/CSRF/限流、正式TDLib发送前许可核验与Win10/11真人交互，这些在第26步及正式集成/最终验收继续。没有更改Signal MS002。
 - **开发进度25/32（78.125%），剩余7步；下一步26 云端授权安全性与离线策略。**
+
+## Step26 — 独立Telegram授权安全与离线策略（2026-10-17）
+
+- **开发阶段 done_dev**：管理员发行、续费、禁用不再接受长期管理员密钥直接调用；`/v1/admin/session` 必须提供独立主密钥和6位TOTP（30秒步长、相邻时间容错、D1记录已用步长阻止重放）或单次消耗的恢复码。短期随机256位会话与CSRF令牌只以SHA-256摘要存储，15分钟失效；请求Origin校验、强制CSRF、单会话登出和管理员代际全撤销。
+- **账号保护**：D1按照可信CF-Connecting-IP的HMAC摘要进行固定窗口频率限制：管理员登录5分钟8次、管理操作每分钟90次、许可证校验每分钟120次；安全审计只保留固定操作类别、时间、成功状态，不保留TOTP、主密钥、明文恢复码或原始IP。恢复码一批8条，仅首次显示，旧批次作废。
+- **秘密轮换**：签名响应带 `keyId`；.NET 客户端最多只接受开发者已固定的两个P-256签名SPKI公钥，可为发行服务安排双公钥过渡。HMAC卡密旧密钥可以通过独立 `LICENSE_PEPPER_PREVIOUS` 临时兼容，新的卡密总是新密钥签发；操作步骤写入 `docs/SECURITY.md` 与 `docs/DEPLOYMENT.md`。
+- **离线宽限**：签名许可最多1小时且仅本进程内可使用；新增 `Stopwatch` 单调时间与墙钟最高值约束，防本机时间回拨试图延长许可。收到伪造、无效签名、错误产品或服务端拒绝时，本进程清除旧缓存许可。
+- **完整回归验证**：Node24真实内存SQLite+D1兼容适配器 Windows/Linux **各10/10场景通过**，含TOTP重放、恢复码重复、CSRF、旧主密钥绕过、15分钟会话、Origin、D1限流、签名/HMAC轮换与Signal产品隔离；.NET客户端 Windows/Linux **各54/54断言通过**，含发布方双公钥与反回拨。 [GitHub CI 38976961308](https://github.com/mosen6266-netizen/MS_001/actions/runs/38976961308) **47/47 SUCCESS**，所有原有43项调度、回执、恢复、历史、性能、安全与Windows WPF发布无回归。
+- 先前CI先后暴露管理路由仍含旧版Bearer直通、Node测试只初始化v1表、无参数D1调用不兼容测试适配器，均修复。最终业务提交 [`c875ff3c`](https://github.com/mosen6266-netizen/MS_001/commit/c875ff3ca997a43389dc13bded5868334c3a2a3e) 通过完整CI。
+- **DEFERRED**：实际Cloudflare专用staging/正式Worker+D1未创建或部署；公网真实TOTP登录、密钥轮换、WAF、防暴力登录规则、Win10/11激活UI、独立公钥发布与真实TDLib发送前全局许可证校验尚待真实联调。**没有修改Signal MS002生产Worker、D1或卡密。**
+- **开发进度26/32（81.25%），剩余6步；下一步27 Windows完整安装包与用户数据独立。**
