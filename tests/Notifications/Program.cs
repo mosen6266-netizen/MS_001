@@ -67,7 +67,7 @@ try
 
     var db=new AppDatabase(Path.Combine(root,"app.db"));db.Initialize();
     var store=new SchedulerCheckpointStore(db);
-    var account=Guid.NewGuid(),script=Guid.NewGuid().ToString("D");
+    var account=Guid.NewGuid();var script=Guid.NewGuid().ToString("D");
     var jobs=Enumerable.Range(1,50).Select(i=>new SchedulerJob(
         Guid.NewGuid().ToString("D"),"-100"+(10000+i),null,script,1,new string('a',64),
         new List<PlannedStep>{new(Guid.NewGuid().ToString("D"),account,30000,5000,10000)},
