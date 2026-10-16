@@ -6,7 +6,7 @@
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
   "current_step": "13",
-  "current_step_status": "not_started",
+  "current_step_status": "in_progress",
   "phase": 4,
   "total_steps": 32,
   "completed_steps": [
@@ -36,7 +36,7 @@
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step12 SQLite v4可信群/话题/成员权限缓存与只读中文列表、chatId/group bindings稳定、默认拒绝/慢速模式/TTL预检查、官方chatMember本人ID校验通过GitHub CI 38942859853全部19个job；Windows/Linux各47 mock断言、前端32/32；真实TDLib原生DLL、账号及群组自动同步/真实权限刷新DEFERRED。开发12/32=37.5%。",
+  "notes": "Step13 visual script editor implementation underway: draft SQLite v5, role-only identity, reorder/multiselect/copy/undo redo, host IPC and CI tests. No real Telegram send.",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",

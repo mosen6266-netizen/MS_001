@@ -261,7 +261,7 @@
     "step": "13",
     "title": "可视化剧本编辑器",
     "phase": 4,
-    "status": "not_started",
+    "status": "in_progress",
     "acceptance_evidence": [],
     "last_commit_sha": null
   },
