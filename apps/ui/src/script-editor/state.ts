@@ -26,12 +26,12 @@ const validTiming=(values:TimingProfile)=>
   Number.isInteger(values.postSendDelayMs)&&values.postSendDelayMs>=0&&values.postSendDelayMs<=3600000&&values.postSendDelayMs%1000===0;
 export const normalizedLabel=(v:string)=>v.trim().normalize("NFC");
 export const newEditorState=(doc:ScriptDoc):EditorState=>({past:[],present:doc,future:[],selected:[]});
-const snapshot=(x:ScriptDoc):ScriptDoc=>({title:x.title,roles:[...x.roles],steps:[...x.steps]});
+const snapshot=(x:ScriptDoc):ScriptDoc=>({title:x.title,roles:[...x.roles],steps:[...x.steps],defaults:x.defaults?{...x.defaults}:x.defaults});
 const push=(old:EditorState,updated:ScriptDoc,selected=old.selected):EditorState=>{
   // All reducer actions use immutable copy-on-write; compare only root/collection references.
   // Serializing a 1000-message draft on each keystroke causes noticeable input lag.
   if(updated.title===old.present.title&&updated.roles===old.present.roles&&
-     updated.steps===old.present.steps)return old;
+     updated.steps===old.present.steps&&updated.defaults===old.present.defaults)return old;
   return {past:[...old.past.slice(-79),snapshot(old.present)],present:updated,future:[],selected};
 };
 export function editorReducer(state:EditorState,action:EditorAction):EditorState {
