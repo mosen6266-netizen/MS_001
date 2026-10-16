@@ -6,7 +6,7 @@
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
   "current_step": "10",
-  "current_step_status": "not_started",
+  "current_step_status": "in_progress",
   "phase": 3,
   "total_steps": 32,
   "completed_steps": [
@@ -33,7 +33,7 @@
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step09官方TDLib JSON PInvoke+进程单接收pump+双重关联请求/回执+顺序有界更新/背压+Close生命周期源码通过Mock CI Windows/Linux各118断言，全工作流13 job PASS；官方1.8.67源commit已锁定，但原生DLL尚未构建、下载、加载或联网，真正账号验证与DLL分发DEFERRED。开发进度9/32=28.125%。",
+  "notes": "Step10: typed TDLib authorization state machine, QR/phone/email/code/password paths, safe cancellation and preflight; fake transport+CI tests; no native or owned login.",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",

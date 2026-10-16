@@ -184,7 +184,7 @@
     "step": "10",
     "title": "登录与身份验证状态机",
     "phase": 3,
-    "status": "not_started",
+    "status": "in_progress",
     "acceptance_evidence": [],
     "last_commit_sha": null
   },
