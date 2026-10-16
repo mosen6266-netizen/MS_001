@@ -3,13 +3,15 @@ import assert from "node:assert/strict";
 import {DatabaseSync} from "node:sqlite";
 import {readFileSync} from "node:fs";
 import worker,{digestCard,PRODUCT} from "../src/worker.mjs";
+import {totp} from "../src/admin-security.mjs";
 
-const schema=readFileSync(new URL("../migrations/0001_license.sql",import.meta.url),"utf8");
+const schema=readFileSync(new URL("../migrations/0001_license.sql",import.meta.url),"utf8")+"\n"+readFileSync(new URL("../migrations/0002_admin_security.sql",import.meta.url),"utf8");
 
 class FakeD1 {
  constructor(){this.db=new DatabaseSync(":memory:");this.db.exec("PRAGMA foreign_keys=ON;"+schema);this.tail=Promise.resolve();}
  prepare(sql){const db=this.db;return {bind(...params){
   return {async first(){return db.prepare(sql).get(...params)??null;},
+   async all(){return {results:db.prepare(sql).all(...params)};},
    async run(){const r=db.prepare(sql).run(...params);return {success:true,meta:{changes:r.changes}};}};
  }};}
  async batch(actions){
@@ -40,9 +42,23 @@ async function createEnv(){
  return {LICENSE_DB:new FakeD1(),PRODUCT_ID:PRODUCT,ENVIRONMENT:"staging",
   LICENSE_PEPPER:"isolated-telegram-pepper-"+("a".repeat(50)),
   LICENSE_SIGNING_PKCS8:pkcs8,
-  ADMIN_TOKEN:"only-telegram-admin-token-"+("Z".repeat(48)),publicKey:pair.publicKey};
+  ADMIN_TOKEN:"only-telegram-admin-token-"+("Z".repeat(48)),
+  ADMIN_TOTP_SECRET:"JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP",publicKey:pair.publicKey};
 }
-async function call(env,path,body,admin=false){return json(await worker.fetch(req(path,body,admin?env.ADMIN_TOKEN:undefined),env));}
+async function call(env,path,body,admin=false){
+ if(!admin)return json(await worker.fetch(req(path,body),env));
+ if(!env._session||env._session.expiresMs<=Date.now()){
+  const code=await totp(env.ADMIN_TOTP_SECRET,Math.floor(Date.now()/30000));
+  const login=await json(await worker.fetch(req("/v1/admin/session",{totp:code},env.ADMIN_TOKEN),env));
+  assert.equal(login.status,200,"test administrator must log in with master token + TOTP");
+  env._session=login.data;
+ }
+ return json(await worker.fetch(new Request("https://license-telegram.test"+path,{
+  method:"POST",headers:{"content-type":"application/json",
+    "authorization":"Bearer "+env._session.token,
+    "x-csrf-token":env._session.csrfToken},
+  body:JSON.stringify(body)}),env));
+}
 const issues={durationDays:30,maxDevices:1};
 async function signed(lease,env){
  assert.equal(lease.status,200);
