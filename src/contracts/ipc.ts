@@ -84,7 +84,7 @@ export function makeAccountRequest(type:AccountAction,requestId:string,payload:R
 export function isAccountItem(v:unknown):v is AccountItem{
   if(!isRecord(v))return false;
   return typeof v.id==="string" && typeof v.alias==="string" && typeof v.groupTag==="string" &&
-    typeof v.displayName==="string" && Number.isSafeInteger(v.revision) && v.revision>0 &&
+    typeof v.displayName==="string" && Number.isSafeInteger(v.revision) && Number(v.revision)>0 &&
     (v.verifiedUserId===null||typeof v.verifiedUserId==="string") &&
     typeof v.removed==="boolean" && typeof v.canAttachSession==="boolean";
 }
