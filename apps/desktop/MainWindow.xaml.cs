@@ -110,14 +110,21 @@ public partial class MainWindow : Window
         }
     }
 
-    private void OnWebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs evt)
+    private async void OnWebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs evt)
     {
         if (_closing || !string.Equals(evt.Source, TrustedOrigin + "index.html", StringComparison.OrdinalIgnoreCase)) return;
         try
         {
-            var request = JsonSerializer.Deserialize<BridgeRequest>(evt.TryGetWebMessageAsString());
+            string jsonMessage = evt.TryGetWebMessageAsString();
+            if (jsonMessage.Length > 8192) return;
+            var request = JsonSerializer.Deserialize<BridgeRequest>(jsonMessage);
             if (request is null || request.Protocol != Protocol || string.IsNullOrEmpty(request.RequestId) ||
                 request.RequestId.Length > 64) return;
+            if (request.Type is "settings.get" or "settings.save")
+            {
+                await HandleSettingsRequestAsync(jsonMessage, request.RequestId, request.Type);
+                return;
+            }
             string type = request.Type switch { "system.ping" => "system.pong", "app.info" => "app.info.response", _ => "denied" };
             bool allowed = type != "denied";
             Browser.CoreWebView2.PostWebMessageAsJson(JsonSerializer.Serialize(new {
