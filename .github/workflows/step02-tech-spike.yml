@@ -30,3 +30,12 @@ jobs:
       - name: Declare test boundary
         shell: pwsh
         run: Write-Host "CI build only; no TDLib native DLL, no Telegram login, no Win10/11 desktop GUI runtime verification."
+      - name: Publish portable Windows x64 smoke probe
+        shell: pwsh
+        run: dotnet publish spikes/step02/wpf/Step02.WpfSmoke.csproj -c Release -r win-x64 --self-contained true -o artifacts/Step02.WpfSmoke
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MS001-Step02-Windows-x64-Smoke
+          path: artifacts/Step02.WpfSmoke/
+          retention-days: 7
+          if-no-files-found: error
