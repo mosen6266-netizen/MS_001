@@ -3,8 +3,14 @@
     "step": "01",
     "title": "范围、许可与需求冻结",
     "phase": 1,
-    "status": "in_progress",
-    "acceptance_evidence": [],
+    "status": "done",
+    "acceptance_evidence": [
+      "docs/REQUIREMENTS_MATRIX.md",
+      "docs/NON_GOALS.md",
+      "docs/STEP_01_ACCEPTANCE.md",
+      "docs/DECISIONS.md",
+      "docs/PROGRESS.md"
+    ],
     "last_commit_sha": null
   },
   {
