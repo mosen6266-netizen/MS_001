@@ -151,6 +151,12 @@ public partial class MainWindow : Window
                 await HandleAccountRequestAsync(jsonMessage, request.RequestId, request.Type);
                 return;
             }
+            if (operation is AllowedIpcOperation.GroupsList or AllowedIpcOperation.GroupsTopics
+                or AllowedIpcOperation.GroupsMembers)
+            {
+                await HandleGroupRequestAsync(jsonMessage,request.RequestId,request.Type);
+                return;
+            }
             if (operation == AllowedIpcOperation.DiagnosticsGet)
             {
                 SendSettingResponse(request.RequestId,"diagnostics.get.result",true,_safeTelemetry.Snapshot(_appHealth));

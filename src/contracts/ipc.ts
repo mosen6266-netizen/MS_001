@@ -6,7 +6,14 @@ export type AccountAction="accounts.list"|"accounts.create"|"accounts.edit"|"acc
 export type AccountItem={id:string;alias:string;groupTag:string;displayName:string;revision:number;verifiedUserId:string|null;removed:boolean;canAttachSession:boolean};
 export type AccountPage={items:AccountItem[];total:number;page:number;pageSize:number};
 export type AccountRequest={protocol:typeof IPC_PROTOCOL;requestId:string;type:AccountAction;payload:Record<string,unknown>};
-export type BridgeRequest = ReadRequest | SettingsSaveRequest | AccountRequest;
+export type GroupAction="groups.list"|"groups.topics"|"groups.members";
+export type GroupRecord={chatId:string;title:string;kind:"group"|"supergroup"|"channel";isForum:boolean;checkedUtc:string};
+export type TopicRecord={chatId:string;topicId:string;title:string;isClosed:boolean;isHidden:boolean;checkedUtc:string};
+export type MemberRecord={accountId:string;alias:string;status:string;canSendText:boolean;canSendPhotos:boolean;slowModeDelaySeconds:number;checkedUtc:string};
+export type GroupPage={items:GroupRecord[];total:number;page:number;pageSize:number};
+export type TopicPage={items:TopicRecord[];total:number;page:number;pageSize:number};
+export type GroupRequest={protocol:typeof IPC_PROTOCOL;requestId:string;type:GroupAction;payload:Record<string,unknown>};
+export type BridgeRequest = ReadRequest | SettingsSaveRequest | AccountRequest | GroupRequest;
 export type BridgeResponse = { protocol: typeof IPC_PROTOCOL; requestId:string; ok:boolean; type:string; payload:Record<string,unknown> };
 export type Density = "compact" | "comfortable";
 export type UserPreferences = {density:Density;searchDebounceMs:number;pageSize:10|20|50;desktopNotifications:boolean};
@@ -58,6 +65,20 @@ export function isBridgeRequest(v:unknown):v is BridgeRequest {
     if(type==="accounts.archive")return label("typedAlias",64);
     return true;
   }
+  if(v.type==="groups.list"||v.type==="groups.topics"||v.type==="groups.members"){
+    if(!isRecord(v.payload)||Object.keys(v).length!==4)return false;
+    const keys=v.type==="groups.list"?["query","page","pageSize"]:
+      v.type==="groups.topics"?["chatId","page","pageSize"]:["chatId"];
+    if(Object.keys(v.payload).sort().join(",")!==keys.sort().join(","))return false;
+    const p=v.payload;
+    if(v.type!=="groups.list" &&
+       (typeof p.chatId!=="string"||! /^-?[1-9][0-9]{0,18}$/.test(p.chatId)))return false;
+    if(v.type==="groups.members")return true;
+    if(v.type==="groups.list" &&
+      (typeof p.query!=="string"||p.query.length>128||/[\x00-\x1f\x7f]/.test(p.query)))return false;
+    return Number.isInteger(p.page)&&Number(p.page)>=1&&Number(p.page)<=1000000 &&
+      [10,20,50].includes(Number(p.pageSize));
+  }
   return (v.type==="system.ping"||v.type==="app.info"||v.type==="settings.get"||v.type==="diagnostics.get") && Object.keys(v).length===3;
 }
 export function isBridgeResponse(v:unknown):v is BridgeResponse {
@@ -93,4 +114,31 @@ export function isAccountPage(v:unknown):v is AccountPage{
   if(!isRecord(v)||!Array.isArray(v.items))return false;
   return Number.isSafeInteger(v.total)&&Number(v.total)>=0&&Number.isSafeInteger(v.page)&&
     Number(v.page)>=1&&[10,20,50].includes(Number(v.pageSize))&&v.items.length<=Number(v.pageSize)&&v.items.every(isAccountItem);
+}
+
+export function makeGroupRequest(type:GroupAction,requestId:string,payload:Record<string,unknown>):GroupRequest {
+  const req={protocol:IPC_PROTOCOL,requestId,type,payload};
+  if(!isBridgeRequest(req))throw new Error("Invalid group read request");
+  return req;
+}
+const finitePage=(v:unknown):v is {items:unknown[];total:number;page:number;pageSize:number} =>
+  isRecord(v)&&Array.isArray(v.items)&&Number.isSafeInteger(v.total)&&Number(v.total)>=0&&
+  Number.isSafeInteger(v.page)&&Number(v.page)>=1&&[10,20,50].includes(Number(v.pageSize))&&
+  v.items.length<=Number(v.pageSize);
+const safeId=(id:unknown)=>typeof id==="string"&&/^-?[1-9][0-9]{0,18}$/.test(id);
+export function isGroupPage(v:unknown):v is GroupPage {
+  return finitePage(v)&&v.items.every(x=>isRecord(x)&&safeId(x.chatId)&&
+    typeof x.title==="string"&&["group","supergroup","channel"].includes(String(x.kind))&&
+    typeof x.isForum==="boolean"&&typeof x.checkedUtc==="string");
+}
+export function isTopicPage(v:unknown):v is TopicPage {
+  return finitePage(v)&&v.items.every(x=>isRecord(x)&&safeId(x.chatId)&&safeId(x.topicId)&&
+    typeof x.title==="string"&&typeof x.isClosed==="boolean"&&typeof x.isHidden==="boolean"&&
+    typeof x.checkedUtc==="string");
+}
+export function isMemberList(v:unknown):v is MemberRecord[] {
+  return Array.isArray(v)&&v.length<=300&&v.every(x=>isRecord(x)&&typeof x.accountId==="string"&&
+    typeof x.alias==="string"&&typeof x.status==="string"&&typeof x.canSendText==="boolean"&&
+    typeof x.canSendPhotos==="boolean"&&Number.isSafeInteger(x.slowModeDelaySeconds)&&
+    typeof x.checkedUtc==="string");
 }
