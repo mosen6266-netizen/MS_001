@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "upstream": "https://github.com/tdlib/td",
+  "source_commit": "bc9c263e2bfee06aaab41e82db51a103376030bc",
+  "source_version": "1.8.67",
+  "source_commit_uri": "https://github.com/tdlib/td/commit/bc9c263e2bfee06aaab41e82db51a103376030bc",
+  "ffi_interface": "td_create_client_id / td_send / td_receive",
+  "ffi_library_basename": "tdjson",
+  "target": "win-x64",
+  "status": "source_commit_pinned_binary_not_built",
+  "binary_sha256": null,
+  "binary_size_bytes": null,
+  "allow_unknown_binary": false,
+  "license": "Boost Software License 1.0",
+  "notes": "Source commit verified from tdlib/td upstream; binary must be built from pinned source, scanned and SHA256 recorded before inclusion in the Windows installer. CI currently tests only fake transport."
+}
