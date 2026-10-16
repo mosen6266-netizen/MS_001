@@ -5,8 +5,8 @@
   "default_branch": "main",
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
-  "current_step": "11",
-  "current_step_status": "in_progress",
+  "current_step": "12",
+  "current_step_status": "not_started",
   "phase": 3,
   "total_steps": 32,
   "completed_steps": [
@@ -19,7 +19,8 @@
     "07",
     "08",
     "09",
-    "10"
+    "10",
+    "11"
   ],
   "development_started": true,
   "functional_code_started": true,
@@ -28,13 +29,13 @@
   "icon_source_received": true,
   "icon_asset_upload_verified": true,
   "exact_timing_contract": "wait preSendDelayMs -> typing typingDurationMs -> send; 30s+5s=35s; no overlap",
-  "last_verified_commit_sha": "d7808832093642c33d021ac6e82459277eab153d",
+  "last_verified_commit_sha": "7f9c511242ee565727021c7df3ed10373ead9acc",
   "last_updated": "2026-10-16",
   "blocking_issues": [
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step11 开发中：SQLite v3账号注册表、300条查询、目录隔离与Windows DPAPI per-account key vault、有限活跃会话池、重复账号ID拒绝、二次确认软删除；真实TDLib联网 deferred",
+  "notes": "Step11 SQLite v3账号注册表、300条元数据CRUD、按组备注搜索、verified identity唯一索引、双确认归档+恢复、每账号DPAPI加密密钥和独立目录、默认16活动连接槽与异常关闭NeedsReview、WPF白名单IPC及UI全部通过CI 38940132317（17个job，Windows/Linux各48断言，UI29）。原生TDLib/真实免重扫和压力测试DEFERRED。开发11/32=34.375%。",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
@@ -106,6 +107,11 @@
       "id": "AUTH-REAL-ACCOUNT",
       "status": "DEFERRED",
       "detail": "本人账号 TDLib原生DLL真实扫码/手机号/邮箱/两步密码/超时、关闭确认、重启会话恢复及Win10/11个人资料ACL/敏感数据保护"
+    },
+    {
+      "id": "SESSION-REAL-RECOVERY",
+      "status": "DEFERRED",
+      "detail": "真实官方TDLib账号授权后Windows重启/更新不重扫、跨用户ACL/DPAPI隔离、真实会话数据库及多账号开关/资源预算长稳测试；本阶段仅模拟"
     }
   ],
   "step03_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38921641970",
@@ -133,5 +139,8 @@
   "step09_native_source_sha": "bc9c263e2bfee06aaab41e82db51a103376030bc",
   "step10_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38935436769",
   "step10_auth_checks_per_os": 94,
-  "step10_ui_tests": 26
+  "step10_ui_tests": 26,
+  "step11_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38940132317",
+  "step11_session_tests_per_os": 48,
+  "step11_ui_tests": 29
 }

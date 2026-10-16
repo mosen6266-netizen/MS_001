@@ -210,9 +210,27 @@
     "step": "11",
     "title": "账号注册表及会话生命周期",
     "phase": 3,
-    "status": "in_progress",
-    "acceptance_evidence": [],
-    "last_commit_sha": null
+    "status": "done_dev",
+    "acceptance_evidence": [
+      "docs/STEP_11_ACCEPTANCE.md",
+      "docs/STEP_11_ACCOUNTS.md",
+      "docs/STEP_11_TEST_MATRIX.md",
+      "src/Infrastructure/Persistence/AccountRegistry.cs",
+      "src/Infrastructure/Persistence/Migrations/0003_accounts.sql",
+      "src/Core/Sessions/SessionVault.cs",
+      "src/Core/Sessions/SessionSupervisor.cs",
+      "tests/SessionLifecycle/Program.cs",
+      "apps/ui/src/components/AccountRegistryPanel.tsx",
+      "apps/desktop/MainWindow.Accounts.cs",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/38940132317"
+    ],
+    "last_commit_sha": "7f9c511242ee565727021c7df3ed10373ead9acc",
+    "deferred_release_acceptance": [
+      "SESSION-REAL-RECOVERY",
+      "TDLIB-NATIVE-BINARY",
+      "OWNED-ACCOUNT",
+      "SECRET-STORAGE"
+    ]
   },
   {
     "step": "12",

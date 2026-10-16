@@ -33,3 +33,6 @@
 3. 若关闭时native挂起必须限制等待时长并明确记录无法确认；不能将未知关闭结果标成成功。
 4. 旧版非GUID ID目前只读兼容；后续添加安全无损的标识迁移设计，不得在未完成FK协调前直接改变ID。
 5. 300条合成账户测试不代表300条真实Telegram会话的CPU/内存/网络容量。50群任务仍待后续步骤实现。
+
+## 开发自动化验收结论
+[CI 38940132317](https://github.com/mosen6266-netizen/MS_001/actions/runs/38940132317) 17 job全绿，Windows/Linux各48项SessionLifecycle断言，前端29项，CSS16项；Windows WPF打包和原历史测试均PASS。详细证据见 [STEP_11_ACCEPTANCE.md](STEP_11_ACCEPTANCE.md)。此验收不是Telegram真实授权/免重扫/300真实在线账号的证明。

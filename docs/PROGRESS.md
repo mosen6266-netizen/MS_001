@@ -118,3 +118,11 @@
 - [CI Run 38935436769](https://github.com/mosen6266-netizen/MS_001/actions/runs/38935436769) **15个job全部成功**，Windows+Linux各94项认证模拟测试，前端26项、设计16项及第01–09步Windows编译/回归全部通过。
 - 修复C#测试初始化语法错误，额外加入取消与全局关闭不会重复`close`的保护并复测；真实 TDLib win-x64 DLL尚未构建与载入，用户账号/本机测试按约定DEFERRED。
 - 结论 **Step10 done_dev**；下一步 **11 — 账号注册表及会话生命周期**，开发进度 **10/32（31.25%）**，剩余22步。完整证据 `docs/STEP_10_ACCEPTANCE.md`。
+
+## Step11 — 账号注册表与会话生命周期（2026-10-16）
+- SQLite v3账号元数据注册表：300条容量、中文备注/分组CRUD、revision乐观冲突、verified user ID去重、归档及恢复；旧非GUID ID可只读显示但禁止拼接会话目录。
+- Windows CurrentUser DPAPI独立随机TDLib DB key、每账号分离目录/不覆盖历史key、可清零密钥租约；SessionSupervisor默认16个按需活动槽位，授权未确认不称Ready，关闭不确定要人工审查。
+- WebView2仅允许本地账号元数据 CRUD，账号管理页接入真实本地SQLite列表而非模拟账号，可搜索/分页、按备注二次确认归档和查看已归档恢复。无native TDLib账号登录/发消息功能。
+- [GitHub Actions 38940132317](https://github.com/mosen6266-netizen/MS_001/actions/runs/38940132317) **17/17 SUCCESS**；Windows/Linux各48项注册表/会话模拟断言，前端29项、设计16项，SQLite迁移、安全、WPF打包和原有CI全部通过。
+- 修复C# SQL多行字符串语法、TS类型收缩和Unicode控制字符验证、弹窗二次确认，并增补归档恢复后重跑完整CI。
+- 真实Win10/11、TDLib原生DLL、账号密钥完整生命周期/免重扫/72小时压测延至最终本机验收；**Step11 done_dev，下一步12，开发进度11/32（34.375%），剩余21步**。详见 `docs/STEP_11_ACCEPTANCE.md`。
