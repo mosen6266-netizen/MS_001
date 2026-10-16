@@ -14,7 +14,7 @@ void Reject<T>(Action action,string name)where T:Exception
 var baseDir=Path.Combine(Path.GetTempPath(),"ms001-delivery-"+Guid.NewGuid().ToString("N"));
 Directory.CreateDirectory(baseDir);
 var now=new DateTimeOffset(2026,10,16,22,0,0,TimeSpan.Zero);
-var account=Guid.NewGuid(), accountB=Guid.NewGuid();
+var account=Guid.NewGuid();var accountB=Guid.NewGuid();
 SchedulerJob Job(Guid id,string chat="-100001",string? topic=null)=>new(
     Guid.NewGuid().ToString("D"),chat,topic,Guid.NewGuid().ToString("D"),
     1,new string('a',64),new(){new(Guid.NewGuid().ToString("D"),id,30000,5000,12000)},
@@ -89,7 +89,7 @@ try
     Check(ledger.CountEvents(planned.AttemptId)==4,
         "duplicate and contradictory events never insert misleading audit entries");
 
-    var otherJob=Job(account),other=ledger.Register(otherJob,Permit(otherJob),now);
+    var otherJob=Job(account);var other=ledger.Register(otherJob,Permit(otherJob),now);
     ledger.BeforeSubmit(other.AttemptId,now);
     var collision=ledger.Confirm(Receipt(other,"701"),now.AddSeconds(1));
     Check(!collision.Changed&&collision.Code=="DUPLICATE_PLATFORM_MESSAGE",
@@ -102,7 +102,7 @@ try
     // Matching a permit to an unrelated synthetic job must reject.
     Check(alternateAccount.AccountId==accountB,"separate legitimate account can create its own attempt");
 
-    var reorderedJob=Job(accountB,"-100002"),reordered=ledger.Register(reorderedJob,Permit(reorderedJob),now);
+    var reorderedJob=Job(accountB,"-100002");var reordered=ledger.Register(reorderedJob,Permit(reorderedJob),now);
     ledger.BeforeSubmit(reordered.AttemptId,now);
     Check(ledger.Confirm(Receipt(reordered,"77"),now.AddSeconds(1)).Changed,
         "official confirmation arriving ahead of pending still resolves submitting intent");
@@ -124,7 +124,7 @@ try
     Check(ledger.Get(unknown.AttemptId)!.State==DeliveryStatus.Confirmed,
         "late official confirmation persists across new journal instances");
 
-    var failedJob=Job(account,"-100004"),failed=ledger.Register(failedJob,Permit(failedJob),now);
+    var failedJob=Job(account,"-100004");var failed=ledger.Register(failedJob,Permit(failedJob),now);
     ledger.BeforeSubmit(failed.AttemptId,now);
     var rejected=ledger.ReportFailure(failed.CorrelationId,FailureCategory.OfficialRateLimited,
         now.AddSeconds(1));
@@ -141,8 +141,8 @@ try
         now.AddSeconds(2)).Attempt.State==DeliveryStatus.Unknown,
         "transport loss never treated as safe to resend");
 
-    var plannedJob=Job(accountB,"-100006"),unstarted=ledger.Register(plannedJob,Permit(plannedJob),now);
-    var inFlightJob=Job(accountB,"-100007"),inFlight=ledger.Register(inFlightJob,Permit(inFlightJob),now);
+    var plannedJob=Job(accountB,"-100006");var unstarted=ledger.Register(plannedJob,Permit(plannedJob),now);
+    var inFlightJob=Job(accountB,"-100007");var inFlight=ledger.Register(inFlightJob,Permit(inFlightJob),now);
     ledger.BeforeSubmit(inFlight.AttemptId,now);
     ledger.MarkPending(inFlight.CorrelationId,now.AddSeconds(1));
     var recovered=new DeliveryJournal(db).LoadAndQuarantineInterrupted(now.AddHours(1));
