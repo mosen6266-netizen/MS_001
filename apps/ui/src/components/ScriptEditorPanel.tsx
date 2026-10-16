@@ -1,13 +1,15 @@
 import {forwardRef,useCallback,useEffect,useImperativeHandle,useReducer,useRef,useState} from "react";
 import {ActionButton,ConfirmDialog,StatusPill,TextField} from "./DesignSystem";
-import {isBridgeResponse,isAccountPage,isScriptSnapshot,isScriptSummaries,makeAccountRequest,makeScriptRequest,
- type ScriptAction,type ScriptSnapshot,type ScriptSummary,type AccountPage,type UserPreferences} from "../../../../src/contracts/ipc";
-import {editorReducer,newEditorState,normalizedLabel,keyboardAction,type ScriptDoc,type EditorState} from "../script-editor/state";
+import {isBridgeResponse,isAccountPage,isScriptSnapshot,isScriptSummaries,makeAccountRequest,makeScriptRequest,makeMediaRequest,
+ type ScriptAction,type MediaAction,type MediaReference,type TimingProfile,type ScriptSnapshot,type ScriptSummary,type AccountPage,type UserPreferences} from "../../../../src/contracts/ipc";
+import {editorReducer,newEditorState,normalizedLabel,keyboardAction,DEFAULT_STEP_TIMES,type ScriptDoc,type EditorState} from "../script-editor/state";
+import {TimingField} from "../script-editor/TimingField";
+import {MediaAttachment} from "../script-editor/MediaAttachment";
 
 type WorkspaceHandle={flush:()=>Promise<boolean>};
 function useLocalScriptHost(){
   const seq=useRef(0);
-  const request=useCallback((action:ScriptAction,payload:Record<string,unknown>):Promise<unknown>=>{
+  const request=useCallback((action:ScriptAction|MediaAction,payload:Record<string,unknown>):Promise<unknown>=>{
     const host=window.chrome?.webview;
     if(!host)return Promise.reject(new Error("离线浏览器预览不能保存到 Windows 本地数据库"));
     const id="script-"+(++seq.current);
@@ -21,7 +23,7 @@ function useLocalScriptHost(){
       };
       host.addEventListener("message",listener);
       const timer=setTimeout(()=>{if(finish())reject(new Error("写入超时：先确认是否已保存，不要重复创建剧本"));},10000);
-      try{host.postMessage(JSON.stringify(makeScriptRequest(action,id,payload)));}
+      try{host.postMessage(JSON.stringify(action.startsWith("media.")?makeMediaRequest(action as MediaAction,id,payload):makeScriptRequest(action as ScriptAction,id,payload)));}
       catch(e){if(finish())reject(e);}
     });
   },[]);
@@ -56,13 +58,16 @@ async function readAliases():Promise<string[]>{
 const pageSize=20;
 const ScriptWorkspace=forwardRef<WorkspaceHandle,{
   script:ScriptSnapshot;aliases:string[];save:(id:string,revision:number,doc:ScriptDoc)=>Promise<ScriptSnapshot>;
-}>(({script,aliases,save},ref)=>{
+  requestMedia:(action:MediaAction,payload:Record<string,unknown>)=>Promise<unknown>;
+}>(({script,aliases,save,requestMedia},ref)=>{
   const [editor,dispatch]=useReducer(editorReducer,script.document,newEditorState);
   const [actor,setActor]=useState("");
   const [roleFilter,setRoleFilter]=useState("");
   const [messageFilter,setMessageFilter]=useState("");
   const [page,setPage]=useState(1);
   const [saveInfo,setSaveInfo]=useState("草稿已加载");
+  const [batchTime,setBatchTime]=useState<TimingProfile>(script.document.defaults??DEFAULT_STEP_TIMES);
+  const [batchFields,setBatchFields]=useState({preSendDelayMs:true,typingDurationMs:true,postSendDelayMs:true});
   const stateRef=useRef<EditorState>(editor);
   const storedRef=useRef(JSON.stringify(script.document));
   const revRef=useRef(script.revision);
@@ -153,6 +158,37 @@ const ScriptWorkspace=forwardRef<WorkspaceHandle,{
       <ActionButton tone="success" disabled={!canAdd||editor.present.steps.length>=1000} onClick={add}>添加消息</ActionButton>
     </div>
     <p className="ui-preview-caption">角色只存备注与角色键，不保存本机账号ID。这里展示本机已登记备注，是否真正授权及所在群权限会在启动前重新检查。</p>
+    <section className="script-timing-panel" aria-label="剧本默认时间设置">
+      <h3>剧本默认时间（新消息采用，现有消息保持不变）</h3>
+      <div className="script-timing-grid">
+        <TimingField label="发送前等待" maxSeconds={3600}
+          value={(editor.present.defaults??DEFAULT_STEP_TIMES).preSendDelayMs}
+          onChange={ms=>dispatch({type:"defaults",values:{...(editor.present.defaults??DEFAULT_STEP_TIMES),preSendDelayMs:ms}})}/>
+        <TimingField label="正在输入" maxSeconds={60}
+          value={(editor.present.defaults??DEFAULT_STEP_TIMES).typingDurationMs}
+          onChange={ms=>dispatch({type:"defaults",values:{...(editor.present.defaults??DEFAULT_STEP_TIMES),typingDurationMs:ms}})}/>
+        <TimingField label="发送后等待" maxSeconds={3600}
+          value={(editor.present.defaults??DEFAULT_STEP_TIMES).postSendDelayMs}
+          onChange={ms=>dispatch({type:"defaults",values:{...(editor.present.defaults??DEFAULT_STEP_TIMES),postSendDelayMs:ms}})}/>
+      </div>
+      <p className="ui-preview-caption">顺序固定：发送前等待 → 正在输入 → 发送 → 发送后等待。30秒 + 5秒 = 35秒后才到达发送阶段。</p>
+    </section>
+    <section className="script-timing-panel" aria-label="批量更改已选择消息的时间">
+      <h3>批量修改选中消息的时间（{editor.selected.length} 条）</h3>
+      <div className="script-timing-grid">
+        {(["preSendDelayMs","typingDurationMs","postSendDelayMs"] as const).map((key,i)=>
+          <div key={key}>
+            <label className="script-time-enable"><input type="checkbox" checked={batchFields[key]}
+              onChange={e=>setBatchFields(v=>({...v,[key]:e.target.checked}))}/> 修改{["发送前等待","正在输入","发送后等待"][i]}</label>
+            <TimingField label={["发送前等待","正在输入","发送后等待"][i]} maxSeconds={key==="typingDurationMs"?60:3600}
+              value={batchTime[key]} onChange={ms=>setBatchTime(v=>({...v,[key]:ms}))}/>
+          </div>)}
+      </div>
+      <ActionButton disabled={!editor.selected.length||!Object.values(batchFields).some(Boolean)}
+        onClick={()=>dispatch({type:"batchTiming",values:Object.fromEntries(
+          (Object.keys(batchFields) as Array<keyof TimingProfile>).filter(k=>batchFields[k]).map(k=>[k,batchTime[k]])
+        )})}>应用到选中消息</ActionButton>
+    </section>
     <div className="script-actions">
       <TextField label="搜索消息内容" value={messageFilter} onChange={v=>{setMessageFilter(v);setPage(1);}} placeholder="支持中文、英文"/>
       <ActionButton onClick={()=>dispatch({type:"undo"})} disabled={!editor.past.length}>撤销</ActionButton>
@@ -191,6 +227,20 @@ const ScriptWorkspace=forwardRef<WorkspaceHandle,{
           <textarea id={"body-"+step.stepKey} rows={3} maxLength={8192} value={step.body}
             onChange={e=>dispatch({type:"body",stepKey:step.stepKey,body:e.target.value})}
             placeholder="输入文字、换行、emoji 或英文内容"/>
+          <div className="script-timing-grid script-per-message-time" aria-label="该消息独立时间设置">
+            <TimingField label="发送前等待" maxSeconds={3600} value={step.preSendDelayMs}
+              onChange={ms=>dispatch({type:"timing",stepKey:step.stepKey,values:{preSendDelayMs:ms}})}/>
+            <TimingField label="正在输入" maxSeconds={60} value={step.typingDurationMs}
+              onChange={ms=>dispatch({type:"timing",stepKey:step.stepKey,values:{typingDurationMs:ms}})}/>
+            <TimingField label="发送后等待" maxSeconds={3600} value={step.postSendDelayMs}
+              onChange={ms=>dispatch({type:"timing",stepKey:step.stepKey,values:{postSendDelayMs:ms}})}/>
+          </div>
+          <MediaAttachment reference={step.media} request={requestMedia}
+            onChange={(media:MediaReference|null)=>dispatch({type:"media",stepKey:step.stepKey,media})}/>
+          <div className="script-timing-summary">
+            <small>发送前等待 {step.preSendDelayMs/1000}s → 正在输入 {step.typingDurationMs/1000}s → 发送 → 发送后等待 {step.postSendDelayMs/1000}s</small>
+            <strong>预计第 {(step.preSendDelayMs+step.typingDurationMs)/1000} 秒进入发送阶段</strong>
+          </div>
           <div className="script-foot">
             <small>发送前等待 {step.preSendDelayMs/1000}s → 正在输入 {step.typingDurationMs/1000}s → 发送 → 发送后等待 {step.postSendDelayMs/1000}s</small>
             <small>{step.body.length} 字符</small>
@@ -203,7 +253,7 @@ const ScriptWorkspace=forwardRef<WorkspaceHandle,{
       <span className="ui-pagination-label">{page}/{pages} · {all.length} 条</span>
       <ActionButton disabled={page>=pages} onClick={()=>setPage(v=>v+1)}>下一页</ActionButton>
     </div>
-    <p className="ui-preview-caption">当前仅支持文字草稿编辑；三段时间批量编辑和图片素材将在第14步实现。拖拽仅改变草稿顺序，不会发送 Telegram 消息。</p>
+    <p className="ui-preview-caption">文字/图文/图片草稿可以编辑保存；实际 Telegram 发送、平台正在输入状态和账号权限检查将在后续阶段实现。</p>
     <span className="sr-only">{keys.length} 个本地逻辑角色</span>
   </div>;
 });
@@ -330,7 +380,7 @@ export function ScriptEditorPanel({preferences}:{preferences:UserPreferences}){
             <h2>剧本消息编辑</h2>
             <ActionButton disabled={busy} onClick={()=>void duplicate()}>复制整个剧本</ActionButton>
           </div>
-          <ScriptWorkspace key={script.scriptId} ref={workspaceRef} script={script} aliases={aliases} save={save}/>
+          <ScriptWorkspace key={script.scriptId} ref={workspaceRef} script={script} aliases={aliases} save={save} requestMedia={request}/>
         </>:<div className="ui-demo-box">
           <h2>创建或选择剧本</h2><p>在左侧新建剧本，然后从本机账号备注下拉选择发言角色、添加消息和调整顺序。</p>
           <p>浏览器预览不连接真实账号。剧本始终是草稿，发布与运行在后续步骤实现。</p>
