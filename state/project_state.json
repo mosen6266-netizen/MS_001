@@ -6,7 +6,7 @@
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
   "current_step": "12",
-  "current_step_status": "not_started",
+  "current_step_status": "in_progress",
   "phase": 3,
   "total_steps": 32,
   "completed_steps": [
@@ -35,7 +35,7 @@
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step11 SQLite v3账号注册表、300条元数据CRUD、按组备注搜索、verified identity唯一索引、双确认归档+恢复、每账号DPAPI加密密钥和独立目录、默认16活动连接槽与异常关闭NeedsReview、WPF白名单IPC及UI全部通过CI 38940132317（17个job，Windows/Linux各48断言，UI29）。原生TDLib/真实免重扫和压力测试DEFERRED。开发11/32=34.375%。",
+  "notes": "Step12 开发中：群/话题持久目录，官方TDLib只读事件同步，账号成员权限与慢速模式检查，消息发送前必须新鲜授权检查，模拟测试与云端CI。",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
