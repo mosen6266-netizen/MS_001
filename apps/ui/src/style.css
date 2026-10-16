@@ -1,3 +1,4 @@
+@import "./settings.css";
 @import "../../../src/web/design/tokens.css";
 @import "../../../src/web/design/primitives.css";
 :root{font-family:var(--font-body);font-size:var(--font-size-md);line-height:var(--line-body)}

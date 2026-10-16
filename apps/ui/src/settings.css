@@ -1,0 +1,11 @@
+.ui-toggle-row{display:flex;align-items:center;gap:12px;min-height:40px;color:var(--fg-muted);font-size:var(--font-size-sm)}
+.ui-toggle-row input{width:18px;height:18px;accent-color:var(--action-success)}
+.ui-list-summary{margin:16px 0 10px;color:var(--fg-muted);font-size:var(--font-size-sm)}
+.ui-bounded-list{margin:0 0 14px;padding:0;list-style:none;max-height:440px;overflow:auto;border:1px solid var(--stroke-subtle);border-radius:var(--radius-md)}
+.ui-bounded-list li{display:flex;gap:10px;align-items:center;justify-content:space-between;min-height:44px;padding:9px 13px;border-bottom:1px solid var(--stroke-subtle)}
+.ui-bounded-list li:last-child{border:0}
+.ui-bounded-list--compact li{min-height:34px;padding:5px 10px}
+.ui-bounded-list li small{color:var(--fg-subtle);font-size:var(--font-size-xs);text-align:right}
+.ui-bounded-list .ui-empty{justify-content:center;color:var(--fg-muted)}
+.ui-pagination-label{font-size:var(--font-size-sm);color:var(--fg-muted)}
+@media(max-width:700px){.ui-bounded-list li{align-items:flex-start;flex-direction:column;gap:2px}.ui-bounded-list li small{text-align:left}}
