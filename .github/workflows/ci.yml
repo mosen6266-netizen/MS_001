@@ -220,3 +220,17 @@ jobs:
           dotnet-version: "10.0.x"
       - name: Test trusted groups, topic closure, account permissions and title rename
         run: dotnet run --project tests/GroupCatalog/Mosen.GroupScheduler.GroupCatalog.Tests.csproj --configuration Release
+  script-editor:
+    name: Script draft and role editor persistence - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: Check role-only draft persistence, revision conflicts, reorder and archive
+        run: dotnet run --project tests/Scripts/Editor/Mosen.GroupScheduler.ScriptEditor.Tests.csproj --configuration Release
