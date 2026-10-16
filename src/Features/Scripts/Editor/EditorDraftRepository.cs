@@ -70,17 +70,20 @@ public sealed class EditorDraftRepository
     }
     public IReadOnlyList<DraftSummary> List(bool archived=false,string query="")
     {
-        if(query is null||query.Length>128||query.Any(char.IsControl))throw new ArgumentException("Invalid search.");
+        if(query is null||query.Length>128||query.Any(char.IsControl))
+            throw new ArgumentException("Invalid search.");
         using var c=Open();using var cmd=c.CreateCommand();
-        cmd.CommandText=@"SELECT script_id,revision,snapshot_json,archived_utc FROM editor_drafts
-                          WHERE archived_utc IS "+(archived?"NOT NULL":"NULL")+" ORDER BY updated_utc DESC,script_id LIMIT 300;";
-        using var r=cmd.ExecuteReader();var result=new List<DraftSummary>();
-        while(r.Read())
+        cmd.CommandText=@"SELECT d.script_id,d.revision,s.title,d.archived_utc,
+                                 COALESCE(json_array_length(json_extract(d.snapshot_json,'$.steps')),0)
+                          FROM editor_drafts d JOIN scripts s ON d.script_id=s.script_id
+                          WHERE d.archived_utc IS "+(archived?"NOT NULL":"NULL")+
+                         " ORDER BY d.updated_utc DESC,d.script_id LIMIT 300;";
+        using var rows=cmd.ExecuteReader();var result=new List<DraftSummary>();
+        while(rows.Read())
         {
-            using var data=JsonDocument.Parse(r.GetString(2));
-            var doc=EditorDocumentRules.Parse(data.RootElement);
-            if(query.Length>0&&!doc.Title.Contains(query,StringComparison.OrdinalIgnoreCase))continue;
-            result.Add(new(r.GetString(0),doc.Title,r.GetInt64(1),doc.Steps.Count,!r.IsDBNull(3)));
+            string title=rows.GetString(2);
+            if(query.Length>0&&!title.Contains(query,StringComparison.OrdinalIgnoreCase))continue;
+            result.Add(new(rows.GetString(0),title,rows.GetInt64(1),rows.GetInt32(4),!rows.IsDBNull(3)));
         }
         return result;
     }
