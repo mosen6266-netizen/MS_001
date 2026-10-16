@@ -237,3 +237,13 @@
 - 源码提交 [`b2a363a6`](https://github.com/mosen6266-netizen/MS_001/commit/b2a363a6086b33ba77dd27c36f277996667fd445)。设计、测试、验收见 `docs/STEP_23_HISTORY.md`、`docs/STEP_23_TEST_MATRIX.md`、`docs/STEP_23_ACCEPTANCE.md`。
 - **DEFERRED**：Win10/11实机历史/文件对话框、正式TDLib在线任务与官方回执、长时50群性能；目前是离线模拟持久数据。Signal MS002与Cloudflare生产资源未更改。
 - **开发进度23/32（71.875%），剩余9步；下一步24性能剖析与资源防泄漏。**
+
+## Step24 — 性能剖析与资源防泄漏（2026-10-16）
+- **开发阶段 done_dev**：`src/Core/ResourceBudget/` 实现当前进程CPU占用、Working Set、GC堆、线程、Windows句柄及显式定时器/缓存/诊断日志预算，资源超限采用两次连续越界才升级、三次正常样本恢复；通知合并并有30分钟重提醒窗口。未将任意原始错误或聊天文本加入遥测。
+- **自适应降级**：正常运行中心5秒只读刷新/异常扫描6秒，警戒级15/30秒，严重级30/60秒。紧急停止能力和权限门禁不受刷新降频影响；前端倒计时仍只有一个共享时钟，后台健康采样单个15秒WPF定时器。桌面严重资源占用时显示提醒而不阻塞发送安全控制。
+- **资源防泄漏**：WebView2新窗口、导航开始/结束和IPC事件均改为具名处理器，通过SubscriptionRegistry统一解除；托盘双击、DispatcherTimer Tick一并登记注销；关闭主窗口销毁计时器、托盘和浏览器。BoundedLruCache容量1—1024带锁淘汰与Clear；ResourceTrend每分钟一条最多480点，不积累无界样本。
+- 测试 `tests/Performance/Program.cs` Windows/Linux各 **227/227 PASS**：CPU/RAM/句柄/GC线程阈值、恶化/恢复、无效输入拒绝、20k项LRU与并发、100次订阅注销及迟到释放、诊断日志轮转，**28,800次一秒逻辑时间＝模拟8小时**。这不是实际Windows进程在真实时间内连续运行8小时的证据。
+- 首轮资源分类器C#多变量声明编译错误已修复；下一轮测试发现550,000与524,288字节阈值的构造预期问题，保留阈值并修正测试值。最终完整 [CI 38973014639](https://github.com/mosen6266-netizen/MS_001/actions/runs/38973014639) **43/43 SUCCESS**，含Windows WPF构建与win-x64发布、全部旧SQLite/历史/50群调度/回执/恢复等回归。
+- 代码主提交 [`10c493dc`](https://github.com/mosen6266-netizen/MS_001/commit/10c493dc0f8e413811d9a8c7a11a13bd606b140b)；最后测试修正 [`45085eb5`](https://github.com/mosen6266-netizen/MS_001/commit/45085eb524a70bce21e23bcb691a6b076a6ca4f8)。详细见 `docs/PERFORMANCE.md`、`docs/STEP_24_TEST_MATRIX.md` 和 `docs/STEP_24_ACCEPTANCE.md`。
+- **DEFERRED**：实际Win10/11八小时50群真实账号负载、真实TDLib，WebView2子进程内存和GPU句柄、72小时稳定性、杀软/休眠与唤醒实测；目前仅开发模拟。没有修改Signal MS002或现有生产授权系统。
+- **开发进度24/32（75%），剩余8步；下一步25独立卡密产品授权**，必须与Signal MS002生产卡密完全隔离。

@@ -545,7 +545,7 @@
     "step": "24",
     "title": "性能剖析与资源防泄漏",
     "phase": 6,
-    "status": "in_progress",
+    "status": "done_dev",
     "acceptance_evidence": [
       "src/Core/ResourceBudget/ResourceBudget.cs",
       "src/Core/ResourceBudget/ResourceTrend.cs",
@@ -554,11 +554,20 @@
       "apps/desktop/MainWindow.ResourceHealth.cs",
       "apps/desktop/MainWindow.xaml.cs",
       "apps/ui/src/components/RuntimeDashboardPanel.tsx",
+      "src/contracts/ipc.ts",
       "tests/Performance/Program.cs",
       "docs/PERFORMANCE.md",
-      "https://github.com/mosen6266-netizen/MS_001/actions/runs/38972790676"
+      "docs/STEP_24_TEST_MATRIX.md",
+      "docs/STEP_24_ACCEPTANCE.md",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/38973014639"
     ],
-    "last_commit_sha": "1b79762a306a3186d54d36ed0fdf5d7523a616f4"
+    "last_commit_sha": "45085eb524a70bce21e23bcb691a6b076a6ca4f8",
+    "deferred_release_acceptance": [
+      "PERFORMANCE-REAL-8H-WINDOWS",
+      "RUNTIME-DASHBOARD-REAL-LIVE",
+      "ALERTS-REAL-WINDOWS-TDLIB",
+      "TDLIB-NATIVE-BINARY"
+    ]
   },
   {
     "step": "25",

@@ -5,8 +5,8 @@
   "default_branch": "main",
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
-  "current_step": "24",
-  "current_step_status": "in_progress",
+  "current_step": "25",
+  "current_step_status": "not_started",
   "phase": 5,
   "total_steps": 32,
   "completed_steps": [
@@ -32,7 +32,8 @@
     "20",
     "21",
     "22",
-    "23"
+    "23",
+    "24"
   ],
   "development_started": true,
   "functional_code_started": true,
@@ -41,13 +42,13 @@
   "icon_source_received": true,
   "icon_asset_upload_verified": true,
   "exact_timing_contract": "wait preSendDelayMs -> typing typingDurationMs -> send; 30s+5s=35s; no overlap",
-  "last_verified_commit_sha": "b2a363a6086b33ba77dd27c36f277996667fd445",
+  "last_verified_commit_sha": "45085eb524a70bce21e23bcb691a6b076a6ca4f8",
   "last_updated": "2026-10-16",
   "blocking_issues": [
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step24 source committed: ResourceBudgetMonitor, process counters, hysteresis and adaptive readonly polls, 480-minute bounded trend, LRU cache and SubscriptionRegistry; WPF event handlers unsubscribed on close. tests/Performance advances 28800 logical seconds (8h simulation), NOT actual 8 hours. CI 38972790676 queued; previous first run C# inferred-variable declaration error fixed in commit 1b79762. Step24 remains IN_PROGRESS and progress stays 23/32 until all CI jobs successful. No TDLib live send.",
+  "notes": "Step24 done_dev: process CPU/WorkingSet/GC heap/threads/Windows handles and explicit timer/cache/log budgets. Two high samples degrade and three low restore; resource alerts dedup; adaptive WPF read-only dashboard 5/15/30s and notification scans 6/30/60s; critical stop controls remain immediate. LRU capacity <=1024; 480-minute ResourceTrend; unified WebView2 navigation/message and tray/Dispatcher event unsubscriptions and cleanup. 28800 synthetic 1s ticks model eight hours, NOT real 8h Windows long soak. Windows/Linux 227 assertions each; full CI 38973014639 completed success 43/43 including win-x64 WPF publish. Live Telegram TDLib/50-group real sustained test deferred. Progress 24/32=75%, 8 steps remain, next Step25 isolated licensing.",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
@@ -184,6 +185,11 @@
       "id": "HISTORY-REAL-PRODUCTION-AUDIT",
       "status": "DEFERRED",
       "detail": "Step23 shows local derived simulation history, not actual TDLib verified network events. On-device Windows10/11 history UI, 100k-row perceptual responsiveness, support ZIP dialogs, live sender auditing and source evidence integrity require later integration and final acceptance. Safe diagnostic log retention library is not yet wired to a desktop control."
+    },
+    {
+      "id": "PERFORMANCE-REAL-8H-WINDOWS",
+      "status": "DEFERRED",
+      "detail": "Step24 8h was 28,800 accelerated logical one-second model ticks, not real on-device 8-hour operation. Full Win10/11 50 real authorized group TDLib integration, WebView2 child process RAM/handles, long-run CPU curves, real antivirus/sleep/lock screen and 72-hour burn-in must be performed at final release."
     }
   ],
   "step03_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38921641970",
@@ -256,6 +262,9 @@
   "step23_history_checks_per_os": 48,
   "step23_total_ci_jobs": 41,
   "step23_benchmark_rows": 100000,
-  "step24_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38972790676",
-  "step24_source_commit": "1b79762a306a3186d54d36ed0fdf5d7523a616f4"
+  "step24_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38973014639",
+  "step24_source_commit": "45085eb524a70bce21e23bcb691a6b076a6ca4f8",
+  "step24_resource_checks_per_os": 227,
+  "step24_total_ci_jobs": 43,
+  "step24_simulated_seconds": 28800
 }
