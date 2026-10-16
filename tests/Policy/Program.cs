@@ -117,7 +117,8 @@ var uncertain=unknown.TryReserve(Job(first),Proof(first),now);
 Check(uncertain.Allowed,"unknown-outcome test obtains a single ticket");
 Check(unknown.Settle(uncertain.Permit!,false),"unknown delivery explicitly marked unresolved");
 Check(!unknown.Settle(uncertain.Permit!,true),"uncertain delivery cannot later be called definitely unsent");
-Check(unknown.TryReserve(Job(first,"-100009"),Proof(first,"-100009"),
+Check(unknown.TryReserve(Job(first,"-100009"),Proof(first,"-100009",
+    authTime:now.AddSeconds(200),permissionTime:now.AddSeconds(200)),
     now.AddSeconds(200)).Code=="OUTCOME_UNKNOWN",
     "account stays blocked after indeterminate delivery; no blind resend");
 
