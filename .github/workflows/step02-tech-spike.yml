@@ -1,0 +1,32 @@
+name: Step02 technical spike
+on:
+  push:
+    paths:
+      - "spikes/step02/**"
+      - ".github/workflows/step02-tech-spike.yml"
+  workflow_dispatch:
+jobs:
+  synthetic-capacity:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python spikes/step02/capacity_simulation.py
+      - run: python spikes/step02/capacity_simulation.py --accounts 3 --groups 2 --steps 1
+  wpf-build-only:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - run: dotnet build spikes/step02/wpf/Step02.WpfSmoke.csproj --configuration Release
+      - name: Declare test boundary
+        shell: pwsh
+        run: Write-Host "CI build only; no TDLib native DLL, no Telegram login, no Win10/11 desktop GUI runtime verification."
