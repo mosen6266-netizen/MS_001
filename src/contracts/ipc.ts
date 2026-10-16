@@ -87,7 +87,8 @@ export function isBridgeRequest(v:unknown):v is BridgeRequest {
           Object.keys(v).every(k=>k==="chatId"||k==="topicId")&&
           Object.keys(v).includes("chatId")&&safeId(v.chatId)&&
           (v.topicId===undefined||(safeId(v.topicId)&&Number(v.topicId)>0));
-        const validChoice=(v:unknown)=>validTarget(v)&&
+        const validChoice=(v:unknown)=>isRecord(v)&&safeId(v.chatId)&&
+          (v.topicId===undefined||(safeId(v.topicId)&&Number(v.topicId)>0))&&
           Object.keys(v).every(k=>["chatId","topicId","roleKey","accountId"].includes(k))&&
           typeof v.roleKey==="string"&&typeof v.accountId==="string"&&
           /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v.roleKey)&&
