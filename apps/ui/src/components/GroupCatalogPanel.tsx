@@ -43,7 +43,7 @@ export function GroupCatalogPanel({preferences}:{preferences:UserPreferences}){
       if(!live)return;
       if(!isGroupPage(v))throw new Error("不安全的群组目录响应");
       setGroups(v);setView("ready");
-      if(selected && !v.items.some(g=>g.chatId===selected)){setSelected(null);setTopics({...Empty});setMembers([]);}
+      if(selected && !v.items.some(g=>g.chatId===selected)){setSelected(null);setTopics({items:[],total:0,page:1,pageSize:preferences.pageSize});setMembers([]);}
     }).catch(()=>{if(live)setView("error");});
     return()=>{live=false;};
   },[debounce,page,preferences.pageSize,revision,request,selected]);
