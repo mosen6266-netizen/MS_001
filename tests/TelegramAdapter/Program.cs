@@ -109,7 +109,7 @@ await using(var strict=new TdlibDispatcher(strictFake,TimeSpan.FromMilliseconds(
     bool rejected=false;
     try{await strict.SendControlAsync(id,(TdlibControlCommand)999,TimeSpan.FromSeconds(1));}
     catch(ArgumentOutOfRangeException){rejected=true;}
-    Check(rejected && strictFake.Sent.Count==0 && strict.PendingRequestCount==0,
+    Check(rejected && strictFake.Sent.Length==0 && strict.PendingRequestCount==0,
         "unknown native command is rejected before any network send");
 }
 Console.WriteLine($"SUMMARY: {checks} TDLib adapter assertions passed, with fake transport only (no TDLib DLL, login or message send).");
