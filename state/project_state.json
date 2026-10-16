@@ -5,7 +5,7 @@
   "default_branch": "main",
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
-  "current_step": "15",
+  "current_step": "16",
   "current_step_status": "not_started",
   "phase": 4,
   "total_steps": 32,
@@ -23,7 +23,8 @@
     "11",
     "12",
     "13",
-    "14"
+    "14",
+    "15"
   ],
   "development_started": true,
   "functional_code_started": true,
@@ -32,13 +33,13 @@
   "icon_source_received": true,
   "icon_asset_upload_verified": true,
   "exact_timing_contract": "wait preSendDelayMs -> typing typingDurationMs -> send; 30s+5s=35s; no overlap",
-  "last_verified_commit_sha": "d6977ad8302d52975dd6ed7b8bedf31e3e2de0c1",
+  "last_verified_commit_sha": "6ba635d7e5285963f9000905305689d56d940c23",
   "last_updated": "2026-10-16",
   "blocking_issues": [
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step14 三段时间默认/单条/批量编辑、纯时间顺序预览、PNG/JPEG/WebP本地SHA256内容寻址媒体库、图片选择/拖入/替换/移除。CI38949689786全23Job通过，Timing+Media Win/Linux各20、Editor各29、UI45、安全Win42/Linux40。实际Telegram发送与Windows实机DEFERRED，下一步15含角色和媒体ZIP移植。完成14/32=43.75%。",
+  "notes": "Step15 .mosentgscript ZIP 实现角色UUID与备注、三段毫秒时间、图片内容哈希与跨设备移植，导入原生Windows文件选择器，不包含账号会话/个人令牌；NFC精确匹配，重复备注不随机选人，缺少角色反馈给用户。CI 38954528584 的 25/25 Job 全绿，Portable Win/Linux 各18检查、UI45、WPF Win64发布成功。Windows真实文件选择器、TDLib账号与群启动预检依用户要求推迟。已完成15/32=46.875%。",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
@@ -130,6 +131,11 @@
       "id": "MEDIA-WINDOWS-REAL-INTERACTION",
       "status": "DEFERRED",
       "detail": "Windows10/11实机PNG/JPEG/WebP拖入/预览/替换、DPI与大图资源、实际TDLib typing/upload/发送回执及多阶段等待，后续真实集成与最终用户验收"
+    },
+    {
+      "id": "PORTABLE-WINDOWS-REAL-INTERACTION",
+      "status": "DEFERRED",
+      "detail": "Windows10/11真实打开/保存文件对话框、双设备实测大图片ZIP、失效账号备注及群内同名角色人工选择；此步骤为云端构建与模拟，不是用户安装验收"
     }
   ],
   "step03_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38921641970",
@@ -170,5 +176,8 @@
   "step14_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38949689786",
   "step14_timing_media_tests_per_os": 20,
   "step14_editor_tests_per_os": 29,
-  "step14_ui_tests": 45
+  "step14_ui_tests": 45,
+  "step15_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38954528584",
+  "step15_portable_checks_per_os": 18,
+  "step15_total_ci_jobs": 25
 }

@@ -149,3 +149,12 @@
 - [完整CI 38949689786](https://github.com/mosen6266-netizen/MS_001/actions/runs/38949689786) 全23个作业通过：Windows/Linux TimingMedia各20、Editor各29、前端45/45、安全Win42/Linux40、WPF打包与原有CI回归成功。
 - 修复旧毫秒时间、GUID匹配、默认时间漏记修改、媒体路径过滤与测试字符串。无绕过失败检查；真实TDLib、Telegram发送/typing及Win10/11实机验收仍DEFERRED。
 - Step14 done_dev；第15步为角色备注移植与剧本格式。开发进度14/32（43.75%），剩余18步。详见docs/STEP_14_ACCEPTANCE.md。
+
+## Step15 — 角色备注移植与 .mosentgscript ZIP（2026-10-16）
+- **开发阶段状态 done_dev**；实际 Windows 用户交互与 TDLib 真实 Telegram 登录/发送仍为 DEFERRED。没有进行任何正式部署，MS002 及生产卡密系统未修改。
+- 实现并提交内容：`src/Features/Scripts/Portable/PortableScriptPackage.cs` 和 `RoleRemarkResolver.cs`、Windows 原生打开/保存对话框 `apps/desktop/MainWindow.Portable.cs`、编辑器“导入/导出 .mosentgscript”按钮，严格IPC控制以及 `EditorDraftRepository.CreateDocument` 原子创建草稿。
+- ZIP清单为严格白名单：`format/version/document`；仅存 UUID 角色键与自定义备注、正文、3段独立毫秒时间和受限图片元信息；PNG/JPEG/WebP 按SHA-256去重打包。无账号ID、手机号、会话、聊天令牌或设备专有路径。防目录穿越、同名ZIP条目、额外文件、图片篡改及超量解压。导入只创建新草稿，不覆盖原有草稿。
+- 跨设备：A三角色、B多出一个账号不影响精确匹配；备注比较采用Unicode NFC+trim；所有缺失角色逐一提示，同名重复角色不得随机绑定，群内权限候选过滤和真正任务启动冻结留到Step16。
+- 自动化测试：独立Portable测试 **Linux 18/18，Windows 18/18**；完整 [GitHub Actions 38954528584](https://github.com/mosen6266-netizen/MS_001/actions/runs/38954528584) **25/25 SUCCESS**；UI测试与设计、所有SQLite/安全/TDLib mock、Windows x64 WPF构建发布、Chromium截图回归均通过。
+- 源码功能提交：[`2ad3feeb`](https://github.com/mosen6266-netizen/MS_001/commit/2ad3feebba6b5e08bfe412575a6269ffb4e1fd6a)，SSR bug修复提交：[`6ba635d7`](https://github.com/mosen6266-netizen/MS_001/commit/6ba635d7e5285963f9000905305689d56d940c23)；本验收/进度提交在后续git历史中。
+- 开发进度：**15/32=46.875%，剩余17步**。下一步 **Step16 发布快照、预览和启动预检**。Windows10/11原生对话框、跨电脑真实用户及群权限真实测试由用户最终统一验收。

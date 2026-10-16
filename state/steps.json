@@ -316,9 +316,24 @@
     "step": "15",
     "title": "角色备注移植与剧本格式",
     "phase": 4,
-    "status": "not_started",
-    "acceptance_evidence": [],
-    "last_commit_sha": null
+    "status": "done_dev",
+    "acceptance_evidence": [
+      "docs/SCRIPT_FORMAT.md",
+      "docs/STEP_15_TEST_MATRIX.md",
+      "docs/STEP_15_ACCEPTANCE.md",
+      "src/Features/Scripts/Portable/PortableScriptPackage.cs",
+      "src/Features/Scripts/Portable/RoleRemarkResolver.cs",
+      "apps/desktop/MainWindow.Portable.cs",
+      "apps/ui/src/components/ScriptEditorPanel.tsx",
+      "tests/Scripts/Portable/Program.cs",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/38954528584"
+    ],
+    "last_commit_sha": "6ba635d7e5285963f9000905305689d56d940c23",
+    "deferred_release_acceptance": [
+      "PORTABLE-WINDOWS-REAL-INTERACTION",
+      "TDLIB-NATIVE-BINARY",
+      "AUTH-REAL-ACCOUNT"
+    ]
   },
   {
     "step": "16",
