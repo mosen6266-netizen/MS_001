@@ -10,6 +10,7 @@ public static class IpcRequestGuard
     private const int MaxMessageChars = 8192;
     private static readonly HashSet<string> RootReadFields = ["protocol","requestId","type"];
     private static readonly HashSet<string> RootWriteFields = ["protocol","requestId","type","payload"];
+    private static readonly HashSet<string> PayloadFields = ["expectedRevision","preferences"];
     private static readonly HashSet<string> SettingsFields =
         ["density","searchDebounceMs","pageSize","desktopNotifications"];
     public static bool TryValidate(string? raw, out AllowedIpcOperation operation)
@@ -41,7 +42,7 @@ public static class IpcRequestGuard
             {
                 if (!ExactFields(root, RootWriteFields) ||
                     !root.TryGetProperty("payload", out JsonElement payload) ||
-                    !ExactFields(payload, ["expectedRevision","preferences"])) return false;
+                    !ExactFields(payload, PayloadFields)) return false;
                 if (!payload.TryGetProperty("expectedRevision", out JsonElement revision) ||
                     revision.ValueKind != JsonValueKind.Number || !revision.TryGetInt64(out long rev) || rev < 0) return false;
                 if (!payload.TryGetProperty("preferences", out JsonElement prefs) || !ExactFields(prefs, SettingsFields)) return false;
