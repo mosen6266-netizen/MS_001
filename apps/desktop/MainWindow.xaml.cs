@@ -165,6 +165,11 @@ public partial class MainWindow : Window
                 await HandleScriptRequestAsync(jsonMessage,request.RequestId,request.Type);
                 return;
             }
+            if(operation is AllowedIpcOperation.MediaImport or AllowedIpcOperation.MediaPreview)
+            {
+                await HandleMediaRequestAsync(jsonMessage,request.RequestId,request.Type);
+                return;
+            }
             if (operation == AllowedIpcOperation.DiagnosticsGet)
             {
                 SendSettingResponse(request.RequestId,"diagnostics.get.result",true,_safeTelemetry.Snapshot(_appHealth));

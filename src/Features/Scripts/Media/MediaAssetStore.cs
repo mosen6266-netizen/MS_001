@@ -10,6 +10,7 @@ public sealed class MediaAssetStore
     public const int MaxImageBytes=5*1024*1024;
     private const long TotalQuotaBytes=128L*1024*1024;
     private readonly string _root;
+    public string RootPath => _root;
     private readonly object _gate=new();
     public MediaAssetStore(string root)
     {
