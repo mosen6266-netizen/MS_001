@@ -44,3 +44,11 @@
 - 发现历史 Git 提交构造 tree 时未设置 base_tree_sha，导致新 main 分支意外缺少规格文件。已以 fast-forward 新提交恢复全部文档，保留 Step01 最新状态；修复提交：`c1561ca471a79546acdcbbf857e1b6039a336391`。
 - 修复规则：今后若使用 Git Data API 创建 tree，必须提供 `base_tree_sha`；提交后必须重新读取 main 的完整文件树，检查规划文件与进度文件仍全部存在。否则不得推进步骤。
 - Step02 当前标记 in_progress；尚未通过 Win10/11 单账号真实授权 / WPF构建 / TDLib native DLL 验收。
+
+### Step 02 — isolated smoke tests & CI (2026-10-16)
+- 修复仓库完整性：main 分支恢复历史提交中遗漏的文档，修复提交 `c1561ca471a79546acdcbbf857e1b6039a336391`；新提交全部基于完整 base tree，不再全量清空。
+- 新增可复现模拟队列：300条虚拟账号资料 + 50独立任务队列 + 10,000条虚拟事件，Linux 本地测试成功：0.16659秒，Python tracemalloc峰值0.1878MiB；这不是TDLib内存基准。
+- Windows WPF + WebView2 Smoke 工程源码、最新 TDLib JSON ABI 的 C# 声明和 GitHub Actions 已上传；CI成功: https://github.com/mosen6266-netizen/MS_001/actions/runs/38919353228，Windows runner `dotnet build` 成功且 Linux Python 测试通过。
+- 最初 CI 失败 `https://github.com/mosen6266-netizen/MS_001/actions/runs/38919305431`；修复 DllImport UTF-8 参数声明后通过；记录了失败原因，不把初版失败隐藏。
+- **状态 blocked（Step02未验收）**：尚缺 Windows 10/11 可交互实机验证、TDLib原生DLL加载、本人授权账号的单次登录/重启恢复、实际CPU/RAM/句柄数据。不能以云端编译或模拟300个对象替代。
+- **进度维持：1/32（3.125%），剩余31步**；明确需要本人的Windows测试环境和对自有测试账号的安全授权，云端GitHub不保存任何凭据。

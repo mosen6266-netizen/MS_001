@@ -17,9 +17,16 @@
     "step": "02",
     "title": "关键技术原型与风险验证",
     "phase": 1,
-    "status": "in_progress",
-    "acceptance_evidence": [],
-    "last_commit_sha": null
+    "status": "blocked",
+    "acceptance_evidence": [
+      "docs/TECH_SPIKES.md",
+      "docs/RISK_REGISTER.md",
+      "spikes/step02/capacity_simulation.py",
+      "spikes/step02/wpf/Step02.WpfSmoke.csproj",
+      ".github/workflows/step02-tech-spike.yml",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919353228"
+    ],
+    "last_commit_sha": "7ec32cb9c63c8e334a10d633d84e863203228103"
   },
   {
     "step": "03",
