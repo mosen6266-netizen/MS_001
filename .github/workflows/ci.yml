@@ -206,3 +206,17 @@ jobs:
           dotnet-version: "10.0.x"
       - name: Test 300 account records, backup, independent keys and fake lifecycle
         run: dotnet run --project tests/SessionLifecycle/Mosen.GroupScheduler.SessionLifecycle.Tests.csproj --configuration Release
+  group-catalog:
+    name: TDLib group/topic permissions and stable IDs - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: Test trusted groups, topic closure, account permissions and title rename
+        run: dotnet run --project tests/GroupCatalog/Mosen.GroupScheduler.GroupCatalog.Tests.csproj --configuration Release
