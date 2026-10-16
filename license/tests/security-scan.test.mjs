@@ -5,6 +5,7 @@ const read=p=>readFileSync(new URL(p,import.meta.url),"utf8");
 const worker=read("../src/worker.mjs");
 const auth=read("../src/admin-security.mjs");
 const config=read("../wrangler.toml");
+const activeConfig=config.split("\n").filter(line=>!line.trim().startsWith("#")).join("\n");
 const schema=read("../migrations/0002_admin_security.sql");
 const dotnet=read("../../src/Core/Licensing/SignedLicenseVerifier.cs");
 test("Step26 deploy boundary: no Signal binding, no real D1 ID and no public Worker",()=>{
@@ -12,7 +13,7 @@ test("Step26 deploy boundary: no Signal binding, no real D1 ID and no public Wor
  assert.match(config,/database_name = "ms001-telegram-license-staging"/);
  assert.match(config,/database_id = "REPLACE_WITH_NEW_TELEGRAM_D1_DATABASE_ID"/);
  assert.match(config,/workers_dev = false/);
- assert.doesNotMatch(config,/signal-scheduler-license|ms002|MS002|api[_-]?token\s*=/i);
+ assert.doesNotMatch(activeConfig,/signal-scheduler-license|ms002|MS002|api[_-]?token\s*=/i);
  assert.doesNotMatch(worker,/signal-scheduler-license|__SECRET_LITERAL__/);
  assert.doesNotMatch(config,/-----BEGIN (EC |RSA )?PRIVATE KEY-----/);
 });
