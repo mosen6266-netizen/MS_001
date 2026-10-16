@@ -5,8 +5,8 @@
   "default_branch": "main",
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
-  "current_step": "21",
-  "current_step_status": "in_progress",
+  "current_step": "22",
+  "current_step_status": "not_started",
   "phase": 5,
   "total_steps": 32,
   "completed_steps": [
@@ -29,7 +29,8 @@
     "17",
     "18",
     "19",
-    "20"
+    "20",
+    "21"
   ],
   "development_started": true,
   "functional_code_started": true,
@@ -38,13 +39,13 @@
   "icon_source_received": true,
   "icon_asset_upload_verified": true,
   "exact_timing_contract": "wait preSendDelayMs -> typing typingDurationMs -> send; 30s+5s=35s; no overlap",
-  "last_verified_commit_sha": "ba4a0bdc231162e1fb733571992c6e427e7b021a",
+  "last_verified_commit_sha": "e330b85f3f8ea4eb3fccb5329e695be9046f7e27",
   "last_updated": "2026-10-16",
   "blocking_issues": [
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step21 runtime dashboard integrated: read-only SQLite runtime.snapshot IPC, React 50-task paged screen, 1s shared countdown timer and 5s local snapshot polling, search/status filters, issue-highlight, pure domain projection and tests/UI/Dashboard Windows/Linux. GitHub CI run 38963263363 still queued; status IN_PROGRESS and progress remains 20/32. No Telegram sending, real live task API, TDLib auth or production runtime integration.",
+  "notes": "Step21: WPF readonly runtime.snapshot IPC to SQLite simulation metadata, 50-task RuntimeDashboardBuilder, bounded snapshot without editing state, React dark runtime center with 10/page filtering/search/diagnostics/progress, one 1s clock + 5s refresh, no fabricated live Telegram data. Windows/Linux Dashboard 23 model checks each including 90 snapshot reads; React 7 tests including 2000 page selections; complete CI 38963263363 37/37 success. Genuine TDLib live runtime, Windows on-device UI and 50-group long-term performance deferred. Dev 21/32=65.625%, remaining 11.",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
@@ -166,6 +167,11 @@
       "id": "RECOVERY-REAL-POWER-NETWORK",
       "status": "DEFERRED",
       "detail": "Step20 only offline simulation: real Windows10/11 lifecycle wiring, hard kills, actual sleep/wake, network loss, disk corruption, TDLib delivery reconciliation and 72h stress require future integration and final on-device acceptance."
+    },
+    {
+      "id": "RUNTIME-DASHBOARD-REAL-LIVE",
+      "status": "DEFERRED",
+      "detail": "Step21 UI displays only local durable simulation states. Actual real TDLib live sender integration/official callbacks/permissions, 50-group rapid runtime performance and display correctness on Windows10/11, and 72h stability require later development and final on-device acceptance."
     }
   ],
   "step03_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38921641970",
@@ -227,5 +233,7 @@
   "step20_recovery_checks_per_os": 47,
   "step20_total_ci_jobs": 30,
   "step21_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38963263363",
-  "step21_source_commit": "e330b85f3f8ea4eb3fccb5329e695be9046f7e27"
+  "step21_source_commit": "e330b85f3f8ea4eb3fccb5329e695be9046f7e27",
+  "step21_dashboard_checks_per_os": 23,
+  "step21_total_ci_jobs": 37
 }

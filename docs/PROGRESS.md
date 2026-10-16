@@ -209,3 +209,12 @@
 - 开发源码提交 [`ba4a0bdc`](https://github.com/mosen6266-netizen/MS_001/commit/ba4a0bdc231162e1fb733571992c6e427e7b021a)，代码、验证矩阵及已知限制见 `docs/STEP_20_RECOVERY.md`、`docs/STEP_20_TEST_MATRIX.md`、`docs/STEP_20_ACCEPTANCE.md`。
 - **DEFERRED**：Win10/11 原生生命周期真实接线、真断网/休眠/强退、TDLib账号实时状态、50群/72小时实机长稳。当前为离线演练，无实际 Telegram 出站或后台发送功能，Signal MS002 不受影响。
 - **开发进度20/32（62.5%），剩余12步，下一步21运行中心与实时状态。**
+
+## Step21 — 运行中心与50群实时状态展示（2026-10-16）
+- **开发阶段 done_dev**。`src/Features/RuntimeDashboard/` 基于第17步模拟任务快照、第19步投递状态及第20步损坏隔离统计形成**真实本地状态只读**模型：完成率、下一条、时间锚点、模拟运行、暂停、失败和未知结果显式分类。既不自动创建任务，也不读取/显示 Telegram 私密消息正文。
+- Windows WebView2 IPC 新增严格白名单 **`runtime.snapshot`**（无参数、只读，任何发送/恢复命令仍被拒绝），读取SQLite快照时不调用会改变任务状态的启动恢复方法。
+- `apps/ui/src/components/RuntimeDashboardPanel.tsx` 已替换运行中心占位页，提供50任务10条/页、6类状态筛选、群/任务ID搜索、优先显示异常、进度条、单条倒计时、已读回执/人工复核/隔离记录提醒。**仅一个共享1秒计时器，每5秒同步一次，只在此页面挂载**；浏览器无桌面环境时显式显示预览空状态，绝不伪装真实群发中。
+- 自动化：`tests/UI/Dashboard/Program.cs` Windows/Linux 各 **23/23 PASS**，包含90轮本地SQLite只读刷新；React/Vitest `runtime-dashboard/model.test.tsx` 7项测试覆盖50群分页、搜索、异常、倒计时及2000次纯分页运算。最终 [CI 38963263363](https://github.com/mosen6266-netizen/MS_001/actions/runs/38963263363) **37/37 成功**，含WPF、账号/群/剧本/恢复/调度全量回归。
+- 初始前端 SSR 预览空态在 CI 发现文案预期错误，修复后重新运行全量 CI 通过。主源码提交 [`4b1580b1`](https://github.com/mosen6266-netizen/MS_001/commit/4b1580b1e534846b3f17cd491dceda3460c05412)，测试预览修正 [`e330b85f`](https://github.com/mosen6266-netizen/MS_001/commit/e330b85f3f8ea4eb3fccb5329e695be9046f7e27)；交付与限制见 `docs/STEP_21_RUNTIME_DASHBOARD.md`、`docs/STEP_21_TEST_MATRIX.md`、`docs/STEP_21_ACCEPTANCE.md`。
+- **DEFERRED**：真实 TDLib 发送/官方回执数据源、Windows10/11实机交互与真实50群高频更新、72小时长稳测试。当前数据为离线模拟记录，并非真实 Telegram 运行证明。MS002、现有卡密后台无更改。
+- 开发进度 **21/32（65.625%），剩余11步**；下一步 **22：Windows提醒与紧急停止**。

@@ -464,20 +464,28 @@
     "step": "21",
     "title": "运行中心与实时状态",
     "phase": 6,
-    "status": "in_progress",
+    "status": "done_dev",
     "acceptance_evidence": [
       "src/Features/RuntimeDashboard/RuntimeDashboardBuilder.cs",
       "src/Features/RuntimeDashboard/RuntimeDashboardReader.cs",
+      "apps/desktop/MainWindow.RuntimeDashboard.cs",
       "apps/ui/src/components/RuntimeDashboardPanel.tsx",
       "apps/ui/src/runtime-dashboard/model.ts",
       "apps/ui/src/runtime-dashboard/model.test.tsx",
-      "apps/desktop/MainWindow.RuntimeDashboard.cs",
       "tests/UI/Dashboard/Program.cs",
       "docs/STEP_21_RUNTIME_DASHBOARD.md",
       "docs/STEP_21_TEST_MATRIX.md",
+      "docs/STEP_21_ACCEPTANCE.md",
       "https://github.com/mosen6266-netizen/MS_001/actions/runs/38963263363"
     ],
-    "last_commit_sha": "e330b85f3f8ea4eb3fccb5329e695be9046f7e27"
+    "last_commit_sha": "e330b85f3f8ea4eb3fccb5329e695be9046f7e27",
+    "deferred_release_acceptance": [
+      "RUNTIME-DASHBOARD-REAL-LIVE",
+      "RECOVERY-REAL-POWER-NETWORK",
+      "DELIVERY-OFFICIAL-TDLIB-REAL",
+      "AUTH-REAL-ACCOUNT",
+      "TDLIB-NATIVE-BINARY"
+    ]
   },
   {
     "step": "22",
