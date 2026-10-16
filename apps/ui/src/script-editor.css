@@ -1,0 +1,29 @@
+.script-editor-layout{display:grid;grid-template-columns:minmax(224px,270px) minmax(0,1fr);gap:16px;align-items:start}
+.script-directory,.script-editor-main{background:var(--surface-panel);border:1px solid var(--stroke-subtle);border-radius:var(--radius-lg);padding:16px;min-width:0}
+.script-directory h2,.script-main-top h2{margin:0 0 10px;font-size:var(--font-size-lg)}
+.script-directory-list{list-style:none;margin:10px 0;padding:0;max-height:520px;overflow-y:auto}
+.script-directory-list li{display:flex;gap:5px;align-items:center;min-width:0;padding:5px 0;border-bottom:1px solid var(--stroke-subtle)}
+.script-item{border:1px solid transparent;text-align:left;background:transparent;color:var(--fg-primary);border-radius:var(--radius-md);cursor:pointer;display:flex;flex-direction:column;gap:5px;padding:10px;min-width:0;flex:1}
+.script-item strong{overflow-wrap:anywhere}.script-item small{color:var(--fg-muted)}
+.script-item:hover,.script-item.is-active{background:var(--surface-hover);border-color:var(--stroke-strong)}
+.script-create{display:flex;flex-direction:column;gap:8px;margin:14px 0}
+.script-main-top,.script-toolbar,.script-actions,.script-card-top,.script-foot{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.script-main-top{justify-content:space-between;margin-bottom:16px}
+.script-toolbar{margin:10px 0;align-items:end}
+.script-toolbar>.ui-field{flex:1;min-width:172px}
+.script-save{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.script-actions{margin:16px 0}
+.script-actions>.ui-field{flex:1;min-width:160px}
+.script-card{padding:14px;border:1px solid var(--stroke-subtle);border-radius:var(--radius-md);background:var(--surface-root);margin-bottom:12px;min-width:0}
+.script-card.is-selected{border-color:var(--fg-primary);box-shadow:0 0 0 1px var(--stroke-strong)}
+.script-card-top{justify-content:space-between;align-items:center;margin-bottom:12px;font-size:var(--font-size-xs);color:var(--fg-muted)}
+.script-card-top .ui-button{min-height:30px;padding:4px 10px}
+.script-card .ui-field{margin-bottom:12px}
+.script-card textarea{display:block;resize:vertical;width:100%;min-height:96px;border:1px solid var(--stroke-strong);background:var(--surface-panel);border-radius:var(--radius-md);color:var(--fg-primary);padding:12px;font:inherit;line-height:1.55}
+.script-card textarea:focus-visible{outline:2px solid var(--fg-primary);outline-offset:2px}
+.script-text-label{display:block;font-size:var(--font-size-sm);font-weight:600;margin:7px 0}
+.script-foot{justify-content:space-between;color:var(--fg-muted);line-height:1.5;margin-top:11px}
+.script-scroll{min-width:0}
+.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+@media(max-width:930px){.script-editor-layout{grid-template-columns:1fr}.script-directory-list{max-height:220px}.script-directory{padding:12px}}
+@media(max-width:640px){.script-directory,.script-editor-main{padding:10px}.script-toolbar>.ui-field{min-width:100%}.script-card{padding:10px}}
