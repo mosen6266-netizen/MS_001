@@ -99,6 +99,13 @@ jobs:
         with:
           name: ms001-ui-dist
           path: apps/ui/dist/
+      - name: Install Chinese CJK fonts for truthful visual snapshots
+        shell: bash
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          fc-cache -f
+          fc-match "Noto Sans CJK SC" | grep -i "NotoSansCJK"
       - name: Capture real Chromium-rendered snapshots
         shell: bash
         run: |
