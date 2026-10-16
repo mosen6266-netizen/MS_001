@@ -5,16 +5,17 @@
   "default_branch": "main",
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
-  "current_step": "03",
-  "current_step_status": "in_progress",
+  "current_step": "04",
+  "current_step_status": "not_started",
   "phase": 1,
   "total_steps": 32,
   "completed_steps": [
     "01",
-    "02"
+    "02",
+    "03"
   ],
   "development_started": true,
-  "functional_code_started": false,
+  "functional_code_started": true,
   "production_deployment_authorized": false,
   "real_telegram_login_or_send_authorized": false,
   "icon_source_received": true,
@@ -26,7 +27,7 @@
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step02 done_dev (CI/模拟通过，实际Win10/11 native登录与性能 DEFERRED). Step03工程搭建中，开发进度2/32。",
+  "notes": "Step03基础工程已通过 GitHub Actions 38921641970：TypeScript/React lint+unit+build, Windows WPF build+self-contained publish; npm ci锁文件已纳入仓库。真实机器/账号仍 DEFERRED。进入 Step04 数据合同与迁移。",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
@@ -64,5 +65,8 @@
       "status": "DEFERRED",
       "detail": "72小时长期稳定性、Win10/11正式安装与升级回滚"
     }
-  ]
+  ],
+  "step03_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38921641970",
+  "step03_lockfile_packages": 238,
+  "step03_desktop_artifact_id": 12054891527
 }

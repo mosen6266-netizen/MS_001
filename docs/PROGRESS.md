@@ -63,3 +63,10 @@
 - Step02 云端 Windows 构建（Actions 38919353228 / 38919854974）、打包和 Python 300/50 模拟均通过，技术风险及限制已记录。
 - Step02 标记 `done_dev`（**仅开发/CI结束**），Win10/11 GUI启动、tdjson native加载、真实单账号登录/重启及性能指标转移到最终统一验收，状态 `DEFERRED`，不是 PASS。
 - Step03 基础工程与持续集成开始，进度 **2/32 = 6.25%**，剩余30步；仅统计开发完成比例。
+
+## Step 03 — 基础工程及CI开发验收（2026-10-16）
+- 实际新增19个工程/CI文件；WPF/WebView2 本地宿主、单实例保护、React/TypeScript业务页骨架、有限IPC、严格CSP以及CI管线；无Telegram实际发送。
+- npm依赖锁文件已从GitHub构建产物生成并提交主仓库，lockfileVersion=3，238个packaged entries；常规CI使用npm ci，临时写入权限工作流已删除。
+- [CI 38921641970](https://github.com/mosen6266-netizen/MS_001/actions/runs/38921641970)：UI job成功（TypeScript lint、Vitest IPC test、Vite build），Windows job成功（编译和win-x64自包含publish）。
+- Windows原生UI启动/TDLib实机和性能验证依用户要求延后；文档 `docs/STEP_03_ACCEPTANCE.md` 说明，禁止把CI当成正式版验收。
+- **Step03 done_dev，当前下一步04（数据合同与迁移框架），开发进度3/32 = 9.375%，剩余29步**。

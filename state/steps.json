@@ -38,9 +38,20 @@
     "step": "03",
     "title": "基础工程与持续集成",
     "phase": 1,
-    "status": "in_progress",
-    "acceptance_evidence": [],
-    "last_commit_sha": null
+    "status": "done_dev",
+    "acceptance_evidence": [
+      "docs/STEP_03_ACCEPTANCE.md",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/38921641970",
+      "apps/desktop/Mosen.GroupScheduler.Desktop.csproj",
+      "apps/ui/package-lock.json",
+      ".github/workflows/ci.yml"
+    ],
+    "last_commit_sha": "681ae2dc69eab5285d16f4d795264de5ed52f993",
+    "deferred_release_acceptance": [
+      "WIN10-11-GUI",
+      "TDLIB-NATIVE",
+      "OWNED-ACCOUNT"
+    ]
   },
   {
     "step": "04",
