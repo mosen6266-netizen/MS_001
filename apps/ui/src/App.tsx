@@ -3,6 +3,7 @@ import brandIcon from "../../../assets/branding/icon.svg?url";
 import { DesignShowcase } from "./components/DesignShowcase";
 import { PreferencesPanel } from "./components/PreferencesPanel";
 import { MockAccountIndex } from "./components/MockAccountIndex";
+import { DiagnosticsPanel } from "./components/DiagnosticsPanel";
 import { usePreferences } from "./hooks/usePreferences";
 import { isBridgeResponse, makeRequest } from "../../../src/contracts/ipc";
 import { initialShellState, SHELL_ROUTES, shortcutRoute, transitionShellRoute, type ShellRoute } from "../../../src/web/routes";
@@ -76,10 +77,10 @@ export function App() {
           <div className="overview-grid">
             <article className="summary-tile"><h2>已授权账号</h2><strong>尚未接入</strong><p>真实 Telegram 登录将在后续阶段实现</p></article>
             <article className="summary-tile"><h2>运行任务</h2><strong>0</strong><p>目前不执行群消息发送</p></article>
-            <article className="summary-tile"><h2>工程状态</h2><strong>STEP 07</strong><p>本地设置、搜索防抖和分页状态管理</p></article>
+            <article className="summary-tile"><h2>工程状态</h2><strong>STEP 08</strong><p>本地安全、诊断与健康检查基础</p></article>
             <article className="notice-tile"><h2 id="panel-title">当前开发范围</h2><p>已实现非敏感 UI 设置持久化与 300 条模拟账号搜索；真实账号及群组任务仍未接入，当前不会执行发送。</p></article>
           </div> :
-          shell.active === "settings" ? <><PreferencesPanel {...preferences} /><DesignShowcase /></> :
+          shell.active === "settings" ? <><PreferencesPanel {...preferences} /><DiagnosticsPanel /><DesignShowcase /></> :
           shell.active === "accounts" ? <MockAccountIndex preferences={preferences.snapshot.preferences} /> :
           <div className="blank-panel">
             <h2 id="panel-title">{active.label}</h2>

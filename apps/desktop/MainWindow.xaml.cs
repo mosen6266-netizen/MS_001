@@ -6,6 +6,8 @@ using System.Text.Json.Serialization;
 using System.Windows;
 using Microsoft.Web.WebView2.Core;
 using Mosen.GroupScheduler.Core.Shell;
+using Mosen.GroupScheduler.Core.Security;
+using Mosen.GroupScheduler.Core.Telemetry;
 
 namespace Mosen.GroupScheduler.Desktop;
 
@@ -14,6 +16,8 @@ public partial class MainWindow : Window
     private const string TrustedOrigin = "https://ms001.local/";
     private const string Protocol = "mosen.desktop.v1";
     private readonly WindowStateStore _windowStore = new();
+    private readonly SafeDiagnostics _safeTelemetry = SafeDiagnostics.ForCurrentUser();
+    private string _appHealth = "initializing";
     private bool _started;
     private bool _closing;
     private record BridgeRequest([property: JsonPropertyName("protocol")] string Protocol,
@@ -23,12 +27,15 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        _safeTelemetry.Record(DiagnosticEvent.Started);
         ApplyWindowPlacement();
         Loaded += InitializeBrowser;
         Closing += (_, _) => SaveWindowPlacement();
         Closed += (_, _) =>
         {
             _closing = true;
+            _appHealth = "closing";
+            _safeTelemetry.Record(DiagnosticEvent.Closed);
             // WebView2 runs only while the window is open; never keep background sessions.
             if (Browser.CoreWebView2 is { } core)
                 core.WebMessageReceived -= OnWebMessageReceived;
@@ -67,6 +74,8 @@ public partial class MainWindow : Window
         string folder = Path.Combine(AppContext.BaseDirectory, "ui");
         if (!File.Exists(Path.Combine(folder, "index.html")))
         {
+            _appHealth = "degraded";
+            _safeTelemetry.Record(DiagnosticEvent.RecoverableError, FailureCategory.FileSystem);
             Diagnostics.Text = "未找到离线界面资源，请检查安装文件是否完整。";
             return;
         }
@@ -92,6 +101,8 @@ public partial class MainWindow : Window
                 if (_closing) return;
                 if (!evt.IsSuccess)
                 {
+                    _appHealth = "degraded";
+                    _safeTelemetry.Record(DiagnosticEvent.RecoverableError,FailureCategory.Protocol);
                     Diagnostics.Text = "界面加载失败，请尝试重新启动或检查本地界面文件。";
                     Browser.Visibility = Visibility.Hidden;
                     StatusPanel.Visibility = Visibility.Visible;
@@ -99,6 +110,8 @@ public partial class MainWindow : Window
                 }
                 Browser.Visibility = Visibility.Visible;
                 StatusPanel.Visibility = Visibility.Collapsed;
+                _appHealth = "ready";
+                _safeTelemetry.Record(DiagnosticEvent.Ready);
             };
             core.SetVirtualHostNameToFolderMapping("ms001.local", folder, CoreWebView2HostResourceAccessKind.DenyCors);
             core.WebMessageReceived += OnWebMessageReceived;
@@ -106,7 +119,11 @@ public partial class MainWindow : Window
         }
         catch (Exception ex) when (ex is InvalidOperationException or COMException or FileNotFoundException)
         {
-            if (!_closing) Diagnostics.Text = "界面初始化失败：" + ex.GetType().Name + "。请检查 WebView2 Runtime。";
+            if (!_closing) {
+                _appHealth = "degraded";
+                _safeTelemetry.Record(DiagnosticEvent.RecoverableError,FailureClassifier.Classify(ex));
+                Diagnostics.Text = "界面初始化失败，请检查 WebView2 Runtime 与程序安装文件。";
+            }
         }
     }
 
@@ -116,22 +133,32 @@ public partial class MainWindow : Window
         try
         {
             string jsonMessage = evt.TryGetWebMessageAsString();
-            if (jsonMessage.Length > 8192) return;
-            var request = JsonSerializer.Deserialize<BridgeRequest>(jsonMessage);
-            if (request is null || request.Protocol != Protocol || string.IsNullOrEmpty(request.RequestId) ||
-                request.RequestId.Length > 64) return;
-            if (request.Type is "settings.get" or "settings.save")
+            if (!IpcRequestGuard.TryValidate(jsonMessage, out AllowedIpcOperation operation))
+            {
+                _safeTelemetry.Record(DiagnosticEvent.IpcRejected); // never record submitted JSON
+                return;
+            }
+            var request = JsonSerializer.Deserialize<BridgeRequest>(jsonMessage)!;
+            if (operation is AllowedIpcOperation.SettingsGet or AllowedIpcOperation.SettingsSave)
             {
                 await HandleSettingsRequestAsync(jsonMessage, request.RequestId, request.Type);
                 return;
             }
-            string type = request.Type switch { "system.ping" => "system.pong", "app.info" => "app.info.response", _ => "denied" };
+            if (operation == AllowedIpcOperation.DiagnosticsGet)
+            {
+                SendSettingResponse(request.RequestId,"diagnostics.get.result",true,_safeTelemetry.Snapshot(_appHealth));
+                return;
+            }
+            string type = operation switch {
+                AllowedIpcOperation.SystemPing => "system.pong",
+                AllowedIpcOperation.AppInfo => "app.info.response", _ => "denied"
+            };
             bool allowed = type != "denied";
             Browser.CoreWebView2.PostWebMessageAsJson(JsonSerializer.Serialize(new {
                 protocol = Protocol, requestId = request.RequestId, ok = allowed, type,
                 payload = new { name = "MOSEN Group Scheduler", mode = "offline-foundation" }
             }));
         }
-        catch (Exception) { /* Invalid JSON is ignored; never dispatch an unrecognized IPC action. */ }
+        catch (Exception) { _safeTelemetry.Record(DiagnosticEvent.IpcRejected); /* Never log input */ }
     }
 }

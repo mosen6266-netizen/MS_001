@@ -1,6 +1,6 @@
 /** Allowlisted offline host commands; no Telegram sends, login, sessions or secrets. */
 export const IPC_PROTOCOL = "mosen.desktop.v1" as const;
-export type ReadRequest = { protocol: typeof IPC_PROTOCOL; requestId: string; type: "system.ping"|"app.info"|"settings.get" };
+export type ReadRequest = { protocol: typeof IPC_PROTOCOL; requestId: string; type: "system.ping"|"app.info"|"settings.get"|"diagnostics.get" };
 export type SettingsSaveRequest = { protocol: typeof IPC_PROTOCOL; requestId: string; type: "settings.save"; payload: {expectedRevision:number;preferences:UserPreferences} };
 export type BridgeRequest = ReadRequest | SettingsSaveRequest;
 export type BridgeResponse = { protocol: typeof IPC_PROTOCOL; requestId:string; ok:boolean; type:string; payload:Record<string,unknown> };
