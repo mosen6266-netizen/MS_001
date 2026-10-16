@@ -234,3 +234,17 @@ jobs:
           dotnet-version: "10.0.x"
       - name: Check role-only draft persistence, revision conflicts, reorder and archive
         run: dotnet run --project tests/Scripts/Editor/Mosen.GroupScheduler.ScriptEditor.Tests.csproj --configuration Release
+  script-timing-media:
+    name: Sequential timing and local image store - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: Test virtual 30-plus-5 phase ordering and secure image persistence
+        run: dotnet run --project tests/Scripts/Timing/Mosen.GroupScheduler.ScriptTiming.Tests.csproj --configuration Release
