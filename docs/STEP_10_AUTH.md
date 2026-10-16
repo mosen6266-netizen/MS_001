@@ -61,3 +61,6 @@
 - https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1_authorization_state.html
 - https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1set_tdlib_parameters.html
 - https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1request_qr_code_authentication.html
+
+## 最终开发CI验收（2026-10-16）
+[GitHub Actions 38935436769](https://github.com/mosen6266-netizen/MS_001/actions/runs/38935436769) 15个job全绿，Windows/Linux认证模拟各94项断言，UI 26项；主程序云端编译及所有历史回归通过。原生DLL、真实扫码/手机号/邮箱/两步验证、Win10/11安装与会话恢复仍标记DEFERRED。详见 [STEP_10_ACCEPTANCE.md](STEP_10_ACCEPTANCE.md)。

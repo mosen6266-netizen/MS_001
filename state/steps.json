@@ -184,9 +184,27 @@
     "step": "10",
     "title": "登录与身份验证状态机",
     "phase": 3,
-    "status": "in_progress",
-    "acceptance_evidence": [],
-    "last_commit_sha": null
+    "status": "done_dev",
+    "acceptance_evidence": [
+      "docs/STEP_10_AUTH.md",
+      "docs/STEP_10_SECURITY_TEST_MATRIX.md",
+      "docs/STEP_10_ACCEPTANCE.md",
+      "src/Features/AccountAuth/AuthState.cs",
+      "src/Features/AccountAuth/AuthSession.cs",
+      "src/Features/AccountAuth/TdlibAuthGateway.cs",
+      "src/Infrastructure/Telegram/TdlibAuthRequest.cs",
+      "src/Infrastructure/Telegram/TdlibDispatcher.cs",
+      "tests/AccountAuth/Program.cs",
+      "apps/ui/src/components/AuthStatusPreview.tsx",
+      "apps/ui/src/auth-preview.test.tsx",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/38935436769"
+    ],
+    "last_commit_sha": "d7808832093642c33d021ac6e82459277eab153d",
+    "deferred_release_acceptance": [
+      "AUTH-REAL-ACCOUNT",
+      "TDLIB-NATIVE-BINARY",
+      "SECRET-STORAGE"
+    ]
   },
   {
     "step": "11",

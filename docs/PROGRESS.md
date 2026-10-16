@@ -111,3 +111,10 @@
 - [CI 38933092843](https://github.com/mosen6266-netizen/MS_001/actions/runs/38933092843) 13个jobs **SUCCESS**；Windows/Linux模拟TDLib各118项断言通过，UI+数据库/诊断安全/窗口回归与Windows编译通过；测试用的是fake transport，不涉及真实账号/消息。
 - 修复C#测试的raw字符串大括号与数组类型编译错误后复测，同时修正原生接收必须在首个请求发送后启动的生命周期要求。
 - Step09 `done_dev`（仅源码与模拟验证）、Step10待开始，开发进度 **9/32（28.125%）**，剩余23步。详情见 `docs/STEP_09_ACCEPTANCE.md`。
+
+## Step10 — 登录与身份验证状态机开发/CI验收（2026-10-16）
+- 完成13种官方 TDLib 授权状态的中文说明/临时QR内存链接、严格按clientId隔离/按状态限制操作、验证码/邮箱/2FA/注册条款/Premium拦截、成功只接受Telegram Ready更新、取消防迟到授权恢复。
+- 官方TDLib登录JSON白名单请求、二维码状态刷新、`close`操作去重；账号页面内提供清楚标记为模拟、**不支持实际登录**的中文状态预览。
+- [CI Run 38935436769](https://github.com/mosen6266-netizen/MS_001/actions/runs/38935436769) **15个job全部成功**，Windows+Linux各94项认证模拟测试，前端26项、设计16项及第01–09步Windows编译/回归全部通过。
+- 修复C#测试初始化语法错误，额外加入取消与全局关闭不会重复`close`的保护并复测；真实 TDLib win-x64 DLL尚未构建与载入，用户账号/本机测试按约定DEFERRED。
+- 结论 **Step10 done_dev**；下一步 **11 — 账号注册表及会话生命周期**，开发进度 **10/32（31.25%）**，剩余22步。完整证据 `docs/STEP_10_ACCEPTANCE.md`。
