@@ -168,3 +168,12 @@
 - [CI 38956311705](https://github.com/mosen6266-netizen/MS_001/actions/runs/38956311705) **27/27 SUCCESS**，包含前端lint/test/Vite、Chromium截图、Linux/Windows全部安全/数据库/角色/群模拟测试、Windows WPF编译及win-x64自包含发布；源码最后修复提交 [`b6d6296`](https://github.com/mosen6266-netizen/MS_001/commit/b6d6296896ee6fff95331cbfb65a97b413c0adc8)；验收文档见 `docs/STEP_16_ACCEPTANCE.md`。
 - **仍DEFERRED**：Windows10/11真正可交互界面、合法Telegram账号的TDLib原生实时登录/群权限刷新、多群真实任务启动、资源压测。MS002与生产Cloudflare授权无任何修改。
 - 当前进度 **16/32=50%，剩余16步，下一步17“任务状态机与50群调度”**。
+
+## Step17 — 50群独立任务状态机与虚拟时钟调度（2026-10-16）
+- **开发完成 done_dev**，支持每群独立 Ready/Running/Paused/Review/Completed/Stopped/Failed 状态；`src/Core/StateMachine` 对每条消息严格实现发送前等待→正在输入→等待外部提交→等待外部回执→发送后等待。30+5=35秒不重叠，12秒后等待由确认后开始；零耗时阶段安全转换。
+- `src/Core/Scheduler/FairScheduler.cs` 使用轮转首群，每次手动 Tick 最多对每个活动群推进一个非零耗时阶段；50群模拟都公平取得执行机会。暂停保留精确剩余毫秒，恢复不会计入暂停时的墙上时间。某群失败/进入人工复核，不影响其他群。
+- `scheduler_simulation_jobs` 是 SQLite v7 单独模拟表，所有任务与账号/步骤关系存检查点（正文仍位于发布版本），原子批量创建、乐观版本控制、全局原子停止。重启后 **Ready/Running/Paused 强制 Review**，没有任何自动重试、后台定时器或真实Telegram出站命令。
+- 回归旧数据库 v6→v7 后，Windows/Linux `tests/Scheduler/Program.cs` **各 37/37 PASS**；完整 [CI 38957627884](https://github.com/mosen6266-netizen/MS_001/actions/runs/38957627884) **29/29 SUCCESS**，包含原有安全/授权/SQLite/媒体与可视界面、Windows x64 自包含桌面编译发布。
+- 源码提交 [`8bf4e702`](https://github.com/mosen6266-netizen/MS_001/commit/8bf4e7028aec53b0449e05f4134f1aefddeb176b)，设计与证据见 `docs/STEP_17_SCHEDULER.md`、`docs/STEP_17_TEST_MATRIX.md`、`docs/STEP_17_ACCEPTANCE.md`。
+- **仍 DEFERRED**：真实 Telegram 原生账号授权/群实时权限、正式 `runs/outbox` 持久化与实际发送、Windows10/11控制界面、50 群/300会话持续压测，预计按用户指示最终集中实机测试。此步骤没有启动自动群发功能，不能等同可用正式版。
+- 进度 **17/32 = 53.125%**；剩余 **15步**，下一步 **18 账号与群发送规则协调**。

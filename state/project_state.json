@@ -5,7 +5,7 @@
   "default_branch": "main",
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
-  "current_step": "17",
+  "current_step": "18",
   "current_step_status": "not_started",
   "phase": 5,
   "total_steps": 32,
@@ -25,7 +25,8 @@
     "13",
     "14",
     "15",
-    "16"
+    "16",
+    "17"
   ],
   "development_started": true,
   "functional_code_started": true,
@@ -34,13 +35,13 @@
   "icon_source_received": true,
   "icon_asset_upload_verified": true,
   "exact_timing_contract": "wait preSendDelayMs -> typing typingDurationMs -> send; 30s+5s=35s; no overlap",
-  "last_verified_commit_sha": "b6d6296896ee6fff95331cbfb65a97b413c0adc8",
+  "last_verified_commit_sha": "8bf4e7028aec53b0449e05f4134f1aefddeb176b",
   "last_updated": "2026-10-16",
   "blocking_issues": [
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step16 immutable published versions SQLite v6 with sha256 snapshot/read check, image verification, revision CAS, published roles/steps, read-only timing/link timeline and strict group/topic per-role preflight/frozen binding tests. Native WebView UI adds publish/version select/preview/group/topic/manual same-remark choice and check. CI38956311705 27/27 SUCCESS; new Windows/Linux 30 tests each; Windows x64 shell builds/publishes. True TDLib live authorization has not been integrated and host preflight explicitly denies live authorization to avoid any accidental launch; Windows real testing deferred. Completed16/32=50%.",
+  "notes": "Step17 SQLite v7 simulation-only scheduler: 50 group independent durable virtual clocks, RR round-robin tick, 30s pre-wait then 5s typing, explicitly simulated receipt before 12s post-send wait, per-group pause/resume/stop/fail/review, atomic StopAll, crash/restart Ready/Running/Paused => Review and never background resume. No Telegram outbound IPC; Step18/19 will add separate real outbound policy and receipts. CI 38957627884 29/29 SUCCESS; Scheduler 37 tests each Windows/Linux; Win-x64 published. Development 17/32=53.125%, 15 remain.",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
@@ -142,6 +143,11 @@
       "id": "PUBLISH-PREFLIGHT-REAL-WINDOWS",
       "status": "DEFERRED",
       "detail": "Win10/11真实WebView2发布/预览/群话题选择与重复备注人工指派体验、TDLib原生即时账号授权和本次启动权限刷新、实际群任务绑定持久化/真实执行、50群稳定性。当前仅mock测试、客户端默认拒绝启动。"
+    },
+    {
+      "id": "SCHEDULER-REAL-50GROUP",
+      "status": "DEFERRED",
+      "detail": "Step17 only runs deterministic simulator and SQLite simulation checkpoints; no actual TDLib Telegram sends. Future real durable runs/outbox integration, Windows10/11 control panel interactions, 50 legal Telegram group tasks, session/permission reevaluation, network/sleep/crash recovery and 72h pressure testing require final user verification."
     }
   ],
   "step03_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38921641970",
@@ -188,5 +194,8 @@
   "step15_total_ci_jobs": 25,
   "step16_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38956311705",
   "step16_preflight_checks_per_os": 30,
-  "step16_total_ci_jobs": 27
+  "step16_total_ci_jobs": 27,
+  "step17_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38957627884",
+  "step17_scheduler_checks_per_os": 37,
+  "step17_total_ci_jobs": 29
 }

@@ -365,9 +365,26 @@
     "step": "17",
     "title": "任务状态机与 50 群调度",
     "phase": 5,
-    "status": "not_started",
-    "acceptance_evidence": [],
-    "last_commit_sha": null
+    "status": "done_dev",
+    "acceptance_evidence": [
+      "src/Core/StateMachine/SchedulerStates.cs",
+      "src/Core/StateMachine/JobStateMachine.cs",
+      "src/Core/Scheduler/FairScheduler.cs",
+      "src/Core/Scheduler/SchedulerCheckpointStore.cs",
+      "src/Infrastructure/Persistence/Migrations/0007_scheduler_simulations.sql",
+      "tests/Scheduler/Program.cs",
+      "docs/STEP_17_SCHEDULER.md",
+      "docs/STEP_17_TEST_MATRIX.md",
+      "docs/STEP_17_ACCEPTANCE.md",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/38957627884"
+    ],
+    "last_commit_sha": "8bf4e7028aec53b0449e05f4134f1aefddeb176b",
+    "deferred_release_acceptance": [
+      "SCHEDULER-REAL-50GROUP",
+      "AUTH-REAL-ACCOUNT",
+      "GROUPS-REAL-SYNC",
+      "TDLIB-NATIVE-BINARY"
+    ]
   },
   {
     "step": "18",
