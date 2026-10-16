@@ -160,7 +160,8 @@ public partial class MainWindow : Window
             if(operation is AllowedIpcOperation.ScriptsList or AllowedIpcOperation.ScriptsGet or
                 AllowedIpcOperation.ScriptsCreate or AllowedIpcOperation.ScriptsSave or
                 AllowedIpcOperation.ScriptsDuplicate or AllowedIpcOperation.ScriptsArchive or
-                AllowedIpcOperation.ScriptsRestore)
+                AllowedIpcOperation.ScriptsRestore or AllowedIpcOperation.ScriptsExport or
+                AllowedIpcOperation.ScriptsImport)
             {
                 await HandleScriptRequestAsync(jsonMessage,request.RequestId,request.Type);
                 return;

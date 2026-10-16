@@ -28,9 +28,12 @@ public sealed class EditorDraftRepository
         if(id==Guid.Empty)throw new ArgumentException("Missing draft ID.");
         return id.ToString("D");
     }
-    public DraftSnapshot Create(string title)
+    public DraftSnapshot Create(string title)=>CreateDocument(new EditorDocument(title,new(),new()));
+
+    /// <summary>Atomic import: no empty draft remains if the imported document is invalid.</summary>
+    public DraftSnapshot CreateDocument(EditorDocument input)
     {
-        var doc=EditorDocumentRules.Validate(new EditorDocument(title,new(),new()));
+        var doc=EditorDocumentRules.Validate(input);
         var id=Guid.NewGuid();
         var now=Time();
         var json=JsonSerializer.Serialize(doc,EditorDocumentRules.WireOptions);

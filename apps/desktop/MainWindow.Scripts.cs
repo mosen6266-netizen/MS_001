@@ -15,6 +15,12 @@ public partial class MainWindow
         {
             using var root=JsonDocument.Parse(raw);
             var p=root.RootElement.GetProperty("payload");
+            if(type is "scripts.export" or "scripts.import")
+            {
+                await HandlePortableScriptRequestAsync(id,type,
+                    type=="scripts.export"?p.GetProperty("id").GetString():null);
+                return;
+            }
             object output=await Task.Run<object>(()=>type switch
             {
                 "scripts.list" => new {items=_editor.List(

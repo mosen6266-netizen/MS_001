@@ -2,7 +2,7 @@ using System.Text.Json;
 
 namespace Mosen.GroupScheduler.Core.Security;
 
-public enum AllowedIpcOperation { SystemPing, AppInfo, SettingsGet, SettingsSave, DiagnosticsGet, AccountsList, AccountsCreate, AccountsEdit, AccountsArchive, AccountsRestore, GroupsList, GroupsTopics, GroupsMembers, ScriptsList, ScriptsGet, ScriptsCreate, ScriptsSave, ScriptsDuplicate, ScriptsArchive, ScriptsRestore, MediaImport, MediaPreview }
+public enum AllowedIpcOperation { SystemPing, AppInfo, SettingsGet, SettingsSave, DiagnosticsGet, AccountsList, AccountsCreate, AccountsEdit, AccountsArchive, AccountsRestore, GroupsList, GroupsTopics, GroupsMembers, ScriptsList, ScriptsGet, ScriptsCreate, ScriptsSave, ScriptsDuplicate, ScriptsArchive, ScriptsRestore, ScriptsExport, ScriptsImport, MediaImport, MediaPreview }
 
 /// <summary>Fail-closed JSON input gate: exact origin is checked separately by WebView2 host.</summary>
 public static class IpcRequestGuard
@@ -53,6 +53,8 @@ public static class IpcRequestGuard
                 case "scripts.duplicate": operation=AllowedIpcOperation.ScriptsDuplicate; break;
                 case "scripts.archive": operation=AllowedIpcOperation.ScriptsArchive; break;
                 case "scripts.restore": operation=AllowedIpcOperation.ScriptsRestore; break;
+                case "scripts.export": operation=AllowedIpcOperation.ScriptsExport; break;
+                case "scripts.import": operation=AllowedIpcOperation.ScriptsImport; break;
                 case "media.import": operation=AllowedIpcOperation.MediaImport; break;
                 case "media.preview": operation=AllowedIpcOperation.MediaPreview; break;
                 default: return false;
@@ -69,7 +71,8 @@ public static class IpcRequestGuard
             if(operation is AllowedIpcOperation.ScriptsList or AllowedIpcOperation.ScriptsGet or
                 AllowedIpcOperation.ScriptsCreate or AllowedIpcOperation.ScriptsSave or
                 AllowedIpcOperation.ScriptsDuplicate or AllowedIpcOperation.ScriptsArchive or
-                AllowedIpcOperation.ScriptsRestore)
+                AllowedIpcOperation.ScriptsRestore or AllowedIpcOperation.ScriptsExport or
+                AllowedIpcOperation.ScriptsImport)
             {
                 if(!ExactFields(root,RootWriteFields) || !root.TryGetProperty("payload",out var data))
                     return false;
@@ -150,10 +153,12 @@ public static class IpcRequestGuard
             AllowedIpcOperation.ScriptsCreate=>new HashSet<string>{"title"},
             AllowedIpcOperation.ScriptsSave=>new HashSet<string>{"id","expectedRevision","document"},
             AllowedIpcOperation.ScriptsArchive=>new HashSet<string>{"id","expectedRevision","confirmation"},
+            AllowedIpcOperation.ScriptsImport=>new HashSet<string>(),
             AllowedIpcOperation.ScriptsRestore=>new HashSet<string>{"id","expectedRevision"},
             _=>new HashSet<string>{"id"}
         };
         if(!ExactFields(p,fields))return false;
+        if(operation==AllowedIpcOperation.ScriptsImport)return true;
         if(operation==AllowedIpcOperation.ScriptsList)
             return p.GetProperty("archived").ValueKind is JsonValueKind.True or JsonValueKind.False
                 && Label(p,"query",128,true);

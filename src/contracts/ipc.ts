@@ -13,7 +13,7 @@ export type MemberRecord={accountId:string;alias:string;status:string;canSendTex
 export type GroupPage={items:GroupRecord[];total:number;page:number;pageSize:number};
 export type TopicPage={items:TopicRecord[];total:number;page:number;pageSize:number};
 export type GroupRequest={protocol:typeof IPC_PROTOCOL;requestId:string;type:GroupAction;payload:Record<string,unknown>};
-export type ScriptAction="scripts.list"|"scripts.get"|"scripts.create"|"scripts.save"|"scripts.duplicate"|"scripts.archive"|"scripts.restore";
+export type ScriptAction="scripts.list"|"scripts.get"|"scripts.create"|"scripts.save"|"scripts.duplicate"|"scripts.archive"|"scripts.restore"|"scripts.export"|"scripts.import";
 export type EditorRole={roleKey:string;roleLabel:string};
 export type TimingProfile={preSendDelayMs:number;typingDurationMs:number;postSendDelayMs:number};
 export type MediaReference={assetId:string;mimeType:"image/png"|"image/jpeg"|"image/webp";byteLength:number;width:number;height:number;fileName:string};
@@ -63,13 +63,14 @@ export function isBridgeRequest(v:unknown):v is BridgeRequest {
       "scripts.list":["query","archived"],"scripts.get":["id"],
       "scripts.create":["title"],"scripts.save":["id","expectedRevision","document"],
       "scripts.duplicate":["id"],"scripts.archive":["id","expectedRevision","confirmation"],
-      "scripts.restore":["id","expectedRevision"]
+      "scripts.restore":["id","expectedRevision"],"scripts.export":["id"],"scripts.import":[]
     };
     if(!(v.type in schema)||!isRecord(v.payload)||Object.keys(v).length!==4)return false;
     const action=v.type as ScriptAction;
     if(Object.keys(v.payload).sort().join(",")!==[...schema[action]].sort().join(","))return false;
     const p=v.payload;
     if(action==="scripts.list")return typeof p.query==="string"&&p.query.length<=128&&typeof p.archived==="boolean";
+    if(action==="scripts.import")return true;
     if(action==="scripts.create")return typeof p.title==="string"&&p.title.trim().length>0&&p.title.length<=128;
     if(typeof p.id!=="string"||!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(p.id))return false;
     if(action==="scripts.save"||action==="scripts.archive"||action==="scripts.restore"){

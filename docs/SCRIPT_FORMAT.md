@@ -1,0 +1,11 @@
+# .mosentgscript portable script package — V1
+
+Project: MS_001. Version: 1. ZIP with `manifest.json` plus optional `media/<lowercase-64-hex-sha256>.png|jpg|webp` files.
+
+- `manifest.json`: strict JSON `{format:"mosen.telegram.script",version:1,document:{title,roles,steps,defaults}}`; `roles` contain only `roleKey` (UUID) and `roleLabel` (custom remark). Steps contain only role UUID, body, three serial timing values, and optional image metadata. Unknown keys **reject**. No account identifiers, Telegram user IDs, phone, login sessions, export passwords, cookies or tokens are included.
+- The three timing fields in milliseconds are preserved exactly. Pre-send wait **finishes before** typing begins: 30,000ms + 5,000ms => earliest send initiation at 35,000ms, plus network and platform time.
+- Media is content-addressed. SHA-256, bytes, MIME, width and height must match the manifest. PNG/JPEG/WebP only, max image 5MiB, total assets <=128MiB. No executable SVG. Shared image packaged once. Unlisted files, duplicates, archive symlinks, directories, backslashes, absolute names and traversal rejected. ZIP entries and expanded size are bounded.
+- Import validates the *whole* ZIP before any file is installed. Media integrity is re-verified by the existing local MediaAssetStore. If saving fails, source ZIP and existing local drafts remain unchanged; non-referenced deduplicated image blobs may remain after failed import and must not be garbage-collected without reference checks.
+- Account remarks are Unicode NFC-normalized, trimmed, then compared **exactly** (case-sensitive). Target device may have extra accounts. Missing remarks produce an explicit list; multiple candidates remain `ambiguous` (no auto-selection). At future launch preflight (Step16), actual group membership/permissions constrain candidates; if still ambiguous, require explicit per-group choice, never arbitrary rotation.
+- Draft export/import uses a native Windows file dialog; no arbitrary file path crosses browser IPC. Imported script is a new draft with its own local script ID; the account bindings are **not** imported. The ZIP cannot trigger a Telegram login, session mutation or send action.
+- No live Telegram/Windows full installer user acceptance has been performed. Platform and per-group eligibility must be checked at run start (Step16).

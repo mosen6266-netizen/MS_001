@@ -315,6 +315,50 @@ export function ScriptEditorPanel({preferences}:{preferences:UserPreferences}){
     if(!isScriptSnapshot(result))throw new Error("保存结果无效");
     return result;
   },[request]);
+  const exportScript=async()=>{
+    if(!script||busy||!window.chrome?.webview)return;
+    if(workspaceRef.current&&!(await workspaceRef.current.flush())){
+      setMessage("导出前必须先保存当前修改，请检查保存状态。");return;
+    }
+    setBusy(true);
+    try{
+      const result=await request("scripts.export",{id:script.scriptId});
+      if(typeof result!=="object"||result===null)throw new Error("导出响应异常");
+      if("cancelled" in result&&result.cancelled===true){setMessage("已取消导出");return;}
+      if(!("saved" in result)||result.saved!==true)throw new Error("没有生成导出文件");
+      setMessage("已导出 .mosentgscript，包含剧本文字、三段时间、角色备注和图片，不包含账号会话。");
+    }catch(e){setMessage(e instanceof Error?e.message:"导出失败");}
+    finally{setBusy(false);}
+  };
+  const importScript=async()=>{
+    if(busy||!window.chrome?.webview)return;
+    if(workspaceRef.current&&!(await workspaceRef.current.flush())){
+      setMessage("先保存当前剧本再导入，避免未保存内容丢失。");return;
+    }
+    setBusy(true);
+    try{
+      const result=await request("scripts.import",{});
+      if(typeof result!=="object"||result===null)throw new Error("导入响应异常");
+      if("cancelled" in result&&result.cancelled===true){setMessage("已取消导入");return;}
+      if(!("draft" in result)||!isScriptSnapshot(result.draft))throw new Error("导入草稿无效");
+      setScript(result.draft);
+      await list();
+      let message="剧本和图片已导入为新草稿。";
+      if("roleMatches" in result&&Array.isArray(result.roleMatches)){
+        const problems=result.roleMatches.filter((r:unknown)=>typeof r==="object"&&r!==null&&
+          "status" in r&&(r.status==="missing"||r.status==="ambiguous"));
+        if(problems.length){
+          const labels=problems.map((r:unknown)=>{
+            if(typeof r!=="object"||r===null||!("roleLabel" in r)||!("status" in r))return "";
+            return String(r.roleLabel)+(r.status==="missing"?"（本机缺少）":"（同名账号需指定）");
+          }).filter(Boolean);
+          message+=" 待处理角色："+labels.join("、")+"。启动任务前必须解决。";
+        }
+      }
+      setMessage(message);
+    }catch(e){setMessage(e instanceof Error?e.message:"导入失败");}
+    finally{setBusy(false);}
+  };
   const duplicate=async()=>{
     if(!script||busy)return;
     if(workspaceRef.current&&!(await workspaceRef.current.flush())){setMessage("先保存当前剧本");return;}
@@ -355,6 +399,7 @@ export function ScriptEditorPanel({preferences}:{preferences:UserPreferences}){
       <div className="script-create">
         <TextField label="新建剧本名称" value={title} onChange={setTitle}/>
         <ActionButton tone="success" onClick={()=>void create()} disabled={busy||!title.trim()}>新建剧本</ActionButton>
+        <ActionButton disabled={busy||!window.chrome?.webview} onClick={()=>void importScript()}>导入 .mosentgscript</ActionButton>
       </div>
       <TextField label="搜索剧本" value={query} onChange={setQuery}/>
       <div className="ui-action-row">
@@ -379,6 +424,7 @@ export function ScriptEditorPanel({preferences}:{preferences:UserPreferences}){
           <div className="script-main-top">
             <h2>剧本消息编辑</h2>
             <ActionButton disabled={busy} onClick={()=>void duplicate()}>复制整个剧本</ActionButton>
+            <ActionButton disabled={busy} onClick={()=>void exportScript()}>导出 .mosentgscript</ActionButton>
           </div>
           <ScriptWorkspace key={script.scriptId} ref={workspaceRef} script={script} aliases={aliases} save={save} requestMedia={request}/>
         </>:<div className="ui-demo-box">

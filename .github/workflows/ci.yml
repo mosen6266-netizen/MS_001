@@ -248,3 +248,18 @@ jobs:
           dotnet-version: "10.0.x"
       - name: Test virtual 30-plus-5 phase ordering and secure image persistence
         run: dotnet run --project tests/Scripts/Timing/Mosen.GroupScheduler.ScriptTiming.Tests.csproj --configuration Release
+
+  script-portable:
+    name: Portable ZIP safety and remark matching - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: Test cross-device archive compatibility, role ambiguity and ZIP attacks
+        run: dotnet run --project tests/Scripts/Portable/Mosen.GroupScheduler.ScriptPortable.Tests.csproj --configuration Release
