@@ -141,7 +141,7 @@
     "step": "08",
     "title": "客户端本地安全和诊断基础",
     "phase": 2,
-    "status": "not_started",
+    "status": "in_progress",
     "acceptance_evidence": [],
     "last_commit_sha": null
   },

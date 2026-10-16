@@ -6,7 +6,7 @@
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
   "current_step": "08",
-  "current_step_status": "not_started",
+  "current_step_status": "in_progress",
   "phase": 2,
   "total_steps": 32,
   "completed_steps": [
@@ -31,7 +31,7 @@
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step07 SQLite设置revision防冲突/保存/读取、WPF异步白名单IPC、React设置页、300项模拟搜索/分页防抖与1000次重复提交防重通过CI。实际Windows/Telegram接入与磁盘故障DEFERRED。开发进度7/32。",
+  "notes": "Step08 in progress: isolated Win32 DPAPI credential envelope, IPC strict allowlist/payload limits, structured redacted diagnostics, health counters and crash reporting. No real Telegram account actions.",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
