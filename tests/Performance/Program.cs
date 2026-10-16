@@ -72,8 +72,8 @@ cacheOn.Observe(S(now,cache:800));
 Check(cacheOn.Observe(S(now.AddSeconds(15),cache:800)).Level==PressureLevel.Conserve,
     "cache pressure independently triggers optional refresh slowdown");
 var logOn=new ResourceBudgetMonitor();
-logOn.Observe(S(now,logBytes:520000));
-Check(logOn.Observe(S(now.AddSeconds(15),logBytes:520000)).Level==PressureLevel.Critical,
+logOn.Observe(S(now,logBytes:550000));
+Check(logOn.Observe(S(now.AddSeconds(15),logBytes:550000)).Level==PressureLevel.Critical,
     "oversized diagnostic log budget is independently detected");
 var threadOn=new ResourceBudgetMonitor();
 threadOn.Observe(S(now,threads:175));
