@@ -20,7 +20,8 @@ public partial class MainWindow
                 "accounts.list" => _accountRegistry.Find(
                     p.GetProperty("query").GetString()!,
                     p.GetProperty("group").GetString() is string g && g.Length>0 ? g : null,
-                    p.GetProperty("page").GetInt32(),p.GetProperty("pageSize").GetInt32()),
+                    p.GetProperty("page").GetInt32(),p.GetProperty("pageSize").GetInt32(),
+                    p.GetProperty("archived").GetBoolean()),
                 "accounts.create" => _accountRegistry.Register(p.GetProperty("alias").GetString()!,
                     p.GetProperty("groupTag").GetString()!),
                 "accounts.edit" => _accountRegistry.Edit(

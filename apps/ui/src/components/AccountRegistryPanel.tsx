@@ -8,6 +8,7 @@ export function AccountRegistryPanel({preferences}:{preferences:UserPreferences}
   const [query,setQuery]=useState("");
   const [group,setGroup]=useState("");
   const [page,setPage]=useState(1);
+  const [showArchived,setShowArchived]=useState(false);
   const [result,setResult]=useState<AccountPage>({items:[],total:0,page:1,pageSize:preferences.pageSize});
   const [state,setState]=useState<"loading"|"ready"|"error">("loading");
   const [alias,setAlias]=useState("");
@@ -54,14 +55,14 @@ export function AccountRegistryPanel({preferences}:{preferences:UserPreferences}
   useEffect(()=>{
     let active=true;
     setState("loading");
-    request("accounts.list",{query:debounce,group,page,pageSize:preferences.pageSize})
+    request("accounts.list",{query:debounce,group,page,pageSize:preferences.pageSize,archived:showArchived})
       .then(data=>{
         if(!active)return;
         if(!isAccountPage(data))throw new Error("本地账号列表响应格式异常");
         setResult(data);setState("ready");
       }).catch(()=>{if(active)setState("error");});
     return ()=>{active=false;};
-  },[request,debounce,group,page,preferences.pageSize,serial]);
+  },[request,debounce,group,page,preferences.pageSize,showArchived,serial]);
   const announce=(message:string,tone:"success"|"danger"="success")=>
     setToast({id:Date.now(),message,tone});
   const refresh=()=>setSerial(x=>x+1);
@@ -98,6 +99,11 @@ export function AccountRegistryPanel({preferences}:{preferences:UserPreferences}
       <p className="ui-preview-caption" style={{marginTop:10}}>
         最多登记300个账号。登录与会话恢复需要官方 TDLib 原生库验收后才能使用；备注和分组数据已保存于本机 SQLite。
       </p>
+      <div className="ui-action-row" style={{marginBottom:14}}>
+        <ActionButton tone={!showArchived?"success":"quiet"} onClick={()=>{setShowArchived(false);setPage(1);}}>正常账号</ActionButton>
+        <ActionButton tone={showArchived?"success":"quiet"} onClick={()=>{setShowArchived(true);setPage(1);}}>已归档账号</ActionButton>
+        <StatusPill>连接池默认16槽 · 真实连接尚未启用</StatusPill>
+      </div>
       <div className="ui-form-row">
         <TextField label="搜索账号备注" value={query} onChange={x=>{setQuery(x);setPage(1);}} placeholder="查找账号"/>
         <TextField label="按分组筛选（留空表示全部）" value={group} onChange={x=>{setGroup(x);setPage(1);}}/>
@@ -108,8 +114,13 @@ export function AccountRegistryPanel({preferences}:{preferences:UserPreferences}
         {result.items.map(item=><li key={item.id} className="ui-account-row">
           <div><strong>{item.alias}</strong><small>{item.groupTag||"未分组"} · {item.displayName||"未绑定Telegram身份"} · 未连接</small></div>
           <div className="ui-action-row">
-            <ActionButton disabled={busy||!item.canAttachSession} onClick={()=>startEdit(item)}>编辑备注</ActionButton>
-            <ActionButton tone="danger" disabled={busy||!item.canAttachSession} onClick={()=>{setArchive(item);setTypedAlias("");}}>归档</ActionButton>
+            {showArchived?
+              <ActionButton tone="success" disabled={busy||!item.canAttachSession}
+                onClick={()=>write("accounts.restore",{id:item.id,expectedRevision:item.revision},"账号已恢复到正常目录，仍须官方授权才能登录")}>恢复账号</ActionButton>:
+              <>
+                <ActionButton disabled={busy||!item.canAttachSession} onClick={()=>startEdit(item)}>编辑备注</ActionButton>
+                <ActionButton tone="danger" disabled={busy||!item.canAttachSession} onClick={()=>{setArchive(item);setTypedAlias("");}}>归档</ActionButton>
+              </>}
           </div>
         </li>)}
         {!result.items.length&&state==="ready"?<li className="ui-empty">暂无匹配账号</li>:null}

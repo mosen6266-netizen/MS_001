@@ -31,7 +31,7 @@ export function isBridgeRequest(v:unknown):v is BridgeRequest {
     return Number.isSafeInteger(v.payload.expectedRevision) && (v.payload.expectedRevision as number)>=0 && isPreferences(v.payload.preferences);
   }
   const schemas:Record<AccountAction,readonly string[]>={
-    "accounts.list":["query","group","page","pageSize"],
+    "accounts.list":["query","group","page","pageSize","archived"],
     "accounts.create":["alias","groupTag"],
     "accounts.edit":["id","expectedRevision","alias","groupTag"],
     "accounts.archive":["id","expectedRevision","typedAlias"],
@@ -52,6 +52,7 @@ export function isBridgeRequest(v:unknown):v is BridgeRequest {
       (Number.isSafeInteger(body.expectedRevision)&&Number(body.expectedRevision)>0);
     if(!validId||!validRev)return false;
     if(type==="accounts.list")return label("query",128,true)&&label("group",64,true)&&
+      typeof body.archived==="boolean"&&
       Number.isInteger(body.page)&&Number(body.page)>=1&&Number(body.page)<=1000000&&[10,20,50].includes(Number(body.pageSize));
     if(type==="accounts.create"||type==="accounts.edit")return label("alias",64)&&label("groupTag",64,true);
     if(type==="accounts.archive")return label("typedAlias",64);

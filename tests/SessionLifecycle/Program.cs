@@ -49,6 +49,8 @@ try
     Check(confirmation&&reg.Find().Total==300,"wrong archive confirmation preserves account");
     reg.Archive(Guid.Parse(verified.Id),verified.Revision,verified.Alias);
     Check(reg.Find().Total==299&&reg.Get(Guid.Parse(verified.Id))==null,"confirmed archive hides account without deleting files");
+    Check(reg.Find(archived:true).Total==1,"archived account visible in recovery listing");
+    Check(reg.Find(archived:true).Items[0].Removed,"archived list returns tombstone metadata");
     var deleted=reg.Get(Guid.Parse(verified.Id),includeRemoved:true)!;
     Check(deleted.Removed&&deleted.Revision==verified.Revision+1,"archived metadata retained with revision");
     reg.Restore(Guid.Parse(deleted.Id),deleted.Revision);

@@ -74,7 +74,7 @@ public static class IpcRequestGuard
     private static bool ValidateAccountPayload(AllowedIpcOperation action,JsonElement body)
     {
         IReadOnlySet<string> fields=action switch {
-            AllowedIpcOperation.AccountsList=>new HashSet<string>{ "query","group","page","pageSize" },
+            AllowedIpcOperation.AccountsList=>new HashSet<string>{ "query","group","page","pageSize","archived" },
             AllowedIpcOperation.AccountsCreate=>new HashSet<string>{ "alias","groupTag" },
             AllowedIpcOperation.AccountsEdit=>new HashSet<string>{ "id","expectedRevision","alias","groupTag" },
             AllowedIpcOperation.AccountsArchive=>new HashSet<string>{ "id","expectedRevision","typedAlias" },
@@ -94,6 +94,7 @@ public static class IpcRequestGuard
         return action switch {
             AllowedIpcOperation.AccountsList =>
                 Label(body,"query",128,true)&&Label(body,"group",64,true)&&
+                body.GetProperty("archived").ValueKind is (JsonValueKind.True or JsonValueKind.False) &&
                 IntegerValue(body,"page",1,1000000)&&
                 (IntegerValue(body,"pageSize",10,10)||IntegerValue(body,"pageSize",20,20)||IntegerValue(body,"pageSize",50,50)),
             AllowedIpcOperation.AccountsCreate or AllowedIpcOperation.AccountsEdit =>
