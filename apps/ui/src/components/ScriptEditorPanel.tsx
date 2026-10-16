@@ -300,7 +300,7 @@ export function ScriptEditorPanel({preferences}:{preferences:UserPreferences}){
   };
   const filtered=all.filter(x=>x.title.toLocaleLowerCase().includes(query.toLocaleLowerCase()));
   return <div className="script-editor-layout" aria-label="可视化剧本编辑器">
-    <aside className="script-directory">
+    <div className="script-directory" role="region" aria-label="我的剧本列表">
       <h2 id="panel-title">我的剧本</h2>
       <StatusPill tone="warning">仅本地草稿 · 不会发送消息</StatusPill>
       <div className="script-create">
@@ -323,7 +323,7 @@ export function ScriptEditorPanel({preferences}:{preferences:UserPreferences}){
         </li>)}
       </ul>
       <small>{message}</small>
-    </aside>
+    </div>
     <div className="script-editor-main">
       {script&&!script.archived?
         <>
