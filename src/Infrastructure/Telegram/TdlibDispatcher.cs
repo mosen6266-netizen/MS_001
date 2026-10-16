@@ -29,8 +29,9 @@ public sealed class TdlibDispatcher : IAsyncDisposable
     private readonly TimeSpan _pollInterval;
     private readonly TimeSpan _closeGrace;
     private Task? _pump;
+    private readonly object _sendGate = new();
     private long _sequence;
-    private int _started, _shutdown;
+    private int _started, _shutdown, _pumpStarted;
 
     private sealed record PendingRequest(int ClientId, TaskCompletionSource<TdlibEnvelope> Completion);
 
@@ -66,7 +67,14 @@ public sealed class TdlibDispatcher : IAsyncDisposable
         EnsureActive();
         if (Interlocked.CompareExchange(ref _started,1,0) != 0)
             throw new InvalidOperationException("A process may have only one active TDLib receive loop.");
-        _pump = Task.Run(ReceiveLoopAsync);
+        // TDLib documentation requires a first request before td_receive is called.
+        // Launch the single receive loop after the first actual td_send, not here.
+    }
+
+    private void StartPumpAfterFirstSend()
+    {
+        if (Interlocked.CompareExchange(ref _pumpStarted,1,0)==0)
+            _pump=Task.Run(ReceiveLoopAsync);
     }
 
     public async Task<TdlibEnvelope> SendControlAsync(int clientId, TdlibControlCommand command,
@@ -95,7 +103,12 @@ public sealed class TdlibDispatcher : IAsyncDisposable
             throw new InvalidOperationException("Duplicate correlation ID.");
         try
         {
-            _transport.Send(clientId,json);
+            lock(_sendGate)
+            {
+                EnsureActive();
+                _transport.Send(clientId,json);
+                StartPumpAfterFirstSend();
+            }
             // Timeouts are terminal: no automatic resend or mutation of authenticated state.
             return await completion.Task.WaitAsync(timeout,cancellationToken);
         }
@@ -172,8 +185,15 @@ public sealed class TdlibDispatcher : IAsyncDisposable
         // is only confirmed after authorizationStateClosed updates.
         foreach (int client in _closed.Keys.Order())
         {
-            try { _transport.Send(client, """{"@type":"close"}"""); }
-            catch (Exception) { /* best effort; release waiters and report incomplete close */ }
+            try
+            {
+                lock(_sendGate)
+                {
+                    _transport.Send(client, """{"@type":"close"}""");
+                    StartPumpAfterFirstSend();
+                }
+            }
+            catch (Exception) { /* best effort; report incomplete close */ }
         }
         if (_pump is not null && _closed.Count>0 && _closeGrace>TimeSpan.Zero)
         {
