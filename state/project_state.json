@@ -6,7 +6,7 @@
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
   "current_step": "06",
-  "current_step_status": "not_started",
+  "current_step_status": "in_progress",
   "phase": 2,
   "total_steps": 32,
   "completed_steps": [
@@ -29,7 +29,7 @@
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step05固定侧栏、单文档路由/滚动恢复/Alt+1–6、WPF窗口位置保存和暗色加载屏均通过代码和GitHub CI。视觉无闪烁、DPI、真实关闭后台资源统一DEFERRED。开发进度5/32。",
+  "notes": "Step06 in progress: implement reusable dark design tokens, semantic controls, confirmation modal left/green/right/red, non-stacking notifications, high DPI layout and CI checks.",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
