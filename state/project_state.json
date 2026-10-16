@@ -19,7 +19,7 @@
   "icon_source_received": true,
   "icon_asset_upload_verified": true,
   "exact_timing_contract": "wait preSendDelayMs -> typing typingDurationMs -> send; 30s+5s=35s; no overlap",
-  "last_verified_commit_sha": "7f70491032a97234f11afce6f364eac42398a0b9",
+  "last_verified_commit_sha": "15c60ce77bba52494004168081f62f4758292fbb",
   "last_updated": "2026-10-16",
   "blocking_issues": [
     "Step02需Windows实机/模拟环境做单账号TDLib技术验证，尚未实测",
