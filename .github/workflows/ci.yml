@@ -308,3 +308,18 @@ jobs:
           dotnet-version: "10.0.x"
       - name: Validate 50-group concurrency, strict permissions and official rate wait
         run: dotnet run --project tests/Policy/Mosen.GroupScheduler.Policy.Tests.csproj --configuration Release
+
+  delivery-dedup:
+    name: Durable receipt matching and crash-safe de-duplication - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: Verify reordered callbacks, duplicate receipts, network uncertainty and restart quarantine
+        run: dotnet run --project tests/Delivery/Mosen.GroupScheduler.Delivery.Tests.csproj --configuration Release

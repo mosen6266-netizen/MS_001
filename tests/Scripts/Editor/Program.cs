@@ -7,7 +7,7 @@ var root=Path.Combine(Path.GetTempPath(),"ms001-editor-"+Guid.NewGuid().ToString
 try
 {
  var db=new AppDatabase(Path.Combine(root,"app.db"));db.Initialize();var scripts=new EditorDraftRepository(db);
- Verify(db.GetSchemaVersion()==7,"draft schema upgrades to v7");
+ Verify(db.GetSchemaVersion()==8,"draft schema upgrades to v8");
  var created=scripts.Create("示例剧本");
  Verify(created.Revision==1&&created.Document.Roles.Count==0,"empty script draft created locally");
  Verify(scripts.List().Count==1,"script index persists");
