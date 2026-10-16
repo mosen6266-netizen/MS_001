@@ -32,7 +32,7 @@ describe("script editor portability and bridge security",()=>{
     const html=renderToStaticMarkup(<ScriptEditorPanel preferences={DEFAULT_PREFERENCES}/>);
     expect(html).toContain("可视化剧本编辑器");
     expect(html).toContain("仅本地草稿");
-    expect(html).toContain("Windows 本地剧本保存");
+    expect(html).toContain("正在读取本地剧本");
     expect(html).not.toContain("立即发送");
   });
 });
