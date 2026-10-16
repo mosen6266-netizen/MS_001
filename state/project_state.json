@@ -6,7 +6,7 @@
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
   "current_step": "25",
-  "current_step_status": "not_started",
+  "current_step_status": "in_progress",
   "phase": 5,
   "total_steps": 32,
   "completed_steps": [
@@ -48,7 +48,7 @@
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step24 done_dev: process CPU/WorkingSet/GC heap/threads/Windows handles and explicit timer/cache/log budgets. Two high samples degrade and three low restore; resource alerts dedup; adaptive WPF read-only dashboard 5/15/30s and notification scans 6/30/60s; critical stop controls remain immediate. LRU capacity <=1024; 480-minute ResourceTrend; unified WebView2 navigation/message and tray/Dispatcher event unsubscriptions and cleanup. 28800 synthetic 1s ticks model eight hours, NOT real 8h Windows long soak. Windows/Linux 227 assertions each; full CI 38973014639 completed success 43/43 including win-x64 WPF publish. Live Telegram TDLib/50-group real sustained test deferred. Progress 24/32=75%, 8 steps remain, next Step25 isolated licensing.",
+  "notes": "Step25 in progress, current accepted progress 24/32. Isolated MS_001-only Telegram license Worker and dedicated D1 schema with HMAC card hashes, atomic device quotas and renewal idempotency, P256 signed leases and .NET verifier (1h max), no Signal MS002 production changes. GitHub CI 38974642970 pending, do not mark done_dev until completed success. Cloudflare new worker/D1 actual live provisioning and license WPF UI deferred.",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
@@ -266,5 +266,7 @@
   "step24_source_commit": "45085eb524a70bce21e23bcb691a6b076a6ca4f8",
   "step24_resource_checks_per_os": 227,
   "step24_total_ci_jobs": 43,
-  "step24_simulated_seconds": 28800
+  "step24_simulated_seconds": 28800,
+  "step25_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38974642970",
+  "step25_source_commit": "f394b334054881b171abb2c54c872b28c0b01c06"
 }

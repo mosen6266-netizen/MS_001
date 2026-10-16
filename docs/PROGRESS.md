@@ -247,3 +247,8 @@
 - 代码主提交 [`10c493dc`](https://github.com/mosen6266-netizen/MS_001/commit/10c493dc0f8e413811d9a8c7a11a13bd606b140b)；最后测试修正 [`45085eb5`](https://github.com/mosen6266-netizen/MS_001/commit/45085eb524a70bce21e23bcb691a6b076a6ca4f8)。详细见 `docs/PERFORMANCE.md`、`docs/STEP_24_TEST_MATRIX.md` 和 `docs/STEP_24_ACCEPTANCE.md`。
 - **DEFERRED**：实际Win10/11八小时50群真实账号负载、真实TDLib，WebView2子进程内存和GPU句柄、72小时稳定性、杀软/休眠与唤醒实测；目前仅开发模拟。没有修改Signal MS002或现有生产授权系统。
 - **开发进度24/32（75%），剩余8步；下一步25独立卡密产品授权**，必须与Signal MS002生产卡密完全隔离。
+
+## Step25 — 独立Telegram产品卡密授权（开发与CI验收中）
+- 已提交全新Worker/D1、卡密HMAC摘要、设备绑定及续费幂等、管理员禁用、ECDSA签名离线窗口及跨平台测试。当前完整CI [38974642970](https://github.com/mosen6266-netizen/MS_001/actions/runs/38974642970) 未完成，不将源码提交当作测试通过。
+- 云端资源**未部署**，不指向MS002生产Worker、D1、卡密或Cloudflare Secrets。正式环境ID、公钥/私钥配置及Windows激活UI仍等待后续安全交付。
+- **保持24/32（75%）开发验收进度，当前第25步in_progress**，待成功CI再进入第26步。

@@ -573,9 +573,20 @@
     "step": "25",
     "title": "独立卡密产品授权",
     "phase": 7,
-    "status": "not_started",
-    "acceptance_evidence": [],
-    "last_commit_sha": null
+    "status": "in_progress",
+    "acceptance_evidence": [
+      "license/src/worker.mjs",
+      "license/migrations/0001_license.sql",
+      "license/wrangler.toml",
+      "license/tests/license.test.mjs",
+      "src/Core/Licensing/SignedLicenseVerifier.cs",
+      "src/Core/Licensing/LicenseHttpClient.cs",
+      "src/Core/Licensing/InstallationDeviceId.cs",
+      "tests/Licensing/Program.cs",
+      "docs/STEP_25_LICENSING.md",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/38974642970"
+    ],
+    "last_commit_sha": "f394b334054881b171abb2c54c872b28c0b01c06"
   },
   {
     "step": "26",
