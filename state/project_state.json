@@ -6,7 +6,7 @@
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
   "current_step": "21",
-  "current_step_status": "not_started",
+  "current_step_status": "in_progress",
   "phase": 5,
   "total_steps": 32,
   "completed_steps": [
@@ -44,7 +44,7 @@
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step20: SQLite v9 non-destructive quarantine of corrupted scheduler/delivery records with preserved originals and exclusion from active recovery. Network loss/sleep/closing shuts outbound permit gate, atomically moves running simulations to review, and quarantines Planned=>Review, Submitting/Pending=>Unknown while preserving Confirmed. Reconnecting/waking never resumes. Windows/Linux recovery assertions each 47 PASS; CI 38961738009 30/30 SUCCESS. Real Win10/11 power/network, official TDLib and 50 legal-group stress deferred. Progress 20/32=62.5%, 12 steps remain.",
+  "notes": "Step21 runtime dashboard integrated: read-only SQLite runtime.snapshot IPC, React 50-task paged screen, 1s shared countdown timer and 5s local snapshot polling, search/status filters, issue-highlight, pure domain projection and tests/UI/Dashboard Windows/Linux. GitHub CI run 38963263363 still queued; status IN_PROGRESS and progress remains 20/32. No Telegram sending, real live task API, TDLib auth or production runtime integration.",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
@@ -225,5 +225,7 @@
   "step20_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38961738009",
   "step20_source_commit": "ba4a0bdc231162e1fb733571992c6e427e7b021a",
   "step20_recovery_checks_per_os": 47,
-  "step20_total_ci_jobs": 30
+  "step20_total_ci_jobs": 30,
+  "step21_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38963263363",
+  "step21_source_commit": "e330b85f3f8ea4eb3fccb5329e695be9046f7e27"
 }
