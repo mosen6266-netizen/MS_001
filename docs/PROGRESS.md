@@ -39,3 +39,8 @@
 - 代码提交：见本步骤 GitHub 当前提交历史；第二次提交将补充首个提交SHA以避免自引用。
 
 - 步骤 01 基线提交 SHA：`15c60ce77bba52494004168081f62f4758292fbb`；2026-10-16 已从GitHub回读核对 `state/project_state.json`、`state/steps.json`、需求矩阵、非目标及验收文件，结果一致。
+
+## Step 02 — 技术验证启动及仓库结构恢复（2026-10-16）
+- 发现历史 Git 提交构造 tree 时未设置 base_tree_sha，导致新 main 分支意外缺少规格文件。已以 fast-forward 新提交恢复全部文档，保留 Step01 最新状态；修复提交：`c1561ca471a79546acdcbbf857e1b6039a336391`。
+- 修复规则：今后若使用 Git Data API 创建 tree，必须提供 `base_tree_sha`；提交后必须重新读取 main 的完整文件树，检查规划文件与进度文件仍全部存在。否则不得推进步骤。
+- Step02 当前标记 in_progress；尚未通过 Win10/11 单账号真实授权 / WPF构建 / TDLib native DLL 验收。

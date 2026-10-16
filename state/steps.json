@@ -17,7 +17,7 @@
     "step": "02",
     "title": "关键技术原型与风险验证",
     "phase": 1,
-    "status": "not_started",
+    "status": "in_progress",
     "acceptance_evidence": [],
     "last_commit_sha": null
   },
