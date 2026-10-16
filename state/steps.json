@@ -163,7 +163,7 @@
     "step": "09",
     "title": "TDLib 通信适配层",
     "phase": 3,
-    "status": "not_started",
+    "status": "in_progress",
     "acceptance_evidence": [],
     "last_commit_sha": null
   },
