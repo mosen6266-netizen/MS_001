@@ -8,6 +8,12 @@ const doc={title:"中文 English",roles:[{roleKey:id(1),roleLabel:"客服A"}],
 describe("script editor portability and bridge security",()=>{
   it("accepts portable role keys without a local account ID",()=>{
     console.log("TIMING_VALIDATION_DIAGNOSTIC",{profile:isTimingProfile(doc.steps[0]), defaults:isTimingProfile({preSendDelayMs:30000,typingDurationMs:5000,postSendDelayMs:0}), keys:Object.keys(doc.steps[0]).sort().join(","),isEditorDoc:isEditorDoc(doc)});
+    console.log("ROLE_VALIDATION_DIAGNOSTIC",{
+      role:doc.roles[0].roleKey,step:doc.steps[0].stepKey,
+      roleMatch:/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(doc.roles[0].roleKey),
+      stepMatch:/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(doc.steps[0].stepKey),
+      noSteps:isEditorDoc({...doc,steps:[]}),noRoles:isEditorDoc({...doc,roles:[],steps:[]}),
+      stepOnly:isEditorDoc({...doc,roles:doc.roles,steps:[doc.steps[0]]})});
     expect(isEditorDoc(doc)).toBe(true);
     expect(isBridgeRequest(makeScriptRequest("scripts.save","script-1",
       {id:id(10),expectedRevision:1,document:doc}))).toBe(true);
