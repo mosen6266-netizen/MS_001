@@ -18,6 +18,7 @@ public sealed class TdlibDispatcher : IAsyncDisposable
     private const int MaxClientsForTransportFoundation = 300; // metadata ceiling, not online-capacity claim
     private readonly ITdlibTransport _transport;
     private readonly ConcurrentDictionary<int, TaskCompletionSource<bool>> _closed = new();
+    private readonly ConcurrentDictionary<int,byte> _closeRequested = new();
     private readonly ConcurrentDictionary<string, PendingRequest> _pending = new(StringComparer.Ordinal);
     private readonly Channel<TdlibEnvelope> _updates =
         Channel.CreateBounded<TdlibEnvelope>(new BoundedChannelOptions(256)
@@ -149,7 +150,13 @@ public sealed class TdlibDispatcher : IAsyncDisposable
         EnsureActive();
         cancellationToken.ThrowIfCancellationRequested();
         if(!_closed.ContainsKey(clientId))throw new ArgumentException("Unknown client identifier.",nameof(clientId));
-        lock(_sendGate){EnsureActive();_transport.Send(clientId,"""{"@type":"close"}""");StartPumpAfterFirstSend();}
+        lock(_sendGate)
+        {
+            EnsureActive();
+            if (!_closeRequested.TryAdd(clientId,0)) return Task.CompletedTask;
+            try {_transport.Send(clientId,"""{"@type":"close"}""");StartPumpAfterFirstSend();}
+            catch {_closeRequested.TryRemove(clientId,out _);throw;}
+        }
         return Task.CompletedTask;
     }
 
@@ -227,8 +234,11 @@ public sealed class TdlibDispatcher : IAsyncDisposable
             {
                 lock(_sendGate)
                 {
-                    _transport.Send(client, """{"@type":"close"}""");
-                    StartPumpAfterFirstSend();
+                    if (_closeRequested.TryAdd(client,0))
+                    {
+                        try {_transport.Send(client, """{"@type":"close"}""");StartPumpAfterFirstSend();}
+                        catch {_closeRequested.TryRemove(client,out _);throw;}
+                    }
                 }
             }
             catch (Exception) { /* best effort; report incomplete close */ }
