@@ -15,9 +15,8 @@ public static class TdLibAbiProbe
     [DllImport("tdjson", EntryPoint = "td_create_client_id", CallingConvention = CallingConvention.Cdecl)]
     private static extern int CreateClientId();
 
-    [DllImport("tdjson", EntryPoint = "td_send", CallingConvention = CallingConvention.Cdecl,
-        StringMarshalling = StringMarshalling.Utf8)]
-    private static extern void Send(int clientId, string json);
+    [DllImport("tdjson", EntryPoint = "td_send", CallingConvention = CallingConvention.Cdecl)]
+    private static extern void Send(int clientId, [MarshalAs(UnmanagedType.LPUTF8Str)] string json);
 
     [DllImport("tdjson", EntryPoint = "td_receive", CallingConvention = CallingConvention.Cdecl)]
     private static extern IntPtr Receive(double timeoutSeconds);
