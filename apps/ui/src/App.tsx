@@ -5,6 +5,7 @@ import { PreferencesPanel } from "./components/PreferencesPanel";
 import { MockAccountIndex } from "./components/MockAccountIndex";
 import { AccountRegistryPanel } from "./components/AccountRegistryPanel";
 import { GroupCatalogPanel } from "./components/GroupCatalogPanel";
+import { ScriptEditorPanel } from "./components/ScriptEditorPanel";
 import { AuthStatusPreview } from "./components/AuthStatusPreview";
 import { DiagnosticsPanel } from "./components/DiagnosticsPanel";
 import { usePreferences } from "./hooks/usePreferences";
@@ -76,11 +77,15 @@ export function App() {
         <span className="shell-connection" role="status">{bridgeStatus}</span>
       </header>
       <section className="page-panel" aria-labelledby="panel-title">
+        <div style={{display:shell.active==="scripts"?"block":"none"}}>
+          <ScriptEditorPanel preferences={preferences.snapshot.preferences}/>
+        </div>
+        {shell.active==="scripts"?null:
         {shell.active === "overview" ?
           <div className="overview-grid">
             <article className="summary-tile"><h2>已授权账号</h2><strong>尚未接入</strong><p>真实 Telegram 登录将在后续阶段实现</p></article>
             <article className="summary-tile"><h2>运行任务</h2><strong>0</strong><p>目前不执行群消息发送</p></article>
-            <article className="summary-tile"><h2>工程状态</h2><strong>STEP 12</strong><p>Telegram 群组、话题与权限只读目录</p></article>
+            <article className="summary-tile"><h2>工程状态</h2><strong>STEP 13</strong><p>剧本编辑器、本地草稿和角色备注选择</p></article>
             <article className="notice-tile"><h2 id="panel-title">当前开发范围</h2><p>已实现本地账号登记及只读群组目录；真实 TDLib 同步、账号授权和群组任务尚未接入，当前不会执行发送。</p></article>
           </div> :
           shell.active === "settings" ? <><PreferencesPanel {...preferences} /><DiagnosticsPanel /><DesignShowcase /></> :
