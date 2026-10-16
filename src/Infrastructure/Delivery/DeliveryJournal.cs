@@ -252,7 +252,10 @@ public sealed class DeliveryJournal
             cmd.Transaction=tx;
             cmd.CommandText=@"SELECT attempt_id,run_id,step_key,account_id,chat_id,topic_id,
                 correlation_id,state,platform_message_id,diagnostic_code,revision,created_utc,updated_utc
-                FROM delivery_attempts ORDER BY created_utc,attempt_id;";
+                FROM delivery_attempts d WHERE NOT EXISTS
+                (SELECT 1 FROM recovery_quarantine q
+                 WHERE q.source='delivery_attempts' AND q.record_id=d.attempt_id)
+                ORDER BY created_utc,attempt_id;";
             using var rows=cmd.ExecuteReader();
             while(rows.Read())all.Add(FromRow(rows));
         }
@@ -276,7 +279,10 @@ public sealed class DeliveryJournal
         using var cmd=c.CreateCommand();cmd.Transaction=tx;
         cmd.CommandText=@"SELECT attempt_id,run_id,step_key,account_id,chat_id,topic_id,
                 correlation_id,state,platform_message_id,diagnostic_code,revision,created_utc,updated_utc
-                FROM delivery_attempts WHERE state IN ('Unknown','Review') ORDER BY created_utc,attempt_id;";
+                FROM delivery_attempts d WHERE d.state IN ('Unknown','Review')
+                AND NOT EXISTS (SELECT 1 FROM recovery_quarantine q
+                  WHERE q.source='delivery_attempts' AND q.record_id=d.attempt_id)
+                ORDER BY created_utc,attempt_id;";
         using var rows=cmd.ExecuteReader();
         while(rows.Read())all.Add(FromRow(rows));
         return all;

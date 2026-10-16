@@ -24,7 +24,7 @@ public sealed class SchedulerCheckpointStore
         pragma.ExecuteNonQuery();
         return connection;
     }
-    private static void Validate(SchedulerJob j)
+    public static void ValidateCheckpoint(SchedulerJob j)
     {
         if(!Guid.TryParseExact(j.RunId,"D",out var id)||id==Guid.Empty ||
            !Guid.TryParseExact(j.ScriptId,"D",out var scriptId)||scriptId==Guid.Empty ||
@@ -48,7 +48,7 @@ public sealed class SchedulerCheckpointStore
         if(jobs.Count is <1 or >50 || jobs.Any(x=>x.Revision!=1) ||
            jobs.Select(j=>j.ChatId+"|"+(j.TopicId??"")).Distinct().Count()!=jobs.Count)
             throw new ArgumentException("Invalid simulation batch.");
-        foreach(var j in jobs)Validate(j);
+        foreach(var j in jobs)ValidateCheckpoint(j);
         using var c=Open();using var tx=c.BeginTransaction(deferred:false);
         foreach(var j in jobs)
         {
@@ -75,7 +75,7 @@ public sealed class SchedulerCheckpointStore
     }
     public void Update(SchedulerJob next,int expectedRevision)
     {
-        Validate(next);
+        ValidateCheckpoint(next);
         if(expectedRevision<1||next.Revision!=expectedRevision+1)
             throw new InvalidOperationException("Checkpoint revision mismatch.");
         var json=JsonSerializer.Serialize(next,Json);
@@ -118,7 +118,11 @@ public sealed class SchedulerCheckpointStore
         var jobs=new List<SchedulerJob>();
         using(var cmd=c.CreateCommand())
         {
-            cmd.CommandText="SELECT run_id,state,revision,snapshot_json FROM scheduler_simulation_jobs ORDER BY run_id;";
+            cmd.CommandText=@"SELECT s.run_id,s.state,s.revision,s.snapshot_json
+              FROM scheduler_simulation_jobs s WHERE NOT EXISTS
+              (SELECT 1 FROM recovery_quarantine q
+               WHERE q.source='scheduler_simulation_jobs' AND q.record_id=s.run_id)
+              ORDER BY s.run_id;";
             using var rows=cmd.ExecuteReader();
             while(rows.Read())
             {

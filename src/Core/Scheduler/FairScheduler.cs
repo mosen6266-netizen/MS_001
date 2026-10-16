@@ -107,6 +107,18 @@ public sealed class FairScheduler
         }
         return events;
     }
+    /// <summary>Power/network interruption puts every nonterminal simulated run into manual review,
+    /// writes all checkpoints atomically, and permanently closes this process's scheduler.</summary>
+    public void HoldAllForReview(DateTimeOffset now)
+    {
+        EnsureOpen();
+        var updates=_jobs.Values.Where(x=>!x.Terminal && x.Status!=JobStatus.Review)
+            .Select(x=>(Next:JobStateMachine.Review(x,now) with {Revision=x.Revision+1},
+                Previous:x.Revision)).ToArray();
+        _store.UpdateBatch(updates);
+        foreach(var (next,_) in updates)_jobs[next.RunId]=next;
+        _shutdown=true;
+    }
     public void StopAll(DateTimeOffset now)
     {
         EnsureOpen();

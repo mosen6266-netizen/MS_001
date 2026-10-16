@@ -323,3 +323,18 @@ jobs:
           dotnet-version: "10.0.x"
       - name: Verify reordered callbacks, duplicate receipts, network uncertainty and restart quarantine
         run: dotnet run --project tests/Delivery/Mosen.GroupScheduler.Delivery.Tests.csproj --configuration Release
+
+  recovery-safety:
+    name: Crash, network and sleep recovery with corruption isolation - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: Check persistent quarantine, offline holds and manual recovery barriers
+        run: dotnet run --project tests/Recovery/Mosen.GroupScheduler.Recovery.Tests.csproj --configuration Release
