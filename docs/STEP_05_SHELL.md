@@ -21,4 +21,6 @@
 - SSR/状态模型可以证明切换不依赖页面链接，但不能代替浏览器交互、实际窗口 DPI、多屏设备或录屏判断是否出现视觉闪烁。
 - 最终 Windows 10/11 实机要验证加载遮罩、浏览器内视觉闪烁、导航滚动、125/150/200% DPI、断开 WebView2 Runtime、窗口关闭后台释放情况；按用户要求集中于最终验收。
 - 此时没有连接真实账号、没有群组自动发送、没有 Cloudflare 授权部署，旧 Signal MS002 绝不修改。
-\n## 自动化结果\n[CI 38924326676](https://github.com/mosen6266-netizen/MS_001/actions/runs/38924326676)：6个 job success，UI Vitest 8项、Windows/Linux窗口几何各10项、数据库回归与WPF编译通过；最终实机GUI验收仍DEFERRED。\n
+
+## 自动化结果
+[CI 38924326676](https://github.com/mosen6266-netizen/MS_001/actions/runs/38924326676)：6个 job success，UI Vitest 8项、Windows/Linux窗口几何各10项、数据库回归与WPF编译通过；最终实机GUI验收仍DEFERRED。
