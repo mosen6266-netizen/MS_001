@@ -39,6 +39,24 @@ Check(!IpcRequestGuard.TryValidate(scriptList.Replace("\"query\":\"\"","\"query\
 Check(!IpcRequestGuard.TryValidate(scriptSave.Replace("\"expectedRevision\":1","\"expectedRevision\":1,\"expectedRevision\":2"),out _),"duplicate draft revision rejected");
 Check(!IpcRequestGuard.TryValidate(new string('X',600000),out _),"unbounded script payload rejected");
 
+string mediaImport="""{"protocol":"mosen.desktop.v1","requestId":"m-1","type":"media.import","payload":{"fileName":"公告.png","mimeType":"image/png","base64":""""+new string('A',80)+""""}}""";
+string mediaPreview="""{"protocol":"mosen.desktop.v1","requestId":"m-2","type":"media.preview","payload":{"reference":{"assetId":""""+new string('a',64)+"""","mimeType":"image/png","byteLength":100,"width":1,"height":1,"fileName":"image.png"}}}""";
+Check(IpcRequestGuard.TryValidate(mediaImport,out operation)&&operation==AllowedIpcOperation.MediaImport,
+      "bounded image import accepted only via explicit local media command");
+Check(IpcRequestGuard.TryValidate(mediaPreview,out operation)&&operation==AllowedIpcOperation.MediaPreview,
+      "hash-only preview request accepted");
+Check(!IpcRequestGuard.TryValidate(mediaImport.Replace("\"image/png\"","\"image/svg+xml\""),out _),
+      "scriptable SVG media rejected");
+Check(!IpcRequestGuard.TryValidate(mediaPreview.Replace("\"image.png\"","\"../private.png\""),out _),
+      "media preview rejects path traversal names");
+Check(!IpcRequestGuard.TryValidate(mediaPreview.Replace("\"byteLength\":100","\"byteLength\":999999999"),out _),
+      "media preview rejects oversized metadata");
+Check(!IpcRequestGuard.TryValidate(mediaImport.Replace("\"mimeType\":\"image/png\"",
+      "\"mimeType\":\"image/png\",\"path\":\"C:\\\\secret\""),out _),
+      "media import rejects absolute path injection");
+Check(!IpcRequestGuard.TryValidate(mediaImport.Replace("\"base64\":\"","\"base64\":\"!"),out _),
+      "media import rejects invalid base64 alphabet");
+
 string tmp=Path.Combine(Path.GetTempPath(),"ms001-security-"+Guid.NewGuid().ToString("N"));
 Directory.CreateDirectory(tmp);
 try
