@@ -150,3 +150,17 @@ jobs:
           dotnet-version: "10.0.x"
       - name: Run settings concurrency and recovery tests
         run: dotnet run --project tests/Settings/Mosen.GroupScheduler.Settings.Tests.csproj --configuration Release
+  security:
+    name: DPAPI, redaction and IPC fuzz tests - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: Test safe logs, Windows DPAPI and strict local IPC input policy
+        run: dotnet run --project tests/Security/Mosen.GroupScheduler.Security.Tests.csproj --configuration Release
