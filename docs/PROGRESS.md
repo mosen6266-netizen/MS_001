@@ -70,3 +70,10 @@
 - [CI 38921641970](https://github.com/mosen6266-netizen/MS_001/actions/runs/38921641970)：UI job成功（TypeScript lint、Vitest IPC test、Vite build），Windows job成功（编译和win-x64自包含publish）。
 - Windows原生UI启动/TDLib实机和性能验证依用户要求延后；文档 `docs/STEP_03_ACCEPTANCE.md` 说明，禁止把CI当成正式版验收。
 - **Step03 done_dev，当前下一步04（数据合同与迁移框架），开发进度3/32 = 9.375%，剩余29步**。
+
+## Step04 — 数据合同与事务迁移开发验收（2026-10-16）
+- 完成：SQLite v1/v2 表结构、版本化剧本合同、迁移hash校验、WAL/FULL、事务与异常回滚、升级前备份、恢复候选数据库、自动化测试。
+- 修复：首次NuGet源包含高危版本，被TreatWarningsAsErrors阻止；升级SQLite依赖至10.0.13后全套CI通过，未关闭安全检查。
+- [CI 38922965210](https://github.com/mosen6266-netizen/MS_001/actions/runs/38922965210) **SUCCESS**：Linux/Windows各27项测试、UI lint/test/build与Windows WPF构建发布均成功。
+- **真实物理断电/本机安装、会话数据库加密和Windows10/11硬件行为仍DEFERRED**，模拟测试不代替真实环境。
+- 第04步状态 `done_dev`，下一步 `05 not_started`，进度 **4/32 = 12.5%**（剩余28步）。详细证据见 `docs/STEP_04_ACCEPTANCE.md`。

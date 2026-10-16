@@ -57,9 +57,21 @@
     "step": "04",
     "title": "数据合同与迁移框架",
     "phase": 1,
-    "status": "in_progress",
-    "acceptance_evidence": [],
-    "last_commit_sha": null
+    "status": "done_dev",
+    "acceptance_evidence": [
+      "docs/STEP_04_ACCEPTANCE.md",
+      "docs/STEP_04_DATA.md",
+      "src/Infrastructure/Persistence/AppDatabase.cs",
+      "src/Infrastructure/Persistence/Migrations/0001_initial.sql",
+      "src/Infrastructure/Persistence/Migrations/0002_tasks.sql",
+      "tests/Migrations/Program.cs",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/38922965210"
+    ],
+    "last_commit_sha": "58913aa1a7d614c1e875d1a3e1b091354d7db241",
+    "deferred_release_acceptance": [
+      "PHYSICAL-CRASH",
+      "WIN10-11-GUI"
+    ]
   },
   {
     "step": "05",

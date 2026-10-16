@@ -21,3 +21,8 @@
 - 本步骤只测试编译/数据库迁移；用户授权的账号登录、Windows长期锁文件表现、文件系统断电、杀软、Win10兼容仍列为最终实机验收，不冒称已测。
 - 本步骤的模拟异常是**提交前抛异常**，证明 SQLite 事务回滚；不等于已经模拟物理断电（需要系统级混沌/故障测试，计划第 29–31 步）。
 - 加密 session、其他敏感数据与 Windows DPAPI 在后续安全步骤实施，不要把本元数据DB宣称为账号会话保管库。
+
+## 第04步自动化核对（2026-10-16）
+- [GitHub Actions 38922965210](https://github.com/mosen6266-netizen/MS_001/actions/runs/38922965210) 最终全部 job SUCCESS；Windows 和 Linux 分别27项持久化/迁移/故障回滚测试成功。
+- SQLite原生包安全公告导致首次运行失败，已升级 `Microsoft.Data.Sqlite` 至 10.0.13，复测通过；没有通过压制警告绕过。
+- 发布前未测试项与非加密元数据备份边界见 [STEP_04_ACCEPTANCE.md](STEP_04_ACCEPTANCE.md)。

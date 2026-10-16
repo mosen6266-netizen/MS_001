@@ -5,14 +5,15 @@
   "default_branch": "main",
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
-  "current_step": "04",
-  "current_step_status": "in_progress",
-  "phase": 1,
+  "current_step": "05",
+  "current_step_status": "not_started",
+  "phase": 2,
   "total_steps": 32,
   "completed_steps": [
     "01",
     "02",
-    "03"
+    "03",
+    "04"
   ],
   "development_started": true,
   "functional_code_started": true,
@@ -21,13 +22,13 @@
   "icon_source_received": true,
   "icon_asset_upload_verified": true,
   "exact_timing_contract": "wait preSendDelayMs -> typing typingDurationMs -> send; 30s+5s=35s; no overlap",
-  "last_verified_commit_sha": "7ec32cb9c63c8e334a10d633d84e863203228103",
+  "last_verified_commit_sha": "58913aa1a7d614c1e875d1a3e1b091354d7db241",
   "last_updated": "2026-10-16",
   "blocking_issues": [
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step04 in progress: implement local SQLite schema, versioned migrations, backups and fault-injection tests. No Telegram credentials used.",
+  "notes": "Step04 SQLite元数据、版本合同、事务迁移/故障注入、独立恢复候选通过Linux和Windows CI各27项测试。实际物理断电/Win10或Win11安装/完整本地备份加密仍 DEFERRED。开发进度4/32。",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
@@ -64,9 +65,16 @@
       "id": "LONG-SOAK",
       "status": "DEFERRED",
       "detail": "72小时长期稳定性、Win10/11正式安装与升级回滚"
+    },
+    {
+      "id": "PHYSICAL-CRASH",
+      "status": "DEFERRED",
+      "detail": "真实Windows NTFS断电/磁盘满/锁文件/WAL一致性、安装更新与加密备份验收"
     }
   ],
   "step03_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38921641970",
   "step03_lockfile_packages": 238,
-  "step03_desktop_artifact_id": 12054891527
+  "step03_desktop_artifact_id": 12054891527,
+  "step04_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38922965210",
+  "step04_checks_per_os": 27
 }
