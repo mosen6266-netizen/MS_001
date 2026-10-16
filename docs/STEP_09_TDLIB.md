@@ -19,3 +19,7 @@ CI `tdlib-adapter` 使用Windows与Linux矩阵执行 mock 测试，并继续执�
 - 即使注册了300个clientId，这不是300个真实授权账号，也不能推断并发/CPU/内存/联网容量。
 - 关闭前未知请求响应不得用于自动补发，平台FLOOD_WAIT/Slow Mode不允许通过换账号绕过。此阶段没有任何发送消息API。
 - 在第10步明确加入TDLib认证参数、隔离会话数据和凭据保护前，此 adapter 不在 GUI 中启动并创建真实客户端。
+
+## Step09 验收归档
+[GitHub Actions 38933092843](https://github.com/mosen6266-netizen/MS_001/actions/runs/38933092843) 13个job全绿，Windows/Linux TDLib模拟通信各118项通过，主程序编译和原回归正常。
+固定官方v1.8.67源码SHA，但未下载或构建原生DLL；只标记 DEV PASS，不是 native-load/真实账号验收。详见 [STEP_09_ACCEPTANCE.md](STEP_09_ACCEPTANCE.md)。

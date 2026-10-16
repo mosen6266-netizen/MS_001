@@ -104,3 +104,10 @@
 - 修复前端诊断IPC白名单遗漏/前期导入组件时序导致CI红灯，并将日志测试改为真正触发滚动的故障校验；逐次复测，没有关闭警告或测试。
 - **安全界限**：尚未接入真实TDLib会话，DPAPI只是可信本地保护原语；Windows10/11多账户/ACL/磁盘故障/崩溃转储与账号/群操作均 DEFERRED。
 - 完整记录 `docs/STEP_08_ACCEPTANCE.md`、`docs/STEP_08_SECURITY.md`、`docs/SECURITY_THREAT_MODEL.md`；**开发Step08 done_dev，Step09待开始；进度8/32=25%，剩余24步**。
+
+## Step09 — TDLib JSON 适配器开发/CI验收（2026-10-16）
+- 官方JSON ABI的Native P/Invoke接口、进程单一接收/按序更新、有界背压与异步请求 `@extra + @client_id` 双重匹配、超时取消与关闭限时等待机制提交完成。
+- 固定官方1.8.67源代码提交 `bc9c263e2bfee06aaab41e82db51a103376030bc`；**尚未获得/构建原生 tdjson.dll，不存在二进制摘要或真实 DLL 加载测试**。原生构建/版本安全审查/安装集成仍是后续强制门槛。
+- [CI 38933092843](https://github.com/mosen6266-netizen/MS_001/actions/runs/38933092843) 13个jobs **SUCCESS**；Windows/Linux模拟TDLib各118项断言通过，UI+数据库/诊断安全/窗口回归与Windows编译通过；测试用的是fake transport，不涉及真实账号/消息。
+- 修复C#测试的raw字符串大括号与数组类型编译错误后复测，同时修正原生接收必须在首个请求发送后启动的生命周期要求。
+- Step09 `done_dev`（仅源码与模拟验证）、Step10待开始，开发进度 **9/32（28.125%）**，剩余23步。详情见 `docs/STEP_09_ACCEPTANCE.md`。

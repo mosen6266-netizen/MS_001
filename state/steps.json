@@ -163,9 +163,22 @@
     "step": "09",
     "title": "TDLib 通信适配层",
     "phase": 3,
-    "status": "in_progress",
-    "acceptance_evidence": [],
-    "last_commit_sha": null
+    "status": "done_dev",
+    "acceptance_evidence": [
+      "docs/STEP_09_ACCEPTANCE.md",
+      "docs/STEP_09_TDLIB.md",
+      "src/Infrastructure/Telegram/TdlibTransport.cs",
+      "src/Infrastructure/Telegram/TdlibDispatcher.cs",
+      "tests/TelegramAdapter/Program.cs",
+      "native/tdlib/source-lock.json",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/38933092843"
+    ],
+    "last_commit_sha": "9788fa4b69439d7df9d611ab883e6620f0f15b13",
+    "deferred_release_acceptance": [
+      "TDLIB-NATIVE",
+      "TDLIB-NATIVE-BINARY",
+      "OWNED-ACCOUNT"
+    ]
   },
   {
     "step": "10",
