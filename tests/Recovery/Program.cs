@@ -21,7 +21,7 @@ void Reject<T>(Action callback,string label)where T:Exception
 var dir=Path.Combine(Path.GetTempPath(),"ms001-step20-"+Guid.NewGuid().ToString("N"));
 Directory.CreateDirectory(dir);
 var now=new DateTimeOffset(2026,10,16,20,0,0,TimeSpan.Zero);
-var account=Guid.NewGuid(),script=Guid.NewGuid();
+var account=Guid.NewGuid();var script=Guid.NewGuid();
 var sha=new string('a',64);
 FrozenTarget Target(int i)=>new("-100"+(i+100).ToString(),null,
     new[]{new FrozenBinding("role",account)},
