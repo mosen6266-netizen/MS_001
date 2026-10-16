@@ -15,8 +15,8 @@ bool tooEarly=false;try{TimingPreviewCalculator.Create(new(30000,5000,0),30000);
 Check(tooEarly,"cannot acknowledge before send gate");
 bool badTime=false;try{TimingPreviewCalculator.Create(new(-1000,5000,0));}catch(ArgumentException){badTime=true;}
 Check(badTime,"negative timing rejected");
-bool fractional=false;try{TimingPreviewCalculator.Create(new(999,5000,0));}catch(ArgumentException){fractional=true;}
-Check(fractional,"only whole seconds are stored to prevent roundoff");
+Check(TimingPreviewCalculator.Create(new(999,5000,0)).ReadyToSendAtMs==5999,
+  "legacy millisecond timings remain valid and preserved without rounding");
 var temp=Path.Combine(Path.GetTempPath(),"ms001-images-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);
 try
 {

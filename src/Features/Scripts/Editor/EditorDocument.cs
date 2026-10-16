@@ -9,8 +9,7 @@ public sealed record TimingProfile(int PreSendDelayMs=5000,int TypingDurationMs=
     public void Validate()
     {
         if(PreSendDelayMs is < 0 or > 3600000 || TypingDurationMs is < 0 or > 60000 ||
-           PostSendDelayMs is < 0 or > 3600000 || PreSendDelayMs % 1000 != 0 ||
-           TypingDurationMs % 1000 != 0 || PostSendDelayMs % 1000 != 0)
+           PostSendDelayMs is < 0 or > 3600000)
             throw new ArgumentException("Timing values must be whole seconds within allowed ranges.");
     }
 }
@@ -67,9 +66,7 @@ public static class EditorDocumentRules
                step.Body is null||step.Body.Length>8192||
                step.PreSendDelayMs is <0 or >3600000 ||
                step.TypingDurationMs is <0 or >60000 ||
-               step.PostSendDelayMs is <0 or >3600000 ||
-               step.PreSendDelayMs % 1000 != 0 || step.TypingDurationMs % 1000 != 0 ||
-               step.PostSendDelayMs % 1000 != 0)
+               step.PostSendDelayMs is <0 or >3600000)
                 throw new ArgumentException("Invalid script step; all steps require a selected role.");
             if(step.Media is not null)
             {

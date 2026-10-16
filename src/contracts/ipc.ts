@@ -189,7 +189,7 @@ export function isTimingProfile(t:unknown):t is TimingProfile {
   if(!isRecord(t)||Object.keys(t).sort().join(",")!=="postSendDelayMs,preSendDelayMs,typingDurationMs")return false;
   return (["preSendDelayMs","typingDurationMs","postSendDelayMs"] as const).every(k=>
     Number.isSafeInteger(t[k])&&Number(t[k])>=0&&
-    Number(t[k])<=(k==="typingDurationMs"?60000:3600000)&&Number(t[k])%1000===0);
+    Number(t[k])<=(k==="typingDurationMs"?60000:3600000));
 }
 export function isMediaReference(m:unknown):m is MediaReference {
   if(!isRecord(m)||Object.keys(m).sort().join(",")!=="assetId,byteLength,fileName,height,mimeType,width")return false;
