@@ -77,7 +77,7 @@
     "step": "05",
     "title": "Windows 容器与导航框架",
     "phase": 2,
-    "status": "not_started",
+    "status": "in_progress",
     "acceptance_evidence": [],
     "last_commit_sha": null
   },
