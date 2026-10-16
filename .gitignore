@@ -1,0 +1,25 @@
+# Never commit Telegram sessions, API credentials or Windows app data
+**/bin/
+**/obj/
+**/node_modules/
+**/dist/
+**/coverage/
+**/.vs/
+.vscode/
+.env
+.env.*
+!.env.example
+*.user
+*.suo
+*.pfx
+*.snk
+*.key
+*.secret
+*.session
+tdlib-data/
+sessions/
+backups/
+app.db*
+*.db-wal
+*.db-shm
+!database/migrations/*.sql

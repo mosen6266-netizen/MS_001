@@ -1,0 +1,61 @@
+name: Main build and unit tests
+on:
+  push:
+    paths:
+      - "apps/**"
+      - "src/**"
+      - "tests/**"
+      - ".github/workflows/ci.yml"
+      - "Directory.Build.props"
+      - ".gitignore"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - working-directory: apps/ui
+        run: npm install --no-audit --no-fund
+      - working-directory: apps/ui
+        run: npm run lint
+      - working-directory: apps/ui
+        run: npm test
+      - working-directory: apps/ui
+        run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ms001-ui-dist
+          path: apps/ui/dist/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ms001-ui-lock-draft
+          path: apps/ui/package-lock.json
+          if-no-files-found: error
+  windows:
+    needs: ui
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: ms001-ui-dist
+          path: apps/ui/dist/
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: Build WPF shell
+        run: dotnet build apps/desktop/Mosen.GroupScheduler.Desktop.csproj --configuration Release
+      - name: Publish offline shell for diagnostic purposes
+        run: dotnet publish apps/desktop/Mosen.GroupScheduler.Desktop.csproj -c Release -r win-x64 --self-contained true -o artifacts/desktop
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ms001-step03-desktop-build
+          path: artifacts/desktop/
+          retention-days: 7
+          if-no-files-found: error
