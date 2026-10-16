@@ -278,3 +278,18 @@ jobs:
           dotnet-version: "10.0.x"
       - name: Test immutable versions, group permission matrix and frozen bindings
         run: dotnet run --project tests/Preflight/Mosen.GroupScheduler.Preflight.Tests.csproj --configuration Release
+
+  virtual-scheduler:
+    name: Fair 50-group scheduler and fail-closed recovery - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: Test virtual clocks, pause/resume, progress isolation and SQLite restart guard
+        run: dotnet run --project tests/Scheduler/Mosen.GroupScheduler.Scheduler.Tests.csproj --configuration Release

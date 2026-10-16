@@ -46,7 +46,7 @@ try
 {
     string dbPath=Path.Combine(root,"catalog.db");
     var db=new AppDatabase(dbPath);db.Initialize();
-    Assert(db.GetSchemaVersion()==6,"metadata schema migrates to version 6");
+    Assert(db.GetSchemaVersion()==7,"metadata schema migrates to version 7");
     var accounts=new AccountRegistry(db);
     var accountA=accounts.Register("角色A");
     var accountB=accounts.Register("角色B");
