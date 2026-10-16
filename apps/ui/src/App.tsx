@@ -81,7 +81,7 @@ export function App() {
           <ScriptEditorPanel preferences={preferences.snapshot.preferences}/>
         </div>
         {shell.active==="scripts"?null:
-        {shell.active === "overview" ?
+        shell.active === "overview" ?
           <div className="overview-grid">
             <article className="summary-tile"><h2>已授权账号</h2><strong>尚未接入</strong><p>真实 Telegram 登录将在后续阶段实现</p></article>
             <article className="summary-tile"><h2>运行任务</h2><strong>0</strong><p>目前不执行群消息发送</p></article>

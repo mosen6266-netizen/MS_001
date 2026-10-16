@@ -66,7 +66,7 @@ export function editorReducer(state:EditorState,action:EditorAction):EditorState
        doc.steps.length+selected.length>1000 || new Set(action.newStepKeys).size!==selected.length ||
        action.newStepKeys.some(id=>doc.steps.some(x=>x.stepKey===id)))return state;
     const copies=selected.map((s,i)=>({...s,stepKey:action.newStepKeys[i]}));
-    const last=doc.steps.findLastIndex(s=>state.selected.includes(s.stepKey));
+    const last=doc.steps.reduce((latest,step,index)=>state.selected.includes(step.stepKey)?index:latest,-1);
     return push(state,{...doc,steps:[...doc.steps.slice(0,last+1),...copies,...doc.steps.slice(last+1)]},
       copies.map(x=>x.stepKey));
   }
