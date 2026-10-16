@@ -52,7 +52,7 @@ try
     var restored = new AppDatabase(Path.Combine(root, "recovered.db"));
     var candidate = restored.PrepareRestore(backup);
     Assert(new PreferencesRepository(new AppDatabase(candidate)).Read() == next, "settings preserved in consistent backup");
-    Assert(new AppDatabase(file).GetSchemaVersion() == 5, "settings DB stays at schema v5");
+    Assert(new AppDatabase(file).GetSchemaVersion() == 6, "settings DB stays at schema v6");
     Console.WriteLine($"SUMMARY: {passed} settings tests passed, no Telegram network activity.");
 }
 finally { try { Directory.Delete(root, true); } catch (IOException) { } }
