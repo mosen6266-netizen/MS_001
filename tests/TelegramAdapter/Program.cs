@@ -135,7 +135,7 @@ internal sealed class FakeTransport : ITdlibTransport
         if(json.Contains("\"close\"",StringComparison.Ordinal))
         {
             Interlocked.Increment(ref _closed);
-            Push($$"""{"@type":"updateAuthorizationState","@client_id":{{id}},"authorization_state":{"@type":"authorizationStateClosed"}}""");
+            Push("{\"@type\":\"updateAuthorizationState\",\"@client_id\":" + id + ",\"authorization_state\":{\"@type\":\"authorizationStateClosed\"}}");
         }
     }
     public string? Receive(TimeSpan timeout)
