@@ -39,19 +39,20 @@ export function SelectField({ label, value, onChange, options, disabled = false,
 }
 
 /** Exactly one app-owned dialog; confirmation is always left/green, cancel right/red. */
-export function ConfirmDialog({ open, title, description, confirmLabel = "确认", cancelLabel = "取消", busy = false, onConfirm, onCancel }: {
+export function ConfirmDialog({ open, title, description, confirmLabel = "确认", cancelLabel = "取消", busy = false, confirmDisabled = false, children, onConfirm, onCancel }: {
   open: boolean; title: string; description: string; confirmLabel?: string; cancelLabel?: string;
-  busy?: boolean; onConfirm: () => void; onCancel: () => void;
+  busy?: boolean; confirmDisabled?: boolean; children?: ReactNode; onConfirm: () => void; onCancel: () => void;
 }) {
   const titleId = useId(), descId = useId();
   const container = useRef<HTMLDivElement>(null);
   const confirmButton = useRef<HTMLButtonElement>(null);
+  const cancelButton = useRef<HTMLButtonElement>(null);
   const previousFocus = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (!open) return;
     previousFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    confirmButton.current?.focus();
+    (confirmDisabled ? cancelButton.current : confirmButton.current)?.focus();
     const keyHandler = (event: KeyboardEvent) => {
       if (event.key === "Escape") { event.preventDefault(); if (!busy) onCancel(); return; }
       if (event.key !== "Tab" || !container.current) return;
@@ -63,16 +64,17 @@ export function ConfirmDialog({ open, title, description, confirmLabel = "确认
     };
     document.addEventListener("keydown", keyHandler, true);
     return () => { document.removeEventListener("keydown", keyHandler, true); previousFocus.current?.focus(); };
-  }, [open, busy, onCancel]);
+  }, [open, busy, confirmDisabled, onCancel]);
 
   if (!open) return null;
   return <div className="ui-dialog-backdrop" data-testid="ui-dialog-backdrop">
     <div ref={container} className="ui-dialog" role="alertdialog" aria-modal="true" aria-labelledby={titleId} aria-describedby={descId}>
       <h2 id={titleId} className="ui-dialog__heading">{title}</h2>
       <p id={descId} className="ui-dialog__description">{description}</p>
+      {children}
       <div className="ui-dialog__actions">
-        <button type="button" ref={confirmButton} className="ui-button ui-button--success" disabled={busy} onClick={onConfirm}>{busy ? "处理中…" : confirmLabel}</button>
-        <button type="button" className="ui-button ui-button--danger" disabled={busy} onClick={onCancel}>{cancelLabel}</button>
+        <button type="button" ref={confirmButton} className="ui-button ui-button--success" disabled={busy || confirmDisabled} onClick={onConfirm}>{busy ? "处理中…" : confirmLabel}</button>
+        <button type="button" ref={cancelButton} className="ui-button ui-button--danger" disabled={busy} onClick={onCancel}>{cancelLabel}</button>
       </div>
     </div>
   </div>;

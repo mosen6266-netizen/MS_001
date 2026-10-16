@@ -65,22 +65,20 @@ export function AccountRegistryPanel({preferences}:{preferences:UserPreferences}
   const announce=(message:string,tone:"success"|"danger"="success")=>
     setToast({id:Date.now(),message,tone});
   const refresh=()=>setSerial(x=>x+1);
-  const write=async(type:AccountAction,payload:Record<string,unknown>,message:string)=>{
+  const write=async(type:AccountAction,payload:Record<string,unknown>,message:string):Promise<boolean>=>{
     try{
       const output=await run(()=>request(type,payload));
-      if(!output)return;
+      if(!output)return false;
       announce(message);refresh();
-    }catch(e){announce(e instanceof Error?e.message:"本地账号操作失败","danger");}
+      return true;
+    }catch(e){announce(e instanceof Error?e.message:"本地账号操作失败","danger");return false;}
   };
   const save=async()=>{
     if(!alias.trim()||busy)return;
-    if(editing){
-      await write("accounts.edit",{id:editing.id,expectedRevision:editing.revision,alias,groupTag},"账号备注与分组已保存");
-      setEditing(null);
-    }else{
+    const saved=editing ?
+      await write("accounts.edit",{id:editing.id,expectedRevision:editing.revision,alias,groupTag},"账号备注与分组已保存") :
       await write("accounts.create",{alias,groupTag},"已登记账号槽位（尚未登录 Telegram）");
-    }
-    setAlias("");setGroupTag("");
+    if(saved){setEditing(null);setAlias("");setGroupTag("");}
   };
   const startEdit=(item:AccountItem)=>{
     if(!item.canAttachSession){announce("旧版账号ID需要迁移后才能编辑或启动会话。","danger");return;}
@@ -89,8 +87,8 @@ export function AccountRegistryPanel({preferences}:{preferences:UserPreferences}
   const confirmArchive=async()=>{
     if(!archive||typedAlias!==archive.alias){announce("请输入完全一致的账号备注才能确认归档。","danger");return;}
     const target=archive;
-    setArchive(null);
-    await write("accounts.archive",{id:target.id,expectedRevision:target.revision,typedAlias},"账号已归档；会话密钥和文件未被删除");
+    const ok=await write("accounts.archive",{id:target.id,expectedRevision:target.revision,typedAlias},"账号已归档；会话密钥和文件未被删除");
+    if(ok){setArchive(null);setTypedAlias("");}
   };
   const pages=Math.max(1,Math.ceil(result.total/preferences.pageSize));
   return <div className="ui-demo-section">
@@ -137,13 +135,15 @@ export function AccountRegistryPanel({preferences}:{preferences:UserPreferences}
       </div>
       <p className="ui-preview-caption" style={{marginTop:12}}>不收集手机号、验证码、密码或会话密钥。真实 Telegram 账号的重复身份检查必须在后续官方授权之后完成。</p>
     </section>
-    {archive?<div className="ui-account-confirm">
-      <TextField label={"归档确认：输入“"+archive.alias+"”"} value={typedAlias} onChange={setTypedAlias}
-        hint="归档会隐藏账号，但不会永久删除受保护的 TDLib 会话文件。"/>
-    </div>:null}
     <ConfirmDialog open={archive!==null} title="确认归档本地账号" description={archive?
-      "将账号“"+archive.alias+"”从当前目录归档。需要先解除运行任务关联；受保护的会话文件不删除。请在弹窗上方填写完全一致的备注。":""}
-      onConfirm={confirmArchive} onCancel={()=>{setArchive(null);setTypedAlias("");}}/>
+      "将账号“"+archive.alias+"”从目录归档；须先解除任务关联。密钥及会话文件不会永久删除。":""}
+      confirmDisabled={!archive || typedAlias!==archive.alias || busy}
+      onConfirm={confirmArchive} onCancel={()=>{setArchive(null);setTypedAlias("");}}>
+      <div style={{marginTop:14}}>
+        <TextField label={"请输入备注“"+(archive?.alias??"")+"”以确认"} value={typedAlias} onChange={setTypedAlias}
+          hint="必须与账号备注完全一致才能归档。"/>
+      </div>
+    </ConfirmDialog>
     <ToastViewport toast={toast} dismiss={()=>setToast(null)}/>
   </div>;
 }
