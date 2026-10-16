@@ -37,3 +37,6 @@
 **300 个已保存授权会话 ≠ 300 个账号可以同时持续在线；50 群任务也不是无限并发发送承诺。** 容量必须经压测验收并遵守平台速率/群权限限制。禁止将程序用于虚假群聊互动、未经请求的广告群发、伪造人员身份或绕过 Telegram 限制。
 
 参考链接：https://core.telegram.org/tdlib/getting-started 、https://core.telegram.org/api/terms。
+## 图标源与生成
+
+已保存透明 SVG：[`assets/branding/icon.svg`](assets/branding/icon.svg)，依据用户提供图形转换；通过 [`tools/branding/build_icons.py`](tools/branding/build_icons.py) 可生成 Windows 多尺寸 ICO 与 PNG。正式发布需要完成商标合规审查，并避免暗示软件是 Telegram 官方产品。
