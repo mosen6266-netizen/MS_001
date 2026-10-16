@@ -13,7 +13,9 @@ public partial class MainWindow
             // No transport, no scheduler instance, no startup recovery mutations.
             var snapshot=await Task.Run(()=>new RuntimeDashboardReader(
                 AppDatabase.ForCurrentUser()).Read(DateTimeOffset.UtcNow));
-            if(!_closing)SendSettingResponse(requestId,"runtime.snapshot.result",true,snapshot);
+            if(!_closing)SendSettingResponse(requestId,"runtime.snapshot.result",true,new{
+                checkedUtc=snapshot.CheckedUtc,mode=snapshot.Mode,summary=snapshot.Summary,
+                items=snapshot.Items,pollHintSeconds=RuntimeDashboardPollSeconds});
         }
         catch(Exception)
         {

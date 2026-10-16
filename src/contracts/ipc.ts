@@ -25,7 +25,7 @@ export type ScriptSnapshot={scriptId:string;revision:number;document:EditorDoc;a
 export type ScriptSummary={scriptId:string;title:string;revision:number;stepCount:number;archived:boolean};
 export type ScriptRequest={protocol:typeof IPC_PROTOCOL;requestId:string;type:ScriptAction;payload:Record<string,unknown>};
 export type RuntimeDashboardRow={runId:string;chatId:string;topicId:string|null;state:string;phase:string;completedSteps:number;totalSteps:number;completionPercent:number;nextStepNumber:number;remainingMs:number;lastClockUtc:string;isClockActive:boolean;issueCode:string;revision:number};
-export type RuntimeDashboardSnapshot={checkedUtc:string;mode:"offline-simulation-readonly";summary:{total:number;running:number;paused:number;review:number;failed:number;completed:number;stopped:number;ready:number;uncertainMessages:number;corruptRecords:number};items:RuntimeDashboardRow[]};
+export type RuntimeDashboardSnapshot={checkedUtc:string;mode:"offline-simulation-readonly";summary:{total:number;running:number;paused:number;review:number;failed:number;completed:number;stopped:number;ready:number;uncertainMessages:number;corruptRecords:number};items:RuntimeDashboardRow[];pollHintSeconds?:5|15|30};
 export type BridgeRequest = ReadRequest | SettingsSaveRequest | AccountRequest | GroupRequest | ScriptRequest | MediaRequest;
 export type BridgeResponse = { protocol: typeof IPC_PROTOCOL; requestId:string; ok:boolean; type:string; payload:Record<string,unknown> };
 export type Density = "compact" | "comfortable";
@@ -148,6 +148,7 @@ export function isBridgeRequest(v:unknown):v is BridgeRequest {
 }
 export function isRuntimeDashboardSnapshot(v:unknown):v is RuntimeDashboardSnapshot {
   if(!isRecord(v)||v.mode!=="offline-simulation-readonly"||typeof v.checkedUtc!=="string"||
+    (v.pollHintSeconds!==undefined&&![5,15,30].includes(Number(v.pollHintSeconds)))||
     !isRecord(v.summary)||!Array.isArray(v.items)||v.items.length>10000)return false;
   const nonnegative=(n:unknown)=>Number.isSafeInteger(n)&&Number(n)>=0;
   if(!["total","running","paused","review","failed","completed","stopped","ready","uncertainMessages","corruptRecords"].every(k=>nonnegative((v.summary as Record<string,unknown>)[k])))return false;

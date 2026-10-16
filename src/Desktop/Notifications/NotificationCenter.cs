@@ -2,7 +2,7 @@ namespace Mosen.GroupScheduler.Notifications;
 
 /// <summary>Safe, bounded, deduplicated operational alerts. Never store raw Telegram errors,
 /// usernames, message bodies, tokens or phone numbers.</summary>
-public enum AlertCategory { TaskFailed, DeliveryUncertain, RecoveryRequired, CorruptRecord, EmergencyStop }
+public enum AlertCategory { TaskFailed, DeliveryUncertain, RecoveryRequired, CorruptRecord, EmergencyStop, ResourcePressure }
 public sealed record OperationalAlert(string Key,AlertCategory Category,DateTimeOffset FirstUtc,
     DateTimeOffset LatestUtc,int Occurrences,bool Acknowledged);
 public sealed record AlertPublishResult(OperationalAlert Alert,bool IsNew,bool ShouldPop);
@@ -78,6 +78,7 @@ public sealed class NotificationCenter
         AlertCategory.RecoveryRequired=>"群任务需人工复核后方可继续",
         AlertCategory.CorruptRecord=>"本地任务记录已隔离，请检查存储",
         AlertCategory.EmergencyStop=>"全局紧急停止已触发",
+        AlertCategory.ResourcePressure=>"程序资源占用较高，非关键刷新已自动降频",
         _=>"运行异常，需人工确认"
     };
 }

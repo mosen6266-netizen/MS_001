@@ -8,6 +8,7 @@ using Microsoft.Web.WebView2.Core;
 using Mosen.GroupScheduler.Core.Shell;
 using Mosen.GroupScheduler.Core.Security;
 using Mosen.GroupScheduler.Core.Telemetry;
+using Mosen.GroupScheduler.ResourceBudget;
 
 namespace Mosen.GroupScheduler.Desktop;
 
@@ -30,6 +31,7 @@ public partial class MainWindow : Window
         _safeTelemetry.Record(DiagnosticEvent.Started);
         ApplyWindowPlacement();
         InitializeAlertNotifications();
+        InitializeResourceHealth();
         Loaded += InitializeBrowser;
         Closing += (_, _) => SaveWindowPlacement();
         Closed += (_, _) =>
@@ -38,8 +40,8 @@ public partial class MainWindow : Window
             _appHealth = "closing";
             _safeTelemetry.Record(DiagnosticEvent.Closed);
             // WebView2 runs only while the window is open; never keep background sessions.
-            if (Browser.CoreWebView2 is { } core)
-                core.WebMessageReceived -= OnWebMessageReceived;
+            _webSubscriptions.Dispose();
+            StopResourceHealth();
             StopAlertNotifications();
             Browser.Dispose();
         };
@@ -89,34 +91,15 @@ public partial class MainWindow : Window
             core.Settings.AreDevToolsEnabled = false;
             core.Settings.AreDefaultContextMenusEnabled = false;
             core.Settings.IsStatusBarEnabled = false;
-            core.NewWindowRequested += (_, evt) => evt.Handled = true;
-            core.NavigationStarting += (_, evt) =>
-            {
-                if (!Uri.TryCreate(evt.Uri, UriKind.Absolute, out Uri? uri) ||
-                    uri.Scheme != Uri.UriSchemeHttps ||
-                    !string.Equals(uri.Host, "ms001.local", StringComparison.OrdinalIgnoreCase) ||
-                    uri.Port != 443)
-                    evt.Cancel = true;
-            };
-            core.NavigationCompleted += (_, evt) =>
-            {
-                if (_closing) return;
-                if (!evt.IsSuccess)
-                {
-                    _appHealth = "degraded";
-                    _safeTelemetry.Record(DiagnosticEvent.RecoverableError,FailureCategory.Protocol);
-                    Diagnostics.Text = "界面加载失败，请尝试重新启动或检查本地界面文件。";
-                    Browser.Visibility = Visibility.Hidden;
-                    StatusPanel.Visibility = Visibility.Visible;
-                    return;
-                }
-                Browser.Visibility = Visibility.Visible;
-                StatusPanel.Visibility = Visibility.Collapsed;
-                _appHealth = "ready";
-                _safeTelemetry.Record(DiagnosticEvent.Ready);
-            };
+            core.NewWindowRequested += OnCoreNewWindowRequested;
+            _webSubscriptions.Track(()=>core.NewWindowRequested -= OnCoreNewWindowRequested);
+            core.NavigationStarting += OnCoreNavigationStarting;
+            _webSubscriptions.Track(()=>core.NavigationStarting -= OnCoreNavigationStarting);
+            core.NavigationCompleted += OnCoreNavigationCompleted;
+            _webSubscriptions.Track(()=>core.NavigationCompleted -= OnCoreNavigationCompleted);
             core.SetVirtualHostNameToFolderMapping("ms001.local", folder, CoreWebView2HostResourceAccessKind.DenyCors);
             core.WebMessageReceived += OnWebMessageReceived;
+            _webSubscriptions.Track(()=>core.WebMessageReceived -= OnWebMessageReceived);
             core.Navigate(TrustedOrigin + "index.html"); // exactly once; menu clicks never navigate CoreWebView2
         }
         catch (Exception ex) when (ex is InvalidOperationException or COMException or FileNotFoundException)
@@ -129,6 +112,32 @@ public partial class MainWindow : Window
         }
     }
 
+    private void OnCoreNewWindowRequested(object? sender,CoreWebView2NewWindowRequestedEventArgs evt)
+        =>evt.Handled=true;
+    private void OnCoreNavigationStarting(object? sender,CoreWebView2NavigationStartingEventArgs evt)
+    {
+        if(!Uri.TryCreate(evt.Uri,UriKind.Absolute,out var uri)||
+            uri.Scheme!=Uri.UriSchemeHttps||
+            !string.Equals(uri.Host,"ms001.local",StringComparison.OrdinalIgnoreCase)||
+            uri.Port!=443)evt.Cancel=true;
+    }
+    private void OnCoreNavigationCompleted(object? sender,CoreWebView2NavigationCompletedEventArgs evt)
+    {
+        if(_closing)return;
+        if(!evt.IsSuccess)
+        {
+            _appHealth="degraded";
+            _safeTelemetry.Record(DiagnosticEvent.RecoverableError,FailureCategory.Protocol);
+            Diagnostics.Text="界面加载失败，请尝试重新启动或检查本地界面文件。";
+            Browser.Visibility=Visibility.Hidden;
+            StatusPanel.Visibility=Visibility.Visible;
+            return;
+        }
+        Browser.Visibility=Visibility.Visible;
+        StatusPanel.Visibility=Visibility.Collapsed;
+        _appHealth="ready";
+        _safeTelemetry.Record(DiagnosticEvent.Ready);
+    }
     private async void OnWebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs evt)
     {
         if (_closing || !string.Equals(evt.Source, TrustedOrigin + "index.html", StringComparison.OrdinalIgnoreCase)) return;

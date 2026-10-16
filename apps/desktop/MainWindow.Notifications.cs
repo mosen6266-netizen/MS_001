@@ -63,13 +63,19 @@ public partial class MainWindow
             Icon=System.Drawing.SystemIcons.Warning,
             ContextMenuStrip=_trayMenu,Visible=true
         };
-        _tray.DoubleClick+=(_,_)=>Dispatcher.BeginInvoke((Action)BringMainWindowForward);
+        _tray.DoubleClick+=OnTrayDoubleClick;
+        _webSubscriptions.Track(()=>{if(_tray is not null)_tray.DoubleClick-=OnTrayDoubleClick;});
         _alertTimer=new DispatcherTimer(DispatcherPriority.Background) {
             Interval=TimeSpan.FromSeconds(6)
         };
-        _alertTimer.Tick+=async (_,_)=>await ScanLocalAlertsAsync();
+        _alertTimer.Tick+=OnAlertTimerTick;
+        _webSubscriptions.Track(()=>{if(_alertTimer is not null)_alertTimer.Tick-=OnAlertTimerTick;});
         _alertTimer.Start();
     }
+    private void OnTrayDoubleClick(object? sender,EventArgs e)=>
+        Dispatcher.BeginInvoke((Action)BringMainWindowForward);
+    private async void OnAlertTimerTick(object? sender,EventArgs e)=>
+        await ScanLocalAlertsAsync();
     private async Task ScanLocalAlertsAsync()
     {
         if(_closing||_refreshingAlerts||_emergency?.IsStopped==true)return;

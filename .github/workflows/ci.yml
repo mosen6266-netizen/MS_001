@@ -383,3 +383,18 @@ jobs:
           dotnet-version: "10.0.x"
       - name: Verify 100k-row SQLite event timeline, support ZIP and retention
         run: dotnet run --project tests/History/Mosen.GroupScheduler.History.Tests.csproj --configuration Release
+
+  performance-budget:
+    name: Eight-hour accelerated resource trend, bounded LRU and leak guards - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: Verify 28800 logical ticks, CPU/RAM/handles budgets, lifecycle cleanup and cache/log ceilings
+        run: dotnet run --project tests/Performance/Mosen.GroupScheduler.Performance.Tests.csproj --configuration Release

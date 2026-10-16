@@ -18,7 +18,7 @@ export function RuntimeDashboardPanel(){
   useEffect(()=>{
     const host=window.chrome?.webview;
     if(!host){setState("preview");return;}
-    let running=true,seconds=0,sequence=0,latest=0;
+    let running=true,seconds=0,sequence=0,latest=0,pollInterval=5;
     const handler=({data}:{data:unknown})=>{
       if(!running||!isBridgeResponse(data)||data.type!=="runtime.snapshot.result"||
          !data.requestId.startsWith("runtime-"))return;
@@ -26,6 +26,7 @@ export function RuntimeDashboardPanel(){
       if(!Number.isSafeInteger(number)||number<latest)return;
       latest=number;
       if(data.ok&&isRuntimeDashboardSnapshot(data.payload)){
+        pollInterval=data.payload.pollHintSeconds??5;
         setSnapshot(data.payload);setState("ready");setNote("");
       }else{
         setState("error");setNote("本地快照读取失败；不会自动恢复或执行任务。");
@@ -38,11 +39,11 @@ export function RuntimeDashboardPanel(){
       catch{setState("error");setNote("本地界面连接失败。");}
     };
     refresh();
-    // ONE shared clock for countdown + a five-second read refresh, not one per row.
+    // ONE shared clock for countdown, adaptive 5/15/30s local read refresh.
     const timer=window.setInterval(()=>{
       if(!running)return;
       setNow(Date.now());
-      if(++seconds%5===0)refresh();
+      if(++seconds%pollInterval===0)refresh();
     },1000);
     return()=>{running=false;window.clearInterval(timer);host.removeEventListener("message",handler);};
   },[]);
@@ -83,7 +84,7 @@ export function RuntimeDashboardPanel(){
         <option value="review">需复核</option><option value="failed">失败</option>
         <option value="completed">已完成</option><option value="stopped">已停止</option>
       </select></label>
-      <p>每页最多 {PAGE_SIZE} 个任务 · 单一倒计时时钟 · 每5秒只读刷新</p>
+      <p>每页最多 {PAGE_SIZE} 个任务 · 单一倒计时时钟 · 资源高负载时自动降低读取频率</p>
     </div>
     {chosen.items.length===0?<div className="runtime-empty" role="status">
       {state==="preview"?"浏览器预览不显示虚构任务；在 Windows 客户端内读取本地记录。":
