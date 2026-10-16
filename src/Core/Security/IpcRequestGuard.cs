@@ -2,12 +2,13 @@ using System.Text.Json;
 
 namespace Mosen.GroupScheduler.Core.Security;
 
-public enum AllowedIpcOperation { SystemPing, AppInfo, SettingsGet, SettingsSave, DiagnosticsGet, AccountsList, AccountsCreate, AccountsEdit, AccountsArchive, AccountsRestore, GroupsList, GroupsTopics, GroupsMembers }
+public enum AllowedIpcOperation { SystemPing, AppInfo, SettingsGet, SettingsSave, DiagnosticsGet, AccountsList, AccountsCreate, AccountsEdit, AccountsArchive, AccountsRestore, GroupsList, GroupsTopics, GroupsMembers, ScriptsList, ScriptsGet, ScriptsCreate, ScriptsSave, ScriptsDuplicate, ScriptsArchive, ScriptsRestore }
 
 /// <summary>Fail-closed JSON input gate: exact origin is checked separately by WebView2 host.</summary>
 public static class IpcRequestGuard
 {
-    private const int MaxMessageChars = 8192;
+    private const int MaxMessageChars = 524288;
+    private const int StandardMessageLimit = 8192;
     private static readonly HashSet<string> RootReadFields = ["protocol","requestId","type"];
     private static readonly HashSet<string> RootWriteFields = ["protocol","requestId","type","payload"];
     private static readonly HashSet<string> PayloadFields = ["expectedRevision","preferences"];
@@ -44,7 +45,24 @@ public static class IpcRequestGuard
                 case "groups.list": operation=AllowedIpcOperation.GroupsList; break;
                 case "groups.topics": operation=AllowedIpcOperation.GroupsTopics; break;
                 case "groups.members": operation=AllowedIpcOperation.GroupsMembers; break;
+                case "scripts.list": operation=AllowedIpcOperation.ScriptsList; break;
+                case "scripts.get": operation=AllowedIpcOperation.ScriptsGet; break;
+                case "scripts.create": operation=AllowedIpcOperation.ScriptsCreate; break;
+                case "scripts.save": operation=AllowedIpcOperation.ScriptsSave; break;
+                case "scripts.duplicate": operation=AllowedIpcOperation.ScriptsDuplicate; break;
+                case "scripts.archive": operation=AllowedIpcOperation.ScriptsArchive; break;
+                case "scripts.restore": operation=AllowedIpcOperation.ScriptsRestore; break;
                 default: return false;
+            }
+            if(operation != AllowedIpcOperation.ScriptsSave && raw.Length>StandardMessageLimit)return false;
+            if(operation is AllowedIpcOperation.ScriptsList or AllowedIpcOperation.ScriptsGet or
+                AllowedIpcOperation.ScriptsCreate or AllowedIpcOperation.ScriptsSave or
+                AllowedIpcOperation.ScriptsDuplicate or AllowedIpcOperation.ScriptsArchive or
+                AllowedIpcOperation.ScriptsRestore)
+            {
+                if(!ExactFields(root,RootWriteFields) || !root.TryGetProperty("payload",out var data))
+                    return false;
+                return ValidateScriptsPayload(operation,data);
             }
             if (operation == AllowedIpcOperation.SettingsSave)
             {
@@ -78,6 +96,47 @@ public static class IpcRequestGuard
             return ExactFields(root, RootReadFields); // remaining read operations have no payload
         }
         catch (JsonException) { return false; }
+    }
+
+    private static bool ValidateScriptsPayload(AllowedIpcOperation operation,JsonElement p)
+    {
+        IReadOnlySet<string> fields=operation switch
+        {
+            AllowedIpcOperation.ScriptsList=>new HashSet<string>{"archived","query"},
+            AllowedIpcOperation.ScriptsCreate=>new HashSet<string>{"title"},
+            AllowedIpcOperation.ScriptsSave=>new HashSet<string>{"id","expectedRevision","document"},
+            AllowedIpcOperation.ScriptsArchive=>new HashSet<string>{"id","expectedRevision","confirmation"},
+            AllowedIpcOperation.ScriptsRestore=>new HashSet<string>{"id","expectedRevision"},
+            _=>new HashSet<string>{"id"}
+        };
+        if(!ExactFields(p,fields))return false;
+        if(operation==AllowedIpcOperation.ScriptsList)
+            return p.GetProperty("archived").ValueKind is JsonValueKind.True or JsonValueKind.False
+                && Label(p,"query",128,true);
+        if(operation==AllowedIpcOperation.ScriptsCreate)
+            return Label(p,"title",128,false);
+        if(p.GetProperty("id").ValueKind!=JsonValueKind.String ||
+           !Guid.TryParseExact(p.GetProperty("id").GetString(),"D",out var id) || id==Guid.Empty)return false;
+        if(operation is AllowedIpcOperation.ScriptsSave or AllowedIpcOperation.ScriptsArchive or AllowedIpcOperation.ScriptsRestore)
+        {
+            if(p.GetProperty("expectedRevision").ValueKind!=JsonValueKind.Number ||
+               !p.GetProperty("expectedRevision").TryGetInt64(out long revision) || revision<1)return false;
+        }
+        if(operation==AllowedIpcOperation.ScriptsArchive)
+            return p.GetProperty("confirmation").ValueKind==JsonValueKind.String &&
+                p.GetProperty("confirmation").GetString()=="归档剧本";
+        if(operation==AllowedIpcOperation.ScriptsSave)
+        {
+            JsonElement doc=p.GetProperty("document");
+            if(doc.ValueKind!=JsonValueKind.Object ||
+               !ExactFields(doc,new HashSet<string>{"title","roles","steps"}))return false;
+            if(!doc.TryGetProperty("roles",out var roles)||roles.ValueKind!=JsonValueKind.Array||
+               roles.GetArrayLength()>300 ||
+               !doc.TryGetProperty("steps",out var steps)||steps.ValueKind!=JsonValueKind.Array||
+               steps.GetArrayLength()>1000)return false;
+            return Label(doc,"title",128,false); // deeper per-item validation in EditorDocumentRules.Parse
+        }
+        return true;
     }
 
     private static bool ValidateGroupPayload(AllowedIpcOperation operation,JsonElement payload)
