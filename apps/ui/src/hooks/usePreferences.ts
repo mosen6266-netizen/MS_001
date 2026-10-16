@@ -1,6 +1,6 @@
 import {useCallback,useEffect,useRef,useState} from "react";
-import {DEFAULT_PREFERENCES,IPC_PROTOCOL,isBridgeResponse,isPreferencesSnapshot,makeRequest,makeSaveRequest,
-  type BridgeResponse,type PreferencesSnapshot,type UserPreferences} from "../../../../src/contracts/ipc";
+import {DEFAULT_PREFERENCES,isBridgeResponse,isPreferencesSnapshot,makeRequest,makeSaveRequest,
+  type PreferencesSnapshot,type UserPreferences} from "../../../../src/contracts/ipc";
 
 type Mode="loading"|"ready"|"preview"|"error";
 type Waiter={resolve:(value:PreferencesSnapshot)=>void;reject:(error:Error)=>void;timeout:ReturnType<typeof setTimeout>};
