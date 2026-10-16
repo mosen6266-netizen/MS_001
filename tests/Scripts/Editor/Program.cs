@@ -75,6 +75,26 @@ try
    "archived draft restored without losing content");
  var many=Enumerable.Range(0,10).Select(i=>scripts.Create("多草稿"+i)).ToArray();
  Verify(scripts.List().Count==12,"multiple independent draft files can coexist");
+ var mediaDraft=scripts.Create("图文草稿");
+ var reference=new MediaReference(new string('a',64),"image/png",92,1,1,"图片.png");
+ var withImage=new EditorDocument("图文草稿",[new ScriptRole(roleA,"客服A")],
+   [new EditorStep(Guid.NewGuid().ToString("D"),roleA,"配图说明",30000,5000,0,reference)],
+   new TimingProfile(5000,5000,0));
+ var mediaSaved=scripts.Save(Guid.Parse(mediaDraft.ScriptId),1,withImage);
+ Verify(mediaSaved.Document.Steps[0].Media?.AssetId==reference.AssetId,
+   "portable media hash retained in saved script draft");
+ Verify(mediaSaved.Document.Defaults?.TypingDurationMs==5000,
+   "default timing independent from per-message 30+5 configuration");
+ Verify(scripts.Get(Guid.Parse(mediaDraft.ScriptId))!.Document.Steps[0].Media?.FileName=="图片.png",
+   "image display name round trips as metadata without machine absolute paths");
+ var clonedMedia=scripts.Duplicate(Guid.Parse(mediaDraft.ScriptId));
+ Verify(clonedMedia.Document.Steps[0].Media?.AssetId==reference.AssetId,
+   "copying a script retains content addressed image reference");
+ bool invalidMedia=false;
+ try{EditorDocumentRules.Validate(withImage with {Steps=[
+   withImage.Steps[0] with { Media=reference with {FileName="../bad.png"}}
+ ]});}catch(ArgumentException){invalidMedia=true;}
+ Verify(invalidMedia,"unsafe image display name rejected by .NET validation");
  Console.WriteLine($"SUMMARY: {checks} editor draft assertions passed; no TDLib connection, scripts remain unpublished.");
 }
 finally{try{Directory.Delete(root,true);}catch(IOException){}}
