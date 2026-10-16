@@ -27,7 +27,6 @@ Check(!IpcRequestGuard.TryValidate(valid.Replace("}",",\"payload\":{\"hack\":1}}
 Check(!IpcRequestGuard.TryValidate(new string('X',8193),out _),"oversize message denied");
 Check(!IpcRequestGuard.TryValidate("{bad json",out _),"malformed JSON denied");
 
-const string scriptId="11111111-1111-4111-8111-111111111111";
 string scriptList="""{"protocol":"mosen.desktop.v1","requestId":"s-1","type":"scripts.list","payload":{"archived":false,"query":""}}""";
 string scriptSave="""{"protocol":"mosen.desktop.v1","requestId":"s-2","type":"scripts.save","payload":{"id":"11111111-1111-4111-8111-111111111111","expectedRevision":1,"document":{"title":"测试","roles":[],"steps":[]}}}""";
 Check(IpcRequestGuard.TryValidate(scriptList,out operation)&&operation==AllowedIpcOperation.ScriptsList,"script draft list allows only local read");
