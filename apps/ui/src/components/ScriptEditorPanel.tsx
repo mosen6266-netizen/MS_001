@@ -131,7 +131,12 @@ const ScriptWorkspace=forwardRef<WorkspaceHandle,{
   const visible=all.slice((page-1)*pageSize,page*pageSize);
   const pages=Math.max(1,Math.ceil(all.length/pageSize));
   const toggle=(id:string)=>dispatch({type:"select",stepKey:id,multiple:true});
-  return <div className="script-workspace">
+  return <div className="script-workspace" onKeyDown={e=>{
+    const node=e.target;
+    const editing=node instanceof HTMLElement&&(["INPUT","TEXTAREA","SELECT"].includes(node.tagName)||node.isContentEditable);
+    const action=keyboardAction(e,editing);
+    if(action){e.preventDefault();dispatch({type:action});}
+  }}>
     <div className="script-toolbar">
       <TextField label="剧本名称" value={editor.present.title} onChange={v=>dispatch({type:"title",value:v.slice(0,128)})}/>
       <div className="script-save"><StatusPill tone={saveInfo.includes("失败")?"danger":undefined}>{saveInfo}</StatusPill>
@@ -156,13 +161,7 @@ const ScriptWorkspace=forwardRef<WorkspaceHandle,{
         onClick={()=>dispatch({type:"copy",newStepKeys:editor.present.steps.filter(x=>editor.selected.includes(x.stepKey)).map(()=>crypto.randomUUID())})}>复制选中</ActionButton>
       <ActionButton tone="danger" disabled={!editor.selected.length} onClick={()=>dispatch({type:"remove"})}>删除选中</ActionButton>
     </div>
-    <div className="script-scroll" role="list" aria-label="剧本消息卡片列表"
-      onKeyDown={e=>{
-        const node=e.target;
-        const isEditable=node instanceof HTMLElement&&(["INPUT","TEXTAREA","SELECT"].includes(node.tagName)||node.isContentEditable);
-        const action=keyboardAction(e,isEditable);
-        if(action){e.preventDefault();dispatch({type:action});}
-      }}>
+    <div className="script-scroll" role="list" aria-label="剧本消息卡片列表">
       {visible.length===0?<div className="ui-empty">暂无消息，先选择发言账号备注，再添加一条。</div>:null}
       {visible.map((step,index)=>{
         const role=editor.present.roles.find(r=>r.roleKey===step.roleKey);
