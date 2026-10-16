@@ -115,6 +115,44 @@ public sealed class TdlibDispatcher : IAsyncDisposable
         finally { _pending.TryRemove(id,out _); }
     }
 
+    /// <summary>Auth functions are factory-built and allowlisted; raw JSON is not exposed to the GUI.</summary>
+    public Task<TdlibEnvelope> SendAuthorizationAsync(int clientId, TdlibAuthRequest request,
+        TimeSpan timeout, CancellationToken cancellationToken=default)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        return SendCorrelatedAsync(clientId, request.Build, timeout, cancellationToken);
+    }
+
+    private async Task<TdlibEnvelope> SendCorrelatedAsync(int clientId,Func<string,string> encode,
+        TimeSpan timeout,CancellationToken cancellationToken)
+    {
+        EnsureActive();
+        if(Volatile.Read(ref _started)==0)throw new InvalidOperationException("Start receiver first.");
+        if(!_closed.ContainsKey(clientId))throw new ArgumentException("Unknown client identifier.",nameof(clientId));
+        if(timeout<=TimeSpan.Zero||timeout>TimeSpan.FromSeconds(30))throw new ArgumentOutOfRangeException(nameof(timeout));
+        cancellationToken.ThrowIfCancellationRequested();
+        string id="ms10-"+Interlocked.Increment(ref _sequence).ToString(System.Globalization.CultureInfo.InvariantCulture);
+        string json=encode(id); // build before placing in dictionary; no auth value ever logged
+        var completion=new TaskCompletionSource<TdlibEnvelope>(TaskCreationOptions.RunContinuationsAsynchronously);
+        if(!_pending.TryAdd(id,new PendingRequest(clientId,completion)))throw new InvalidOperationException("Duplicate correlation ID");
+        try
+        {
+            lock(_sendGate){EnsureActive();_transport.Send(clientId,json);StartPumpAfterFirstSend();}
+            return await completion.Task.WaitAsync(timeout,cancellationToken);
+        }
+        finally{_pending.TryRemove(id,out _);}
+    }
+
+    /// <summary>Explicit one-client close used to cancel authorization, not logOut.</summary>
+    public Task CloseAuthClientAsync(int clientId,CancellationToken cancellationToken=default)
+    {
+        EnsureActive();
+        cancellationToken.ThrowIfCancellationRequested();
+        if(!_closed.ContainsKey(clientId))throw new ArgumentException("Unknown client identifier.",nameof(clientId));
+        lock(_sendGate){EnsureActive();_transport.Send(clientId,"""{"@type":"close"}""");StartPumpAfterFirstSend();}
+        return Task.CompletedTask;
+    }
+
     private async Task ReceiveLoopAsync()
     {
         try
