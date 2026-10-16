@@ -5,7 +5,7 @@ using Mosen.GroupScheduler.Core.Telemetry;
 
 namespace Mosen.GroupScheduler.Desktop;
 
-public partial class App : Application
+public partial class App : System.Windows.Application
 {
     private Mutex? _instanceMutex;
     private readonly SafeDiagnostics _safeTelemetry = SafeDiagnostics.ForCurrentUser();
@@ -16,7 +16,7 @@ public partial class App : Application
         {
             _safeTelemetry.Record(DiagnosticEvent.FatalError, FailureClassifier.Classify(fault.Exception));
             // A generic message only; never display private exception text or stack.
-            MessageBox.Show("程序遇到意外错误并将关闭。诊断文件不包含账号或消息内容。", "运行异常");
+            System.Windows.MessageBox.Show("程序遇到意外错误并将关闭。诊断文件不包含账号或消息内容。", "运行异常");
             fault.Handled = true;
             Shutdown(1);
         };
@@ -36,7 +36,7 @@ public partial class App : Application
         {
             _instanceMutex.Dispose();
             _instanceMutex = null;
-            MessageBox.Show("MOSEN Group Scheduler 已在运行。请切换到已有窗口。", "重复启动");
+            System.Windows.MessageBox.Show("MOSEN Group Scheduler 已在运行。请切换到已有窗口。", "重复启动");
             Shutdown();
             return;
         }

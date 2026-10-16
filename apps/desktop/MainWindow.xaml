@@ -1,8 +1,31 @@
-<Window x:Class="Mosen.GroupScheduler.Desktop.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf" Title="MOSEN Group Scheduler" Width="1180" Height="760" MinWidth="640" MinHeight="420" Background="#0E1014" WindowStartupLocation="Manual">
-  <Grid Background="#0E1014">
-    <wv2:WebView2 x:Name="Browser" Visibility="Hidden" />
-    <Border x:Name="StatusPanel" Background="#0E1014" Padding="28">
-      <TextBlock x:Name="Diagnostics" Foreground="#BEC6D0" Text="正在初始化本地界面..." FontSize="14" TextWrapping="Wrap" VerticalAlignment="Center" HorizontalAlignment="Center" />
-    </Border>
+<Window x:Class="Mosen.GroupScheduler.Desktop.MainWindow"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+ Title="MOSEN Group Scheduler" Width="1180" Height="760"
+ MinWidth="640" MinHeight="420" Background="#0E1014" WindowStartupLocation="Manual">
+ <Grid Background="#0E1014">
+  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+  <Border Grid.Row="0" Background="#171B21" BorderBrush="#303640" BorderThickness="0,0,0,1" Padding="14,8">
+   <Grid>
+    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+    <TextBlock x:Name="SafetyNotice" Grid.Column="0" Text="离线工程模式 · 无真实 Telegram 消息发送"
+      Foreground="#BAC6D2" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" FontSize="12"/>
+    <Button Grid.Column="1" x:Name="AlertHistoryButton" Content="异常历史" Click="OnOpenAlertHistory"
+      Background="#2D333E" Foreground="#F0F2F4" BorderBrush="#414A56"
+      Padding="13,8" Margin="7,0,0,0" Cursor="Hand"/>
+    <Button Grid.Column="2" x:Name="EmergencyStopButton" Content="全局紧急停止" Click="OnEmergencyStopClick"
+      Background="#A53E38" Foreground="White" BorderBrush="#CA6156"
+      Padding="15,8" Margin="7,0,0,0" FontWeight="SemiBold" Cursor="Hand"/>
+   </Grid>
+  </Border>
+  <Grid Grid.Row="1">
+   <wv2:WebView2 x:Name="Browser" Visibility="Hidden"/>
+   <Border x:Name="StatusPanel" Background="#0E1014" Padding="28">
+    <TextBlock x:Name="Diagnostics" Foreground="#BEC6D0"
+      Text="正在初始化本地界面..." FontSize="14" TextWrapping="Wrap"
+      VerticalAlignment="Center" HorizontalAlignment="Center"/>
+   </Border>
   </Grid>
+ </Grid>
 </Window>

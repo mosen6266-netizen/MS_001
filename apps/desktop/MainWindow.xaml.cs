@@ -29,6 +29,7 @@ public partial class MainWindow : Window
         InitializeComponent();
         _safeTelemetry.Record(DiagnosticEvent.Started);
         ApplyWindowPlacement();
+        InitializeAlertNotifications();
         Loaded += InitializeBrowser;
         Closing += (_, _) => SaveWindowPlacement();
         Closed += (_, _) =>
@@ -39,6 +40,7 @@ public partial class MainWindow : Window
             // WebView2 runs only while the window is open; never keep background sessions.
             if (Browser.CoreWebView2 is { } core)
                 core.WebMessageReceived -= OnWebMessageReceived;
+            StopAlertNotifications();
             Browser.Dispose();
         };
     }
