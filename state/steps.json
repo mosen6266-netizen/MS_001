@@ -118,7 +118,7 @@
     "step": "07",
     "title": "设置、搜索与状态管理",
     "phase": 2,
-    "status": "not_started",
+    "status": "in_progress",
     "acceptance_evidence": [],
     "last_commit_sha": null
   },
