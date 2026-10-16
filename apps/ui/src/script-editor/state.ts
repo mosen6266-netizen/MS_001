@@ -19,7 +19,10 @@ export const normalizedLabel=(v:string)=>v.trim().normalize("NFC");
 export const newEditorState=(doc:ScriptDoc):EditorState=>({past:[],present:doc,future:[],selected:[]});
 const snapshot=(x:ScriptDoc):ScriptDoc=>({title:x.title,roles:[...x.roles],steps:[...x.steps]});
 const push=(old:EditorState,updated:ScriptDoc,selected=old.selected):EditorState=>{
-  if(JSON.stringify(updated)===JSON.stringify(old.present))return old;
+  // All reducer actions use immutable copy-on-write; compare only root/collection references.
+  // Serializing a 1000-message draft on each keystroke causes noticeable input lag.
+  if(updated.title===old.present.title&&updated.roles===old.present.roles&&
+     updated.steps===old.present.steps)return old;
   return {past:[...old.past.slice(-79),snapshot(old.present)],present:updated,future:[],selected};
 };
 export function editorReducer(state:EditorState,action:EditorAction):EditorState {
@@ -41,7 +44,7 @@ export function editorReducer(state:EditorState,action:EditorAction):EditorState
       (state.selected.includes(action.stepKey)?state.selected.filter(x=>x!==action.stepKey):
       [...state.selected,action.stepKey]) : [action.stepKey]};
   }
-  if(action.type==="title")return push(state,{...doc,title:action.value});
+  if(action.type==="title")return action.value===doc.title?state:push(state,{...doc,title:action.value});
   if(action.type==="makeRole"){
     const label=normalizedLabel(action.roleLabel);
     if(!label || label.length>64 ||
@@ -58,8 +61,12 @@ export function editorReducer(state:EditorState,action:EditorAction):EditorState
     if(!doc.roles.some(x=>x.roleKey===action.roleKey))return state;
     return push(state,{...doc,steps:doc.steps.map(x=>x.stepKey===action.stepKey?{...x,roleKey:action.roleKey}:x)});
   }
-  if(action.type==="body")
-    return push(state,{...doc,steps:doc.steps.map(x=>x.stepKey===action.stepKey?{...x,body:action.body.slice(0,8192)}:x)});
+  if(action.type==="body"){
+    const original=doc.steps.find(x=>x.stepKey===action.stepKey);
+    const body=action.body.slice(0,8192);
+    if(!original||original.body===body)return state;
+    return push(state,{...doc,steps:doc.steps.map(x=>x.stepKey===action.stepKey?{...x,body}:x)});
+  }
   if(action.type==="copy"){
     const selected=doc.steps.filter(s=>state.selected.includes(s.stepKey));
     if(!selected.length||selected.length!==action.newStepKeys.length||

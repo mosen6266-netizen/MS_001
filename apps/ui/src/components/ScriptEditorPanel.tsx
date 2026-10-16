@@ -92,7 +92,7 @@ const ScriptWorkspace=forwardRef<WorkspaceHandle,{
   },[save,script.scriptId]);
   useImperativeHandle(ref,()=>({flush}),[flush]);
   useEffect(()=>{
-    if(JSON.stringify(editor.present)===storedRef.current)return;
+    if(editor.present===script.document)return;
     setSaveInfo("有未保存修改");
     const timer=setTimeout(()=>{void flush();},700);
     return()=>clearTimeout(timer);
