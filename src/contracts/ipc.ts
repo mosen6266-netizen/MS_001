@@ -45,7 +45,7 @@ export function isBridgeRequest(v:unknown):v is BridgeRequest {
     const label=(k:string,max:number,empty=false)=>
       typeof body[k]==="string" && (body[k] as string).length<=max &&
       (empty || (body[k] as string).trim().length>0) &&
-      !/[\\x00-\\x1f\\x7f]/.test(body[k] as string);
+      !/[\x00-\x1f\x7f]/.test(body[k] as string);
     const validId=type==="accounts.list"||type==="accounts.create"||
       (typeof body.id==="string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(body.id as string));
     const validRev=type==="accounts.list"||type==="accounts.create"||
