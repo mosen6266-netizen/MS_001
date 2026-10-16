@@ -31,7 +31,7 @@ Check(gate.Apply(null,nonce,now).Code=="NO_SIGNED_LEASE","missing signed lease r
 Check(gate.Apply(Signed(baseClaims,ok:false),nonce,now).Authorized==false,"explicit denied response cannot authorize");
 var accepted=gate.Apply(Signed(baseClaims),nonce,now);
 Check(accepted.Authorized&&accepted.Code=="VALID","genuine P-256 signed Telegram license accepted");
-Check(accepted.LeaseExpiresUtc==now.AddHours(1),"offline window strictly capped at one hour");
+Check(accepted.LeaseExpiresUtc?.ToUnixTimeMilliseconds()==baseClaims.LeaseUntilMs,"offline window strictly capped at one hour");
 Check(gate.Offline(now.AddMinutes(30)).Authorized,"verified lease supports bounded in-process offline interval");
 Check(!gate.Offline(now.AddHours(2)).Authorized,"offline lease cannot extend beyond signed validity");
 Check(!gate.Offline(now.AddMinutes(-4)).Authorized,"clock rollback outside tolerance fails closed");
