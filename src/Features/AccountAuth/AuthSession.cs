@@ -20,6 +20,7 @@ public sealed class AuthSession
     private AuthView _view=AuthStateReader.Initial;
     private int _busy;
     private bool _cancelled;
+    private bool _qrPending;
     private const int MaxInputLength=512;
 
     public AuthSession(int clientId,IAuthGateway gateway)
@@ -38,9 +39,11 @@ public sealed class AuthSession
         catch(InvalidDataException){return false;}
         lock(_gate)
         {
-            if(_cancelled)return false;
+            if(_cancelled && next.Phase!=AuthPhase.Closed)return false;
             if(_view.Phase==AuthPhase.Closed)return false; // closed clients never resurrect
             if(_view.Phase==next.Phase && _view.QrLink==next.QrLink)return false; // duplicate QR/update doesn't spawn another client
+            if(next.Phase!=AuthPhase.WaitPhoneOrQr) _qrPending=next.Phase==AuthPhase.WaitQrConfirmation;
+            else _qrPending=false;
             _view=next with {Revision=_view.Revision+1};
             return true;
         }
@@ -49,6 +52,20 @@ public sealed class AuthSession
     public async Task<AuthResult> SubmitAsync(AuthCommand command,CancellationToken cancellationToken=default)
     {
         ArgumentNullException.ThrowIfNull(command);
+        // Cancellation is an emergency action: must work even if a previous auth query is pending.
+        if(command.Kind==AuthCommandKind.Cancel)
+        {
+            lock(_gate)
+            {
+                if(_cancelled || !Allowed(_view.Phase,AuthCommandKind.Cancel))
+                    return new(false,"CLOSED","此登录流程已取消或正在关闭。");
+                _cancelled=true;
+                _view=new(AuthPhase.Closing,"已取消登录","正在关闭当前客户端。",false,false,false,false,null,_view.Revision+1);
+            }
+            try {await _gateway.CloseAsync(_clientId,cancellationToken);}
+            catch(Exception){return new(false,"CLOSE_UNCERTAIN","关闭请求结果不确定，不得自动创建另一个会话。");}
+            return new(true,"CANCELLED","当前登录尝试已取消，不会自动再次扫码。");
+        }
         if(Interlocked.CompareExchange(ref _busy,1,0)!=0)
             return new(false,"BUSY","当前验证请求尚未完成，请勿重复提交。");
         try
@@ -58,18 +75,8 @@ public sealed class AuthSession
             {
                 if(_cancelled)return new(false,"CLOSED","此登录流程已取消，不能重复使用。");
                 before=_view;
-            }
-            if(command.Kind==AuthCommandKind.Cancel)
-            {
-                lock(_gate)
-                {
-                    _cancelled=true;
-                    _view=new(AuthPhase.Closing,"已取消登录","已停止当前登录尝试，正在关闭客户端。",false,false,false,false,null,_view.Revision+1);
-                }
-                // A close, NOT logOut: never revoke an already established session by accident.
-                try {await _gateway.CloseAsync(_clientId,cancellationToken);}
-                catch(Exception){return new(false,"CLOSE_UNCERTAIN","关闭请求结果不确定；不得自动重建或再次扫码。");}
-                return new(true,"CANCELLED","登录尝试已取消；不自动重新创建账号。");
+                if(command.Kind==AuthCommandKind.StartQr && _qrPending)
+                    return new(false,"QR_PENDING","二维码请求已发送，请等待 Telegram 更新链接。");
             }
             if(!Allowed(before.Phase,command.Kind))
                 return new(false,"WRONG_STATE","当前 Telegram 验证状态不允许此操作。");
@@ -87,7 +94,6 @@ public sealed class AuthSession
             {
                 if(_cancelled)return new(false,"CLOSED","此流程已关闭。");
             }
-            // command acknowledgement does NOT prove authorization; only updateAuthorizationStateReady does.
             if(answer.Type=="error")
             {
                 int code=answer.Body.TryGetProperty("code",out var value)&&value.ValueKind==System.Text.Json.JsonValueKind.Number&&value.TryGetInt32(out var n)?n:0;
@@ -95,8 +101,10 @@ public sealed class AuthSession
                     new(false,"REJECTED","Telegram 未接受本次验证，请检查输入或官方提示。");
             }
             if(answer.Type!="ok" && command.Kind!=AuthCommandKind.RefreshQr &&
-               answer.Type!="authorizationStateWaitOtherDeviceConfirmation")
+                answer.Type!="authorizationStateWaitOtherDeviceConfirmation")
                 return new(false,"UNEXPECTED","收到意外的授权响应，请先核查状态。");
+            if(command.Kind==AuthCommandKind.StartQr)
+                lock(_gate){_qrPending=true;}
             return new(true,"SUBMITTED","请求已提交，请等待 Telegram 官方授权状态更新。");
         }
         finally {Volatile.Write(ref _busy,0);}
@@ -126,8 +134,8 @@ public sealed class AuthSession
         AuthCommandKind.EnterEmailAddress=>c.Input is {Length:>=3 and <=254} email &&
             email.IndexOf('@')>0 && email.LastIndexOf('.')>email.IndexOf('@')+1 && !email.Any(char.IsWhiteSpace),
         AuthCommandKind.EnterPassword=>c.Input is {Length:>=1 and <=MaxInputLength},
-        AuthCommandKind.Register=>c.AcceptedTerms && c.Input is {Length:>=1 and <=128} first &&
-            !string.IsNullOrWhiteSpace(first) && c.LastName is {Length:<=128},
+        AuthCommandKind.Register=>c.AcceptedTerms && c.Input is {Length:>=1 and <=64} first &&
+            !string.IsNullOrWhiteSpace(first) && c.LastName is {Length:<=64},
         _=>false
     };
 }
