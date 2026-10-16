@@ -1,11 +1,16 @@
+import type {MediaReference,TimingProfile} from "../../../../src/contracts/ipc";
 export type ScriptRole={roleKey:string;roleLabel:string};
-export type ScriptStep={stepKey:string;roleKey:string;body:string;preSendDelayMs:number;typingDurationMs:number;postSendDelayMs:number};
-export type ScriptDoc={title:string;roles:ScriptRole[];steps:ScriptStep[]};
+export type ScriptStep={stepKey:string;roleKey:string;body:string;preSendDelayMs:number;typingDurationMs:number;postSendDelayMs:number;media?:MediaReference|null};
+export type ScriptDoc={title:string;roles:ScriptRole[];steps:ScriptStep[];defaults?:TimingProfile|null};
 export type EditorState={past:ScriptDoc[];present:ScriptDoc;future:ScriptDoc[];selected:string[]};
 export type EditorAction=
   |{type:"title";value:string}
   |{type:"choose";stepKey:string;roleKey:string}
   |{type:"body";stepKey:string;body:string}
+  |{type:"timing";stepKey:string;values:Partial<TimingProfile>}
+  |{type:"defaults";values:TimingProfile}
+  |{type:"batchTiming";values:Partial<TimingProfile>}
+  |{type:"media";stepKey:string;media:MediaReference|null}
   |{type:"add";roleKey:string;stepKey:string}
   |{type:"makeRole";roleKey:string;roleLabel:string}
   |{type:"copy";newStepKeys:string[]}
@@ -14,7 +19,11 @@ export type EditorAction=
   |{type:"move";id:string;direction:-1|1}
   |{type:"select";stepKey:string;multiple:boolean}
   |{type:"undo"}|{type:"redo"};
-export const DEFAULT_STEP_TIMES={preSendDelayMs:5000,typingDurationMs:5000,postSendDelayMs:0};
+export const DEFAULT_STEP_TIMES:TimingProfile={preSendDelayMs:5000,typingDurationMs:5000,postSendDelayMs:0};
+const validTiming=(values:TimingProfile)=>
+  Number.isInteger(values.preSendDelayMs)&&values.preSendDelayMs>=0&&values.preSendDelayMs<=3600000&&values.preSendDelayMs%1000===0&&
+  Number.isInteger(values.typingDurationMs)&&values.typingDurationMs>=0&&values.typingDurationMs<=60000&&values.typingDurationMs%1000===0&&
+  Number.isInteger(values.postSendDelayMs)&&values.postSendDelayMs>=0&&values.postSendDelayMs<=3600000&&values.postSendDelayMs%1000===0;
 export const normalizedLabel=(v:string)=>v.trim().normalize("NFC");
 export const newEditorState=(doc:ScriptDoc):EditorState=>({past:[],present:doc,future:[],selected:[]});
 const snapshot=(x:ScriptDoc):ScriptDoc=>({title:x.title,roles:[...x.roles],steps:[...x.steps]});
@@ -55,7 +64,7 @@ export function editorReducer(state:EditorState,action:EditorAction):EditorState
   if(action.type==="add"){
     if(!doc.roles.some(x=>x.roleKey===action.roleKey)||
        doc.steps.some(x=>x.stepKey===action.stepKey)||doc.steps.length>=1000)return state;
-    return push(state,{...doc,steps:[...doc.steps,{stepKey:action.stepKey,roleKey:action.roleKey,body:"",...DEFAULT_STEP_TIMES}]},[action.stepKey]);
+    return push(state,{...doc,steps:[...doc.steps,{stepKey:action.stepKey,roleKey:action.roleKey,body:"",...(doc.defaults??DEFAULT_STEP_TIMES)}]},[action.stepKey]);
   }
   if(action.type==="choose"){
     if(!doc.roles.some(x=>x.roleKey===action.roleKey))return state;
@@ -66,6 +75,43 @@ export function editorReducer(state:EditorState,action:EditorAction):EditorState
     const body=action.body.slice(0,8192);
     if(!original||original.body===body)return state;
     return push(state,{...doc,steps:doc.steps.map(x=>x.stepKey===action.stepKey?{...x,body}:x)});
+  }
+  if(action.type==="defaults"){
+    if(!validTiming(action.values))return state;
+    return push(state,{...doc,defaults:{...action.values}});
+  }
+  if(action.type==="timing"){
+    const item=doc.steps.find(s=>s.stepKey===action.stepKey);
+    if(!item)return state;
+    const value={preSendDelayMs:action.values.preSendDelayMs??item.preSendDelayMs,
+      typingDurationMs:action.values.typingDurationMs??item.typingDurationMs,
+      postSendDelayMs:action.values.postSendDelayMs??item.postSendDelayMs};
+    if(!validTiming(value))return state;
+    if(value.preSendDelayMs===item.preSendDelayMs&&value.typingDurationMs===item.typingDurationMs&&
+       value.postSendDelayMs===item.postSendDelayMs)return state;
+    return push(state,{...doc,steps:doc.steps.map(x=>x.stepKey===action.stepKey?{...x,...value}:x)});
+  }
+  if(action.type==="batchTiming"){
+    if(!state.selected.length)return state;
+    const steps=doc.steps.map(x=>{
+      if(!state.selected.includes(x.stepKey))return x;
+      const value={preSendDelayMs:action.values.preSendDelayMs??x.preSendDelayMs,
+        typingDurationMs:action.values.typingDurationMs??x.typingDurationMs,
+        postSendDelayMs:action.values.postSendDelayMs??x.postSendDelayMs};
+      if(!validTiming(value))return x;
+      if(value.preSendDelayMs===x.preSendDelayMs&&value.typingDurationMs===x.typingDurationMs&&
+         value.postSendDelayMs===x.postSendDelayMs)return x;
+      return {...x,...value};
+    });
+    return steps.every((x,i)=>x===doc.steps[i])?state:push(state,{...doc,steps});
+  }
+  if(action.type==="media"){
+    const item=doc.steps.find(x=>x.stepKey===action.stepKey);
+    if(!item)return state;
+    if(action.media!==null && (!/^[a-f0-9]{64}$/.test(action.media.assetId)||
+       action.media.byteLength>5242880))return state;
+    if(JSON.stringify(item.media??null)===JSON.stringify(action.media))return state;
+    return push(state,{...doc,steps:doc.steps.map(x=>x.stepKey===action.stepKey?{...x,media:action.media}:x)});
   }
   if(action.type==="copy"){
     const selected=doc.steps.filter(s=>state.selected.includes(s.stepKey));
