@@ -1,6 +1,6 @@
 /** Allowlisted offline host commands; no Telegram sends, login, sessions or secrets. */
 export const IPC_PROTOCOL = "mosen.desktop.v1" as const;
-export type ReadRequest = { protocol: typeof IPC_PROTOCOL; requestId: string; type: "system.ping"|"app.info"|"settings.get"|"diagnostics.get" };
+export type ReadRequest = { protocol: typeof IPC_PROTOCOL; requestId: string; type: "system.ping"|"app.info"|"settings.get"|"diagnostics.get"|"runtime.snapshot" };
 export type SettingsSaveRequest = { protocol: typeof IPC_PROTOCOL; requestId: string; type: "settings.save"; payload: {expectedRevision:number;preferences:UserPreferences} };
 export type AccountAction="accounts.list"|"accounts.create"|"accounts.edit"|"accounts.archive"|"accounts.restore";
 export type AccountItem={id:string;alias:string;groupTag:string;displayName:string;revision:number;verifiedUserId:string|null;removed:boolean;canAttachSession:boolean};
@@ -24,6 +24,8 @@ export type MediaRequest={protocol:typeof IPC_PROTOCOL;requestId:string;type:Med
 export type ScriptSnapshot={scriptId:string;revision:number;document:EditorDoc;archived:boolean};
 export type ScriptSummary={scriptId:string;title:string;revision:number;stepCount:number;archived:boolean};
 export type ScriptRequest={protocol:typeof IPC_PROTOCOL;requestId:string;type:ScriptAction;payload:Record<string,unknown>};
+export type RuntimeDashboardRow={runId:string;chatId:string;topicId:string|null;state:string;phase:string;completedSteps:number;totalSteps:number;completionPercent:number;nextStepNumber:number;remainingMs:number;lastClockUtc:string;isClockActive:boolean;issueCode:string;revision:number};
+export type RuntimeDashboardSnapshot={checkedUtc:string;mode:"offline-simulation-readonly";summary:{total:number;running:number;paused:number;review:number;failed:number;completed:number;stopped:number;ready:number;uncertainMessages:number;corruptRecords:number};items:RuntimeDashboardRow[]};
 export type BridgeRequest = ReadRequest | SettingsSaveRequest | AccountRequest | GroupRequest | ScriptRequest | MediaRequest;
 export type BridgeResponse = { protocol: typeof IPC_PROTOCOL; requestId:string; ok:boolean; type:string; payload:Record<string,unknown> };
 export type Density = "compact" | "comfortable";
@@ -142,7 +144,23 @@ export function isBridgeRequest(v:unknown):v is BridgeRequest {
     return Number.isInteger(p.page)&&Number(p.page)>=1&&Number(p.page)<=1000000 &&
       [10,20,50].includes(Number(p.pageSize));
   }
-  return (v.type==="system.ping"||v.type==="app.info"||v.type==="settings.get"||v.type==="diagnostics.get") && Object.keys(v).length===3;
+  return (v.type==="system.ping"||v.type==="app.info"||v.type==="settings.get"||v.type==="diagnostics.get"||v.type==="runtime.snapshot") && Object.keys(v).length===3;
+}
+export function isRuntimeDashboardSnapshot(v:unknown):v is RuntimeDashboardSnapshot {
+  if(!isRecord(v)||v.mode!=="offline-simulation-readonly"||typeof v.checkedUtc!=="string"||
+    !isRecord(v.summary)||!Array.isArray(v.items)||v.items.length>10000)return false;
+  const nonnegative=(n:unknown)=>Number.isSafeInteger(n)&&Number(n)>=0;
+  if(!["total","running","paused","review","failed","completed","stopped","ready","uncertainMessages","corruptRecords"].every(k=>nonnegative((v.summary as Record<string,unknown>)[k])))return false;
+  const validStates=["Ready","Running","Paused","Review","Failed","Completed","Stopped"];
+  const validPhases=["WaitingBefore","Typing","AwaitingSend","AwaitingReceipt","WaitingAfter","Finished"];
+  return v.items.every(x=>isRecord(x)&&typeof x.runId==="string"&&x.runId.length<=64&&
+    typeof x.chatId==="string"&&safeId(x.chatId)&&
+    (x.topicId===null||safeId(x.topicId))&&
+    validStates.includes(String(x.state))&&validPhases.includes(String(x.phase))&&
+    nonnegative(x.completedSteps)&&nonnegative(x.totalSteps)&&Number(x.totalSteps)>0&&
+    Number(x.completedSteps)<=Number(x.totalSteps)&&nonnegative(x.completionPercent)&&Number(x.completionPercent)<=100&&
+    nonnegative(x.nextStepNumber)&&nonnegative(x.remainingMs)&&typeof x.lastClockUtc==="string"&&
+    typeof x.isClockActive==="boolean"&&typeof x.issueCode==="string"&&x.issueCode.length<=128&&nonnegative(x.revision));
 }
 export function isBridgeResponse(v:unknown):v is BridgeResponse {
   return isRecord(v)&&v.protocol===IPC_PROTOCOL&&typeof v.requestId==="string"&&v.requestId.length>0&&

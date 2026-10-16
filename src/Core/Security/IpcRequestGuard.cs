@@ -2,7 +2,7 @@ using System.Text.Json;
 
 namespace Mosen.GroupScheduler.Core.Security;
 
-public enum AllowedIpcOperation { SystemPing, AppInfo, SettingsGet, SettingsSave, DiagnosticsGet, AccountsList, AccountsCreate, AccountsEdit, AccountsArchive, AccountsRestore, GroupsList, GroupsTopics, GroupsMembers, ScriptsList, ScriptsGet, ScriptsCreate, ScriptsSave, ScriptsDuplicate, ScriptsArchive, ScriptsRestore, ScriptsExport, ScriptsImport, ScriptsPublish, ScriptsVersions, ScriptsPreview, ScriptsPreflight, MediaImport, MediaPreview }
+public enum AllowedIpcOperation { SystemPing, AppInfo, SettingsGet, SettingsSave, DiagnosticsGet, AccountsList, AccountsCreate, AccountsEdit, AccountsArchive, AccountsRestore, GroupsList, GroupsTopics, GroupsMembers, ScriptsList, ScriptsGet, ScriptsCreate, ScriptsSave, ScriptsDuplicate, ScriptsArchive, ScriptsRestore, ScriptsExport, ScriptsImport, ScriptsPublish, ScriptsVersions, ScriptsPreview, ScriptsPreflight, MediaImport, MediaPreview, RuntimeSnapshot }
 
 /// <summary>Fail-closed JSON input gate: exact origin is checked separately by WebView2 host.</summary>
 public static class IpcRequestGuard
@@ -38,6 +38,7 @@ public static class IpcRequestGuard
                 case "settings.get": operation=AllowedIpcOperation.SettingsGet; break;
                 case "settings.save": operation=AllowedIpcOperation.SettingsSave; break;
                 case "diagnostics.get": operation=AllowedIpcOperation.DiagnosticsGet; break;
+                case "runtime.snapshot": operation=AllowedIpcOperation.RuntimeSnapshot; break;
                 case "accounts.list": operation=AllowedIpcOperation.AccountsList; break;
                 case "accounts.create": operation=AllowedIpcOperation.AccountsCreate; break;
                 case "accounts.edit": operation=AllowedIpcOperation.AccountsEdit; break;

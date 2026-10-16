@@ -8,6 +8,7 @@ import { GroupCatalogPanel } from "./components/GroupCatalogPanel";
 import { ScriptEditorPanel } from "./components/ScriptEditorPanel";
 import { AuthStatusPreview } from "./components/AuthStatusPreview";
 import { DiagnosticsPanel } from "./components/DiagnosticsPanel";
+import { RuntimeDashboardPanel } from "./components/RuntimeDashboardPanel";
 import { usePreferences } from "./hooks/usePreferences";
 import { isBridgeResponse, makeRequest } from "../../../src/contracts/ipc";
 import { initialShellState, SHELL_ROUTES, shortcutRoute, transitionShellRoute, type ShellRoute } from "../../../src/web/routes";
@@ -85,9 +86,10 @@ export function App() {
           <div className="overview-grid">
             <article className="summary-tile"><h2>已授权账号</h2><strong>尚未接入</strong><p>真实 Telegram 登录将在后续阶段实现</p></article>
             <article className="summary-tile"><h2>运行任务</h2><strong>0</strong><p>目前不执行群消息发送</p></article>
-            <article className="summary-tile"><h2>工程状态</h2><strong>STEP 13</strong><p>剧本编辑器、本地草稿和角色备注选择</p></article>
+            <article className="summary-tile"><h2>工程状态</h2><strong>STEP 21</strong><p>运行中心只读状态、模拟调度与故障恢复</p></article>
             <article className="notice-tile"><h2 id="panel-title">当前开发范围</h2><p>已实现本地账号登记及只读群组目录；真实 TDLib 同步、账号授权和群组任务尚未接入，当前不会执行发送。</p></article>
           </div> :
+          shell.active === "running" ? <RuntimeDashboardPanel /> :
           shell.active === "settings" ? <><PreferencesPanel {...preferences} /><DiagnosticsPanel /><DesignShowcase /></> :
           shell.active === "groups" ? <GroupCatalogPanel preferences={preferences.snapshot.preferences}/> :
           shell.active === "accounts" ? <><AuthStatusPreview />{window.chrome?.webview ? <AccountRegistryPanel preferences={preferences.snapshot.preferences}/> : <MockAccountIndex preferences={preferences.snapshot.preferences} />}</> :

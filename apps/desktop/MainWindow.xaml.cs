@@ -173,6 +173,11 @@ public partial class MainWindow : Window
                 await HandleMediaRequestAsync(jsonMessage,request.RequestId,request.Type);
                 return;
             }
+            if (operation == AllowedIpcOperation.RuntimeSnapshot)
+            {
+                await HandleRuntimeSnapshotAsync(request.RequestId);
+                return;
+            }
             if (operation == AllowedIpcOperation.DiagnosticsGet)
             {
                 SendSettingResponse(request.RequestId,"diagnostics.get.result",true,_safeTelemetry.Snapshot(_appHealth));

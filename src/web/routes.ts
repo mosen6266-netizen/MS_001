@@ -4,7 +4,7 @@ export const SHELL_ROUTES = [
   { id: "accounts", label: "账号管理", description: "本地账号登记、备注及分组", shortcut: "Alt+2" },
   { id: "groups", label: "群组与话题", description: "本地已验证的群组、话题及账号权限快照", shortcut: "Alt+3" },
   { id: "scripts", label: "剧本编辑", description: "从本地备注选择发言角色，拖拽排序及草稿保存", shortcut: "Alt+4" },
-  { id: "running", label: "运行中心", description: "独立群任务状态（待后续接入）", shortcut: "Alt+5" },
+  { id: "running", label: "运行中心", description: "50群任务只读状态、倒计时及异常复核", shortcut: "Alt+5" },
   { id: "settings", label: "设置", description: "本地设置与诊断（待后续接入）", shortcut: "Alt+6" },
 ] as const;
 export type ShellRoute = (typeof SHELL_ROUTES)[number]["id"];
