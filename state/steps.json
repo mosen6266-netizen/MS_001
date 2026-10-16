@@ -236,9 +236,26 @@
     "step": "12",
     "title": "群组、话题与账号权限目录",
     "phase": 3,
-    "status": "in_progress",
-    "acceptance_evidence": [],
-    "last_commit_sha": null
+    "status": "done_dev",
+    "acceptance_evidence": [
+      "docs/STEP_12_ACCEPTANCE.md",
+      "docs/STEP_12_GROUP_CATALOG.md",
+      "docs/STEP_12_TEST_MATRIX.md",
+      "src/Infrastructure/Persistence/Migrations/0004_groups.sql",
+      "src/Features/Groups/TdlibGroupParser.cs",
+      "src/Features/Groups/GroupCatalogRepository.cs",
+      "src/Features/Groups/GroupModels.cs",
+      "apps/ui/src/components/GroupCatalogPanel.tsx",
+      "apps/desktop/MainWindow.Groups.cs",
+      "tests/GroupCatalog/Program.cs",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/38942859853"
+    ],
+    "last_commit_sha": "71fc9298e3f5d58e50cb597a35d44b7e3a24f19c",
+    "deferred_release_acceptance": [
+      "GROUPS-REAL-SYNC",
+      "TDLIB-NATIVE-BINARY",
+      "AUTH-REAL-ACCOUNT"
+    ]
   },
   {
     "step": "13",

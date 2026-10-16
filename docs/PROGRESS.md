@@ -126,3 +126,11 @@
 - [GitHub Actions 38940132317](https://github.com/mosen6266-netizen/MS_001/actions/runs/38940132317) **17/17 SUCCESS**；Windows/Linux各48项注册表/会话模拟断言，前端29项、设计16项，SQLite迁移、安全、WPF打包和原有CI全部通过。
 - 修复C# SQL多行字符串语法、TS类型收缩和Unicode控制字符验证、弹窗二次确认，并增补归档恢复后重跑完整CI。
 - 真实Win10/11、TDLib原生DLL、账号密钥完整生命周期/免重扫/72小时压测延至最终本机验收；**Step11 done_dev，下一步12，开发进度11/32（34.375%），剩余21步**。详见 `docs/STEP_11_ACCEPTANCE.md`。
+
+## Step12 — Telegram 群组、话题与账号权限目录（2026-10-16）
+- SQLite v4加官方trusted来源、forum话题关闭状态及单账号成员权限快照；群名更新由`chat_id`定位，保留剧本目标绑定；权限撤销/话题关闭的时间戳单调处理、权限默认拒绝。
+- 官方形状TDLib chat/topic/chatMember/supergroupFullInfo解析及本人userID核验；`GroupPermissionPolicy.Preflight`拒绝未知/过期/被封禁/无权限/话题关闭，同时要求本次开始时重新从Telegram检查并接受慢速模式调度。
+- 只读中文群组界面，按名称搜索分页、查看话题/账号文字图片权限与slow mode，后端不接受伪造群组/任意发送IPC；没有真实原生会话时列表为空而非假装在线。
+- [GitHub Actions 38942859853](https://github.com/mosen6266-netizen/MS_001/actions/runs/38942859853) **19/19 SUCCESS**；Windows/Linux各47个GroupCatalog模拟断言、UI32/32、CSS16/16，数据库迁移/备份、安全/账号生命周期与Windows编译发布回归全部通过。
+- 解决初次C#测试语法、前端TopicPage状态类型、SSR初始加载测试不匹配并加入成员ID安全边界，最终全量CI全绿。
+- `docs/STEP_12_ACCEPTANCE.md` 为详尽验收；真实TDLib DLL、账号登录、官方群/话题同步、实时权限刷新/50群实操仍**DEFERRED**。**Step12 done_dev；下一步Step13可视化剧本编辑器；开发进度12/32=37.5%，剩余20步。**

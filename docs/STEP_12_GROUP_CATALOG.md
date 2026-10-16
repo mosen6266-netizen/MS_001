@@ -35,3 +35,6 @@
 官方资料：https://core.telegram.org/tdlib/getting-started 、https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1get_chat_member.html 、https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1supergroup_full_info.html
 
 **开发完成状态以 GitHub 最新全部CI作业通过后写入 `docs/STEP_12_ACCEPTANCE.md` 为准。**
+
+## 最终CI开发验收
+[完整GitHub Actions 38942859853](https://github.com/mosen6266-netizen/MS_001/actions/runs/38942859853) 所有19个Job通过；Windows/Linux各47个组/话题权限模拟断言，前端32个单测、16个UI静态检查。官方chatMember.member_id必须等于当前已认证账号本人userID，非本人返回丢弃。真实登录/群自动同步/实时权限/发送任务DEFERRED。详见 [STEP_12_ACCEPTANCE.md](STEP_12_ACCEPTANCE.md)。
