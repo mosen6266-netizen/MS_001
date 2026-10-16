@@ -5,8 +5,8 @@
   "default_branch": "main",
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
-  "current_step": "20",
-  "current_step_status": "in_progress",
+  "current_step": "21",
+  "current_step_status": "not_started",
   "phase": 5,
   "total_steps": 32,
   "completed_steps": [
@@ -28,7 +28,8 @@
     "16",
     "17",
     "18",
-    "19"
+    "19",
+    "20"
   ],
   "development_started": true,
   "functional_code_started": true,
@@ -37,13 +38,13 @@
   "icon_source_received": true,
   "icon_asset_upload_verified": true,
   "exact_timing_contract": "wait preSendDelayMs -> typing typingDurationMs -> send; 30s+5s=35s; no overlap",
-  "last_verified_commit_sha": "a4f44951461ccb56ca211c229d354093c0023196",
+  "last_verified_commit_sha": "ba4a0bdc231162e1fb733571992c6e427e7b021a",
   "last_updated": "2026-10-16",
   "blocking_issues": [
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step20 recovery code exists and docs in main; offline safety test and 31-job CI queued at GitHub Actions run 38961738009. Not accepted until full CI success. Current progress remains 19/32 (59.375%), next unaccepted step20. Non-destructive SQLite v9 quarantine and simulated crash/sleep/offline coordinator. Real Windows10/11/TDLib deferred.",
+  "notes": "Step20: SQLite v9 non-destructive quarantine of corrupted scheduler/delivery records with preserved originals and exclusion from active recovery. Network loss/sleep/closing shuts outbound permit gate, atomically moves running simulations to review, and quarantines Planned=>Review, Submitting/Pending=>Unknown while preserving Confirmed. Reconnecting/waking never resumes. Windows/Linux recovery assertions each 47 PASS; CI 38961738009 30/30 SUCCESS. Real Win10/11 power/network, official TDLib and 50 legal-group stress deferred. Progress 20/32=62.5%, 12 steps remain.",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
@@ -160,6 +161,11 @@
       "id": "DELIVERY-OFFICIAL-TDLIB-REAL",
       "status": "DEFERRED",
       "detail": "Step19 tests use synthetic verified receipt interface; actual official TDLib callbacks/correlation must not trust unverified WebView values. Step18 OutboundCoordinator integration and production durable runs/outbox, Windows 10/11 real disconnect/crash, 50 legal groups and 72h stability require later integration/final acceptance."
+    },
+    {
+      "id": "RECOVERY-REAL-POWER-NETWORK",
+      "status": "DEFERRED",
+      "detail": "Step20 only offline simulation: real Windows10/11 lifecycle wiring, hard kills, actual sleep/wake, network loss, disk corruption, TDLib delivery reconciliation and 72h stress require future integration and final on-device acceptance."
     }
   ],
   "step03_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38921641970",
@@ -217,5 +223,7 @@
   "step19_delivery_checks_per_os": 64,
   "step19_total_ci_jobs": 30,
   "step20_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38961738009",
-  "step20_source_commit": "ba4a0bdc231162e1fb733571992c6e427e7b021a"
+  "step20_source_commit": "ba4a0bdc231162e1fb733571992c6e427e7b021a",
+  "step20_recovery_checks_per_os": 47,
+  "step20_total_ci_jobs": 30
 }

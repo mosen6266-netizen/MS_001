@@ -437,17 +437,28 @@
     "step": "20",
     "title": "断网、崩溃与重启恢复",
     "phase": 5,
-    "status": "in_progress",
+    "status": "done_dev",
     "acceptance_evidence": [
       "src/Core/Recovery/RecoveryCoordinator.cs",
       "src/Core/Recovery/RecoveryQuarantineScanner.cs",
       "src/Infrastructure/Persistence/Migrations/0009_recovery_quarantine.sql",
+      "src/Core/Scheduler/FairScheduler.cs",
+      "src/Core/Scheduler/SchedulerCheckpointStore.cs",
       "tests/Recovery/Program.cs",
       "docs/STEP_20_RECOVERY.md",
       "docs/STEP_20_TEST_MATRIX.md",
+      "docs/STEP_20_ACCEPTANCE.md",
       "https://github.com/mosen6266-netizen/MS_001/actions/runs/38961738009"
     ],
-    "last_commit_sha": "ba4a0bdc231162e1fb733571992c6e427e7b021a"
+    "last_commit_sha": "ba4a0bdc231162e1fb733571992c6e427e7b021a",
+    "deferred_release_acceptance": [
+      "RECOVERY-REAL-POWER-NETWORK",
+      "DELIVERY-OFFICIAL-TDLIB-REAL",
+      "OUTBOUND-REAL-OFFICIAL-LIMITS",
+      "SCHEDULER-REAL-50GROUP",
+      "AUTH-REAL-ACCOUNT",
+      "TDLIB-NATIVE-BINARY"
+    ]
   },
   {
     "step": "21",

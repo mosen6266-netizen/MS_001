@@ -200,3 +200,12 @@
 - 代码已提交：`src/Core/Recovery/`、SQLite v9 损坏记录非破坏隔离、`tests/Recovery/Program.cs`、断网/睡眠/重启的只读恢复报告；当前源码提交 `ba4a0bdc`。
 - GitHub CI [38961738009](https://github.com/mosen6266-netizen/MS_001/actions/runs/38961738009) 等待完整执行（运行器队列）。**没有全部通过前不得标为 done_dev，进度仍19/32**。
 - 真实 Win10/11 系统网络断开/休眠强退、官方 TDLib 会话与实际发送集成均 DEFERRED，不代表实机验收。
+
+## Step20 — 断网、崩溃、休眠与重启安全恢复（2026-10-16，开发阶段验收）
+- **done_dev**：`src/Core/Recovery` 新增安全启动扫描与故障协调。SQLite v9 `recovery_quarantine` 按来源/主键记录损坏任务与投递记录，保留原始数据供人工修复且从可执行/待发送枚举排除。未损坏的其余任务照常读取并进入人工复核。
+- 网络断开、电脑休眠与进程退出时先关闭第18步模拟出站许可，再原子将未结束群任务置 `Review`；第19步 `Planned→Review`、`Submitting/Pending→Unknown`，`Confirmed` 不变。恢复网络及电脑唤醒后仍不自动继续执行，必须重新授权与复核。
+- 通过原子隔离与完整审计保留防止损坏一行拖垮整个数据库的恢复读取；跨重启重复隔离不重写原始记录，不产生重复任务。迟到但可信且完整关联的模拟官方回执仍可以确认 `Unknown`。
+- CI [38961738009](https://github.com/mosen6266-netizen/MS_001/actions/runs/38961738009) **全部成功**；新增 `tests/Recovery/Program.cs` 在 Windows 与 Linux **各47/47项通过**，同时通过所有既有数据库、群权限、50群调度、发送策略、回执保护、WPF和 UI 回归。
+- 开发源码提交 [`ba4a0bdc`](https://github.com/mosen6266-netizen/MS_001/commit/ba4a0bdc231162e1fb733571992c6e427e7b021a)，代码、验证矩阵及已知限制见 `docs/STEP_20_RECOVERY.md`、`docs/STEP_20_TEST_MATRIX.md`、`docs/STEP_20_ACCEPTANCE.md`。
+- **DEFERRED**：Win10/11 原生生命周期真实接线、真断网/休眠/强退、TDLib账号实时状态、50群/72小时实机长稳。当前为离线演练，无实际 Telegram 出站或后台发送功能，Signal MS002 不受影响。
+- **开发进度20/32（62.5%），剩余12步，下一步21运行中心与实时状态。**
