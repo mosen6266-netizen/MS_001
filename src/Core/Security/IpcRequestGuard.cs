@@ -137,6 +137,7 @@ public static class IpcRequestGuard
             return false;
         return IntegerValue(reference,"width",1,8192)&&IntegerValue(reference,"height",1,8192)&&
             Label(reference,"fileName",128,false) &&
+            !reference.GetProperty("fileName").GetString()!.Any(c=>c is '/' or '\\' or ':') &&
             reference.GetProperty("byteLength").ValueKind==JsonValueKind.Number &&
             reference.GetProperty("byteLength").TryGetInt64(out long count) && count is >=32 and <=5242880;
     }
