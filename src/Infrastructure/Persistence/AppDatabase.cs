@@ -12,8 +12,8 @@ namespace Mosen.GroupScheduler.Persistence;
 /// </summary>
 public sealed class AppDatabase
 {
-    private const int LatestSchemaVersion = 3;
-    private static readonly string[] Migrations = ["0001_initial.sql", "0002_tasks.sql", "0003_accounts.sql"];
+    private const int LatestSchemaVersion = 4;
+    private static readonly string[] Migrations = ["0001_initial.sql", "0002_tasks.sql", "0003_accounts.sql", "0004_groups.sql"];
     private readonly string _path;
 
     public AppDatabase(string dbFilePath)
