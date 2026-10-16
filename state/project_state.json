@@ -6,7 +6,7 @@
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
   "current_step": "14",
-  "current_step_status": "not_started",
+  "current_step_status": "in_progress",
   "phase": 4,
   "total_steps": 32,
   "completed_steps": [
@@ -37,7 +37,7 @@
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step13 SQLite v5独立剧本草稿、roleKey/roleLabel可移植模型、中文版剧本卡片/按备注下拉角色/多选/复制/拖拽/撤销重做/自动保存与冲突保护，CI38946517290全21job通过。Windows/Linux各24条草稿断言、UI40/40、安全Windows35/35。媒体和逐条时间编辑Step14，便携格式Step15、预检Step16；真实TDLib账号及Windows实机DEFERRED。开发13/32=40.625%。",
+  "notes": "Step14 in progress: editable sequential timing defaults/overrides/batch, content-addressed local PNG/JPEG/WebP media attachments, validated bounded IPC, edit/preview/replace/remove, synthetic CI. Real TDLib send deferred.",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
