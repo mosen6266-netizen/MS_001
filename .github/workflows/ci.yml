@@ -5,6 +5,7 @@ on:
       - "apps/**"
       - "src/**"
       - "tests/**"
+      - "license/**"
       - ".github/workflows/ci.yml"
       - "Directory.Build.props"
       - ".gitignore"
@@ -398,3 +399,33 @@ jobs:
           dotnet-version: "10.0.x"
       - name: Verify 28800 logical ticks, CPU/RAM/handles budgets, lifecycle cleanup and cache/log ceilings
         run: dotnet run --project tests/Performance/Mosen.GroupScheduler.Performance.Tests.csproj --configuration Release
+
+  telegram-license-worker:
+    name: Telegram-only Cloudflare Worker/D1 license contract - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Exercise isolated D1 SQLite, signed leases, card issuance, renewals, disable and concurrent binding
+        run: node --test license/tests/license.test.mjs
+
+  telegram-license-client:
+    name: Telegram-only signed .NET license verification and fail-closed gate - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: Verify P-256 signed license, anti-replay, 1h offline, revocation and per-install device ID
+        run: dotnet run --project tests/Licensing/Mosen.GroupScheduler.Licensing.Tests.csproj --configuration Release

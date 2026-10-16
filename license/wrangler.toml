@@ -1,0 +1,17 @@
+# Independent TELEGRAM product only. Do not substitute MS002's production Worker/D1.
+name = "ms001-telegram-license-staging"
+main = "src/worker.mjs"
+compatibility_date = "2026-10-17"
+workers_dev = false
+
+[vars]
+PRODUCT_ID = "MOSEN_TELEGRAM_SCHEDULER"
+ENVIRONMENT = "staging"
+
+[[d1_databases]]
+binding = "LICENSE_DB"
+database_name = "ms001-telegram-license-staging"
+database_id = "REPLACE_WITH_NEW_TELEGRAM_D1_DATABASE_ID"
+migrations_dir = "migrations"
+# Configure ADMIN_TOKEN, LICENSE_PEPPER, LICENSE_SIGNING_PKCS8 as secrets.
+# For production create ANOTHER new D1+Worker and separate signing key.

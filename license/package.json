@@ -1,0 +1,12 @@
+{
+  "name": "ms001-telegram-license",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "check": "node --check src/worker.mjs && node --test tests/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}
