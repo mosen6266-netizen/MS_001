@@ -399,7 +399,7 @@ export function ScriptEditorPanel({preferences}:{preferences:UserPreferences}){
       <div className="script-create">
         <TextField label="新建剧本名称" value={title} onChange={setTitle}/>
         <ActionButton tone="success" onClick={()=>void create()} disabled={busy||!title.trim()}>新建剧本</ActionButton>
-        <ActionButton disabled={busy||!window.chrome?.webview} onClick={()=>void importScript()}>导入 .mosentgscript</ActionButton>
+        <ActionButton disabled={busy||typeof window==="undefined"||!window.chrome?.webview} onClick={()=>void importScript()}>导入 .mosentgscript</ActionButton>
       </div>
       <TextField label="搜索剧本" value={query} onChange={setQuery}/>
       <div className="ui-action-row">
