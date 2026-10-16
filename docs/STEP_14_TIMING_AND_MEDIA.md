@@ -30,3 +30,6 @@
 - `apps/ui/src/script-editor/timing-media.test.ts`：逐条、默认值、批量、复制/排序/撤销、图片原始引用和严格IPC字段。
 - `tests/Security`：图片导入/预览白名单、路径伪造/秘密注入/不受支持的SVG与Base64限制；Windows/Linux矩阵继续跑原有21个任务并新增2个 timing-media。
 - 用户明确要求最后完成正式版才自行安装测试，本阶段没有 Win10/11 实机读图/鼠标拖拽/多DPI、真实发送动作、TDLib上传状态或1500毫秒待确认云端消息。它们均列为正式版后续阻断。
+
+## 最终CI归档
+[GitHub Actions 38949689786](https://github.com/mosen6266-netizen/MS_001/actions/runs/38949689786) 23/23 SUCCESS。Windows/Linux TimingMedia各20断言、编辑草稿各29断言、前端45测试、安全Windows42/Linux40、旧全部CI回归与WPF发布通过。Windows实机和真正Telegram状态留待后续。完整报告见 STEP_14_ACCEPTANCE.md。

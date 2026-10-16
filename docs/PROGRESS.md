@@ -142,3 +142,10 @@
 - 修复SSR双侧栏、类型/编译和首屏异步测试不一致、无用C#变量和快捷键作用范围；全部复测。**UI页面未做Win10/11实机拖拽E2E或真正Telegram授权发送，DEFERRED。**
 - 三段时间编辑及素材是Step14、便携导入导出是Step15、发布预检是Step16；但时间语义仍维持`pre30s + typing5s => 35s后发送`。验收记录`docs/STEP_13_ACCEPTANCE.md`。
 - Step13 `done_dev`，下一步14，开发进度 **13/32（40.625%）**，剩余19步。
+
+## Step14 — 时间及图片编辑（2026-10-16）
+- 剧本默认/逐条/按字段批量修改三段等待；30s发送前等待、5s正在输入，累计35s到达发送阶段，后等待从收到模拟回执算起。只在预览中计算，不执行Telegram发送。
+- PNG/JPEG/WebP本地5MiB每张，128MiB额度，SHA256地址去重、文件名消毒、预览哈希校验；支持图片添加、拖拽、预览、替换、移除与图文共存，剧本只记录hash等便携元数据。
+- [完整CI 38949689786](https://github.com/mosen6266-netizen/MS_001/actions/runs/38949689786) 全23个作业通过：Windows/Linux TimingMedia各20、Editor各29、前端45/45、安全Win42/Linux40、WPF打包与原有CI回归成功。
+- 修复旧毫秒时间、GUID匹配、默认时间漏记修改、媒体路径过滤与测试字符串。无绕过失败检查；真实TDLib、Telegram发送/typing及Win10/11实机验收仍DEFERRED。
+- Step14 done_dev；第15步为角色备注移植与剧本格式。开发进度14/32（43.75%），剩余18步。详见docs/STEP_14_ACCEPTANCE.md。

@@ -288,9 +288,29 @@
     "step": "14",
     "title": "三段时间与媒体编辑",
     "phase": 4,
-    "status": "in_progress",
-    "acceptance_evidence": [],
-    "last_commit_sha": null
+    "status": "done_dev",
+    "acceptance_evidence": [
+      "docs/STEP_14_TIMING_AND_MEDIA.md",
+      "docs/STEP_14_TEST_MATRIX.md",
+      "docs/STEP_14_ACCEPTANCE.md",
+      "src/Features/Scripts/Timing/TimingPreview.cs",
+      "src/Features/Scripts/Media/MediaAssetStore.cs",
+      "src/Features/Scripts/Editor/EditorDocument.cs",
+      "apps/ui/src/script-editor/TimingField.tsx",
+      "apps/ui/src/script-editor/MediaAttachment.tsx",
+      "apps/ui/src/components/ScriptEditorPanel.tsx",
+      "apps/desktop/MainWindow.Media.cs",
+      "src/Core/Security/IpcRequestGuard.cs",
+      "tests/Scripts/Timing/Program.cs",
+      "tests/Scripts/Editor/Program.cs",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/38949689786"
+    ],
+    "last_commit_sha": "d6977ad8302d52975dd6ed7b8bedf31e3e2de0c1",
+    "deferred_release_acceptance": [
+      "MEDIA-WINDOWS-REAL-INTERACTION",
+      "TDLIB-NATIVE-BINARY",
+      "OWNED-ACCOUNT"
+    ]
   },
   {
     "step": "15",
