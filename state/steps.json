@@ -600,9 +600,20 @@
     "step": "26",
     "title": "云端授权安全性与离线策略",
     "phase": 7,
-    "status": "not_started",
-    "acceptance_evidence": [],
-    "last_commit_sha": null
+    "status": "in_progress",
+    "acceptance_evidence": [
+      "license/migrations/0002_admin_security.sql",
+      "license/src/admin-security.mjs",
+      "license/src/worker.mjs",
+      "license/tests/license.test.mjs",
+      "license/tests/security-scan.test.mjs",
+      "src/Core/Licensing/SignedLicenseVerifier.cs",
+      "tests/Licensing/Program.cs",
+      "docs/SECURITY.md",
+      "docs/DEPLOYMENT.md",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/38976515140"
+    ],
+    "last_commit_sha": "dab8ef2a55fa0b8fd5f3e94ac3a547f374d0a965"
   },
   {
     "step": "27",
