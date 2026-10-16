@@ -99,7 +99,7 @@ async function renew(env,body,now){
       version=version+1
     WHERE id=? AND product_id=? AND EXISTS(SELECT 1 FROM license_renewals
       WHERE operation_id=? AND license_id=? AND duration_seconds=? AND applied=0)`)
-   .bind(seconds,now,seconds,body.licenseId,PRODUCT,body.operationId,body.licenseId,seconds),
+   .bind(seconds,now,seconds*1000,body.licenseId,PRODUCT,body.operationId,body.licenseId,seconds),
   env.LICENSE_DB.prepare("UPDATE license_renewals SET applied=1, result_expires_ms=(SELECT expires_ms FROM licenses WHERE id=?) WHERE operation_id=? AND license_id=? AND duration_seconds=? AND applied=0")
    .bind(body.licenseId,body.operationId,body.licenseId,seconds)
  ]);
