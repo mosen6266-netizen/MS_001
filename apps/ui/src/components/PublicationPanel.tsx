@@ -37,8 +37,9 @@ export function PublicationPanel({script,request,flush}:{
     const reply=await request("scripts.versions",{id:script.scriptId});
     if(typeof reply!=="object"||reply===null||!("items" in reply)||!Array.isArray(reply.items)||
        !reply.items.every(safeVersion))throw new Error("发布版本列表无效");
-    setVersions(reply.items);
-    setVersion(old=>reply.items.some((v:Version)=>v.version===old)?old:(reply.items[0]?.version??0));
+    const items=reply.items as Version[];
+    setVersions(items);
+    setVersion(old=>items.some(v=>v.version===old)?old:(items[0]?.version??0));
   },[request,script.scriptId]);
   useEffect(()=>{void refresh().catch(()=>setFeedback("发布版本读取失败。"));},[refresh]);
   useEffect(()=>{
