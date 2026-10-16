@@ -86,7 +86,7 @@ Check((await login.SubmitAsync(new(AuthCommandKind.EnterEmailAddress,"owner@exam
 Check(login.Accept(Envelope(42,"authorizationStateWaitEmailCode")),"email code step");
 Check((await login.SubmitAsync(new(AuthCommandKind.EnterEmailCode,"ABC123"))).Accepted,"email code submitted");
 Check(login.Accept(Envelope(42,"authorizationStateWaitPassword")),"2FA password step");
-const password="VERY_PRIVATE_2FA_VALUE";
+const string password="VERY_PRIVATE_2FA_VALUE";
 Check((await login.SubmitAsync(new(AuthCommandKind.EnterPassword,password))).Accepted,"2FA submitted with typed command");
 Check(!new AuthCommand(AuthCommandKind.EnterPassword,password).ToString().Contains(password),
     "auth command debug string always redacts secret");
@@ -224,7 +224,7 @@ internal sealed class FakeTdlibTransport : ITdlibTransport
             Interlocked.Increment(ref CloseCount);
             _responses.Enqueue(JsonSerializer.Serialize(new Dictionary<string,object?>{
                 ["@type"]="updateAuthorizationState",["@client_id"]=id,
-                ["authorization_state"]=new Dictionary<string,object?>{{"@type"]="authorizationStateClosed"}
+                ["authorization_state"]=new Dictionary<string,object?>{["@type"]="authorizationStateClosed"}
             }));
         }
         else
