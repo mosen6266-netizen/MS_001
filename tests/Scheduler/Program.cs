@@ -18,7 +18,7 @@ Directory.CreateDirectory(basePath);
 try
 {
     var db=new AppDatabase(Path.Combine(basePath,"app.db"));db.Initialize();
-    Check(db.GetSchemaVersion()==9,"migration v9 installed without losing prior schema");
+    Check(db.GetSchemaVersion()==10,"migration v10 installed without losing prior schema");
     var store=new SchedulerCheckpointStore(db);
     var clock=new DateTimeOffset(2026,10,16,19,0,0,TimeSpan.Zero);
     var role=Guid.NewGuid().ToString("D");var account=Guid.NewGuid();

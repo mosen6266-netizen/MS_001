@@ -8,13 +8,14 @@
   <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
   <Border Grid.Row="0" Background="#171B21" BorderBrush="#303640" BorderThickness="0,0,0,1" Padding="14,8">
    <Grid>
-    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
     <TextBlock x:Name="SafetyNotice" Grid.Column="0" Text="离线工程模式 · 无真实 Telegram 消息发送"
       Foreground="#BAC6D2" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" FontSize="12"/>
-    <Button Grid.Column="1" x:Name="AlertHistoryButton" Content="异常历史" Click="OnOpenAlertHistory"
+    <Button Grid.Column="1" x:Name="AuditHistoryButton" Content="任务历史" Click="OnOpenTaskHistory" Background="#2D333E" Foreground="#F0F2F4" BorderBrush="#414A56" Padding="13,8" Margin="7,0,0,0" Cursor="Hand"/>
+    <Button Grid.Column="2" x:Name="AlertHistoryButton" Content="异常历史" Click="OnOpenAlertHistory"
       Background="#2D333E" Foreground="#F0F2F4" BorderBrush="#414A56"
       Padding="13,8" Margin="7,0,0,0" Cursor="Hand"/>
-    <Button Grid.Column="2" x:Name="EmergencyStopButton" Content="全局紧急停止" Click="OnEmergencyStopClick"
+    <Button Grid.Column="3" x:Name="EmergencyStopButton" Content="全局紧急停止" Click="OnEmergencyStopClick"
       Background="#A53E38" Foreground="White" BorderBrush="#CA6156"
       Padding="15,8" Margin="7,0,0,0" FontWeight="SemiBold" Cursor="Hand"/>
    </Grid>

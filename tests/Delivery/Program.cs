@@ -26,7 +26,7 @@ OfficialDeliveryReceipt Receipt(DeliveryAttempt attempt,string message="701",boo
 try
 {
     var db=new AppDatabase(Path.Combine(baseDir,"app.db"));db.Initialize();
-    Check(db.GetSchemaVersion()==9,"schema v9 applied");
+    Check(db.GetSchemaVersion()==10,"schema v10 applied");
     var ledger=new DeliveryJournal(db);
     var job=Job(account);var ticket=Permit(job);
     Reject<ArgumentException>(()=>ledger.Register(job with {Phase=JobPhase.WaitingBefore},ticket,now),

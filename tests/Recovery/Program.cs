@@ -40,7 +40,7 @@ OfficialDeliveryReceipt Receipt(DeliveryAttempt a,string msg)=>
 try
 {
     var db=new AppDatabase(Path.Combine(dir,"app.db"));db.Initialize();
-    Check(db.GetSchemaVersion()==9,"SQLite v9 preserves existing schema and adds non-destructive quarantine");
+    Check(db.GetSchemaVersion()==10,"SQLite v10 preserves existing schema and adds non-destructive quarantine");
     var store=new SchedulerCheckpointStore(db);
     var live=new FairScheduler(store,now);
     var created=live.CreateSimulations(script,plan,now);
