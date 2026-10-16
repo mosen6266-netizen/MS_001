@@ -26,3 +26,6 @@
 5. 真实 Win10/11 SQLite 文件锁、实际 WebView2 搜索输入观感、磁盘满/权限受限/杀软和持续运行全部 **DEFERRED** 至用户最后集中验收。
 
 开发源代码保存后必须取得 GitHub Actions 全绿结果，再标记 `done_dev`。云端编译绝不算真实 Telegram 功能完成。
+
+## 实际验收记录
+[GitHub CI Run 38927977333](https://github.com/mosen6266-netizen/MS_001/actions/runs/38927977333) 所有9个job成功；前端22项测试、Windows/Linux各16项持久化设置测试，以及原有数据库/窗口回归全部PASS。初版发现lint未用导入与重复点击误报成功，已修复并复测通过。详细证据参见 [STEP_07_ACCEPTANCE.md](STEP_07_ACCEPTANCE.md)。实际Windows浏览器交互、磁盘满/杀软/长稳仍DEFERRED。

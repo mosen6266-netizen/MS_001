@@ -118,9 +118,24 @@
     "step": "07",
     "title": "设置、搜索与状态管理",
     "phase": 2,
-    "status": "in_progress",
-    "acceptance_evidence": [],
-    "last_commit_sha": null
+    "status": "done_dev",
+    "acceptance_evidence": [
+      "docs/STEP_07_ACCEPTANCE.md",
+      "docs/STEP_07_SETTINGS.md",
+      "src/Infrastructure/Persistence/UserPreferences.cs",
+      "src/web/settings/search.ts",
+      "src/web/settings/exclusive.ts",
+      "apps/ui/src/components/PreferencesPanel.tsx",
+      "apps/ui/src/components/MockAccountIndex.tsx",
+      "apps/ui/src/settings.test.ts",
+      "apps/ui/src/exclusive.test.ts",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/38927977333"
+    ],
+    "last_commit_sha": "83231c696543e411560ff2c8c907d9aaa59a71f4",
+    "deferred_release_acceptance": [
+      "SETTINGS-INTERACTION",
+      "SHELL-UX"
+    ]
   },
   {
     "step": "08",

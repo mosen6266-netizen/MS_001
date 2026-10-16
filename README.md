@@ -1,6 +1,6 @@
 # MOSEN Group Scheduler — Telegram 真实账号版（开发规划仓库资料）
 
-> **当前状态：步骤 01（需求及许可范围冻结）已完成，步骤02云端/开发部分完成，真实本机测试统一推迟至最终验收；步骤03基础工程CI已通过、步骤06深色UI设计系统CI验收通过；步骤07设置、搜索与状态管理待开始；开发完成 6 / 32（18.75%），最终实机验收另计。尚无正式功能代码或已部署服务。**
+> **当前状态：第 07 步（设置、搜索与状态管理）开发/CI 验收完成；第 08 步本地安全与诊断基础待开始。开发已完成 7 / 32（21.875%），实际 Win10/11 与 Telegram 账号/群操作测试按用户要求集中到最终验收；目前尚不是完整可用或已部署的正式版。**
 
 用户要求：独立 Windows 桌面程序，可管理最多 300 条合法授权 Telegram 账号会话，管理 50 个群/话题任务；编辑剧本时按账号备注下拉选择发言人；导出导入支持按角色备注跨设备匹配；缺少备注在“开始运行”时提醒；每条消息有发送前等待、正在输入时间、发送后等待三项独立设置。
 
@@ -21,7 +21,7 @@
 ## 如何用
 
 - 规划资料提交到当前指定仓库：`https://github.com/mosen6266-netizen/MS_001`。
-- 用户已提供图标并确认 MS_001 仓库；从步骤 01 按顺序实现；**一次一个步骤，测试、提交、更新两份进度文件后再继续**。
+- 用户已确认 MS_001 仓库并开始按32步开发；**一次一个步骤，测试、提交、更新两份进度文件后再继续**。
 - 切换新对话时，带上仓库 URL 并发送 `templates/RESUME_PROMPT.md` 的内容。
 
 ## 已确认的严格计时顺序
@@ -30,7 +30,7 @@
 
 ## 图标和品牌
 
-用户已提供 400×400 WEBP 原始图标素材，待放入 `assets/branding/`；源图带棋盘格背景，正式安装图标要完成透明度校验，并在正式公开发布前审查第三方客户端使用 Telegram 标志的限制。
+用户已提供 400×400 图标原样素材，透明转换版已保存在 `assets/branding/icon.svg`；源图带棋盘格背景，正式安装图标要完成透明度校验，并在正式公开发布前审查第三方客户端使用 Telegram 标志的限制。
 
 ## 容量与平台说明
 
@@ -42,7 +42,7 @@
 已保存透明 SVG：[`assets/branding/icon.svg`](assets/branding/icon.svg)，依据用户提供图形转换；通过 [`tools/branding/build_icons.py`](tools/branding/build_icons.py) 可生成 Windows 多尺寸 ICO 与 PNG。正式发布需要完成商标合规审查，并避免暗示软件是 Telegram 官方产品。
 
 ## 每一步的可视化进度汇报
-完成某步骤的正式验收后必须向用户显示进度条、已完成步骤数 /32、百分比、剩余步骤、当前/下一步以及测试/commit证据；正在进行而未验收的步骤不计入完成。当前第07步待开始；Step02 的真实Windows/账号验证登记 DEFERRED，**1/32（3.125%）**。详细要求见 `docs/HANDOFF.md`。
+完成某步骤的正式验收后必须向用户显示进度条、已完成步骤数 /32、百分比、剩余步骤、当前/下一步以及测试/commit证据；正在进行而未验收的步骤不计入完成。当前第08步待开始；已通过开发阶段验收的为 **7/32（21.875%）**，真实Windows/Telegram测试仍 DEFERRED。详细要求见 `docs/HANDOFF.md`。
 
 ## 最新需求冻结文件
 
@@ -57,3 +57,5 @@
 - [Step05 Windows容器与导航验收](docs/STEP_05_ACCEPTANCE.md) · [CI自动化结果](https://github.com/mosen6266-netizen/MS_001/actions/runs/38924326676)
 
 - [Step06 深色UI设计规范](docs/UI_DESIGN.md) · [开发阶段验收](docs/STEP_06_ACCEPTANCE.md) · [CI测试及截图](https://github.com/mosen6266-netizen/MS_001/actions/runs/38926182509)
+
+- [Step07 设置与搜索规范](docs/STEP_07_SETTINGS.md) · [Step07 开发验收](docs/STEP_07_ACCEPTANCE.md) · [9项CI作业](https://github.com/mosen6266-netizen/MS_001/actions/runs/38927977333)

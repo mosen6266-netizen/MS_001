@@ -90,3 +90,10 @@
 - Chromium 截图测试第一次发现 Linux 缺中文字体出现方框，补齐 Noto CJK 字体重新生成宽1440/窄700截图，人工复查中文已正确显示；只是初始工作台，后续需完整浏览器/UI交互测试。
 - [CI 38926182509](https://github.com/mosen6266-netizen/MS_001/actions/runs/38926182509) 7个作业**SUCCESS**；UI15项、静态设计16项、Windows/Linux各10项几何及27项数据库测试、Windows x64云端编译均通过。
 - 结论：`done_dev`，真机 WebView2/DPI/模态键盘交互与正式发布审查 `DEFERRED`；下一步 **07**，开发进度 **6/32（18.75%），剩余26步**。详见 `docs/STEP_06_ACCEPTANCE.md`。
+
+## Step07 — 设置、搜索与状态管理（2026-10-16）
+- 提交 SQLite 非敏感设置持久化、revision 冲突保护、WPF白名单异步IPC、React设置编辑页与搜索防抖150–250ms、300条合成数据索引、每页不超过50条、1000次提交防重锁和测试。
+- [CI 38927977333](https://github.com/mosen6266-netizen/MS_001/actions/runs/38927977333) 完整9项job SUCCESS；前端22项，Windows/Linux各16项设置测试，数据库/窗口历史回归均通过，Windows编译与Chromium初始页截图通过。
+- 修复过首轮 UI 未使用导入引发 lint 失败、双击跳过后误报保存成功；全部有代码和复测记录。
+- **未实测的真正Windows用户操作、群账号接入及磁盘故障标记DEFERRED**，不会冒充已真实登录/发送。
+- Step07 `done_dev`，Step08待开始；进度 **7/32（21.875%）**，剩余25步。详见 `docs/STEP_07_ACCEPTANCE.md`。
