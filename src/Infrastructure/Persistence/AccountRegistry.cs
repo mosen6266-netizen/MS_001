@@ -56,8 +56,8 @@ public sealed class AccountRegistry
         string now=DateTimeOffset.UtcNow.ToString("O",CultureInfo.InvariantCulture);
         using var insert=c.CreateCommand();
         insert.Transaction=tx;
-        insert.CommandText="""INSERT INTO accounts(account_id,alias,group_tag,created_utc,updated_utc,login_state)
-                              VALUES($id,$alias,$tag,$now,$now,'disconnected');""";
+        insert.CommandText=@"INSERT INTO accounts(account_id,alias,group_tag,created_utc,updated_utc,login_state)
+                              VALUES($id,$alias,$tag,$now,$now,'disconnected');";
         insert.Parameters.AddWithValue("$id",id.ToString("D"));
         insert.Parameters.AddWithValue("$alias",alias.Trim());
         insert.Parameters.AddWithValue("$tag",groupTag.Trim());
@@ -71,8 +71,8 @@ public sealed class AccountRegistry
         ValidateId(id);
         using var c=Open();
         using var cmd=c.CreateCommand();
-        cmd.CommandText="""SELECT account_id,alias,group_tag,display_name,revision,verified_telegram_user_id,deleted_utc
-                            FROM accounts WHERE account_id=$id;""";
+        cmd.CommandText=@"SELECT account_id,alias,group_tag,display_name,revision,verified_telegram_user_id,deleted_utc
+                            FROM accounts WHERE account_id=$id;";
         cmd.Parameters.AddWithValue("$id",id.ToString("D"));
         using var rows=cmd.ExecuteReader();
         if(!rows.Read())return null;
@@ -86,8 +86,8 @@ public sealed class AccountRegistry
         if(group is not null)ValidateLabel(group,nameof(group),true);
         using var c=Open();
         using var cmd=c.CreateCommand();
-        cmd.CommandText="""SELECT account_id,alias,group_tag,display_name,revision,verified_telegram_user_id,deleted_utc
-                            FROM accounts WHERE deleted_utc IS NULL ORDER BY created_utc,account_id;""";
+        cmd.CommandText=@"SELECT account_id,alias,group_tag,display_name,revision,verified_telegram_user_id,deleted_utc
+                            FROM accounts WHERE deleted_utc IS NULL ORDER BY created_utc,account_id;";
         using var rows=cmd.ExecuteReader();
         var all=new List<AccountEntry>(MaxEntries);
         while(rows.Read())
@@ -107,8 +107,8 @@ public sealed class AccountRegistry
         ValidateId(id);ValidateLabel(alias,nameof(alias));ValidateLabel(groupTag,nameof(groupTag),true);
         using var c=Open();
         using var cmd=c.CreateCommand();
-        cmd.CommandText="""UPDATE accounts SET alias=$alias,group_tag=$tag,revision=revision+1,updated_utc=$now
-                            WHERE account_id=$id AND revision=$revision AND deleted_utc IS NULL;""";
+        cmd.CommandText=@"UPDATE accounts SET alias=$alias,group_tag=$tag,revision=revision+1,updated_utc=$now
+                            WHERE account_id=$id AND revision=$revision AND deleted_utc IS NULL;";
         cmd.Parameters.AddWithValue("$alias",alias.Trim());cmd.Parameters.AddWithValue("$tag",groupTag.Trim());
         cmd.Parameters.AddWithValue("$id",id.ToString("D"));cmd.Parameters.AddWithValue("$revision",expectedRevision);
         cmd.Parameters.AddWithValue("$now",DateTimeOffset.UtcNow.ToString("O"));
@@ -121,8 +121,8 @@ public sealed class AccountRegistry
         ValidateId(id);ValidateLabel(displayName,nameof(displayName),true);
         if(telegramUserId<=0)throw new ArgumentOutOfRangeException(nameof(telegramUserId));
         using var c=Open();using var cmd=c.CreateCommand();
-        cmd.CommandText="""UPDATE accounts SET verified_telegram_user_id=$uid,display_name=$display,
-                            revision=revision+1,updated_utc=$now WHERE account_id=$id AND revision=$rev AND deleted_utc IS NULL;""";
+        cmd.CommandText=@"UPDATE accounts SET verified_telegram_user_id=$uid,display_name=$display,
+                            revision=revision+1,updated_utc=$now WHERE account_id=$id AND revision=$rev AND deleted_utc IS NULL;";
         cmd.Parameters.AddWithValue("$uid",telegramUserId.ToString(CultureInfo.InvariantCulture));
         cmd.Parameters.AddWithValue("$display",displayName);cmd.Parameters.AddWithValue("$now",DateTimeOffset.UtcNow.ToString("O"));
         cmd.Parameters.AddWithValue("$id",id.ToString("D"));cmd.Parameters.AddWithValue("$rev",expectedRevision);
@@ -146,14 +146,14 @@ public sealed class AccountRegistry
                 throw new InvalidOperationException("Confirmation remark does not match.");
         }
         using var dependencies=c.CreateCommand();dependencies.Transaction=tx;
-        dependencies.CommandText="""SELECT (SELECT COUNT(*) FROM group_bindings WHERE account_id=$id) +
-                                         (SELECT COUNT(*) FROM run_steps WHERE account_id=$id);""";
+        dependencies.CommandText=@"SELECT (SELECT COUNT(*) FROM group_bindings WHERE account_id=$id) +
+                                         (SELECT COUNT(*) FROM run_steps WHERE account_id=$id);";
         dependencies.Parameters.AddWithValue("$id",id.ToString("D"));
         if(Convert.ToInt64(dependencies.ExecuteScalar())>0)
             throw new InvalidOperationException("Account is referenced by a group binding or task; resolve dependencies first.");
         using var cmd=c.CreateCommand();cmd.Transaction=tx;
-        cmd.CommandText="""UPDATE accounts SET deleted_utc=$now,login_state='restricted',revision=revision+1,
-                            updated_utc=$now WHERE account_id=$id AND revision=$rev AND deleted_utc IS NULL;""";
+        cmd.CommandText=@"UPDATE accounts SET deleted_utc=$now,login_state='restricted',revision=revision+1,
+                            updated_utc=$now WHERE account_id=$id AND revision=$rev AND deleted_utc IS NULL;";
         cmd.Parameters.AddWithValue("$now",DateTimeOffset.UtcNow.ToString("O"));
         cmd.Parameters.AddWithValue("$id",id.ToString("D"));cmd.Parameters.AddWithValue("$rev",expectedRevision);
         if(cmd.ExecuteNonQuery()!=1)throw new AccountVersionConflict();
@@ -169,8 +169,8 @@ public sealed class AccountRegistry
             if(Convert.ToInt32(limit.ExecuteScalar())>=MaxEntries)throw new InvalidOperationException("Account limit reached.");
         }
         using var cmd=c.CreateCommand();cmd.Transaction=tx;
-        cmd.CommandText="""UPDATE accounts SET deleted_utc=NULL,login_state='auth_required',revision=revision+1,
-                            updated_utc=$now WHERE account_id=$id AND revision=$rev AND deleted_utc IS NOT NULL;""";
+        cmd.CommandText=@"UPDATE accounts SET deleted_utc=NULL,login_state='auth_required',revision=revision+1,
+                            updated_utc=$now WHERE account_id=$id AND revision=$rev AND deleted_utc IS NOT NULL;";
         cmd.Parameters.AddWithValue("$id",id.ToString("D"));cmd.Parameters.AddWithValue("$rev",expectedRevision);
         cmd.Parameters.AddWithValue("$now",DateTimeOffset.UtcNow.ToString("O"));
         if(cmd.ExecuteNonQuery()!=1)throw new AccountVersionConflict();
