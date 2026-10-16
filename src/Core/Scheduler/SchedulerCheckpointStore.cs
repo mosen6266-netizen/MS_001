@@ -95,7 +95,7 @@ public sealed class SchedulerCheckpointStore
     {
         foreach(var (next,previous) in updates)
         {
-            Validate(next);
+            ValidateCheckpoint(next);
             if(next.Revision!=previous+1)throw new InvalidOperationException("Invalid revision increment.");
         }
         using var c=Open();using var tx=c.BeginTransaction(deferred:false);
@@ -128,7 +128,7 @@ public sealed class SchedulerCheckpointStore
             {
                 var j=JsonSerializer.Deserialize<SchedulerJob>(rows.GetString(3),Json)
                     ??throw new InvalidDataException("Simulation checkpoint unreadable.");
-                Validate(j);
+                ValidateCheckpoint(j);
                 if(j.RunId!=rows.GetString(0)||j.Revision!=rows.GetInt32(2)||
                    !string.Equals(j.Status.ToString(),rows.GetString(1),StringComparison.Ordinal))
                     throw new InvalidDataException("Simulation checkpoint metadata mismatch.");
