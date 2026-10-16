@@ -9,7 +9,7 @@ const PAGE_SIZE=10;
 type FetchState="loading"|"preview"|"ready"|"error";
 export function RuntimeDashboardPanel(){
   const [snapshot,setSnapshot]=useState<RuntimeDashboardSnapshot|null>(null);
-  const [state,setState]=useState<FetchState>("loading");
+  const [state,setState]=useState<FetchState>(()=>typeof window==="undefined"||!window.chrome?.webview?"preview":"loading");
   const [now,setNow]=useState(()=>Date.now());
   const [search,setSearch]=useState("");
   const [filter,setFilter]=useState<RuntimeFilter>("all");
