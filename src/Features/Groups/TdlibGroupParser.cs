@@ -64,7 +64,7 @@ public static class TdlibGroupParser
         // Until verified chat permissions are combined, fail closed rather than guessing.
         bool allowedMember=state is "member" or "administrator" or "creator" ||
              state=="restricted" && GetBool(status,"is_member");
-        bool text=allowedMember && state is "administrator" or "creator";
+        bool text=allowedMember && state is ("administrator" or "creator");
         bool photo=text;
         if(state=="restricted" && status.TryGetProperty("permissions",out var permissions))
         {
@@ -95,10 +95,16 @@ public static class TdlibGroupParser
             }
         };
     }
-    public static int ReadSlowModeSeconds(TdlibEnvelope envelope) =>
-        envelope.Type is "supergroupFullInfo" or "updateSupergroupFullInfo" &&
-        envelope.Body.TryGetProperty("slow_mode_delay",out var delay) &&
-        delay.TryGetInt32(out int value) && value is >=0 and <=3600 ? value : 0;
+    public static int ReadSlowModeSeconds(TdlibEnvelope envelope)
+    {
+        if(envelope.Type is not ("supergroupFullInfo" or "updateSupergroupFullInfo"))return 0;
+        JsonElement info=envelope.Body;
+        if(envelope.Type=="updateSupergroupFullInfo" &&
+            (!info.TryGetProperty("supergroup_full_info",out info) || info.ValueKind!=JsonValueKind.Object))return 0;
+        return info.TryGetProperty("slow_mode_delay",out var delay) &&
+            delay.ValueKind==JsonValueKind.Number &&
+            delay.TryGetInt32(out int value) && value is >=0 and <=3600 ? value : 0;
+    }
 
     private static bool GetBool(JsonElement element,string property)=>
         element.ValueKind==JsonValueKind.Object &&
