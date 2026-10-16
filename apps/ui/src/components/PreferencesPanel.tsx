@@ -17,7 +17,8 @@ export function PreferencesPanel({snapshot,mode,save,reload}:{
   const handleSave=async()=>{
     if(!changed||mode!=="ready"||busy)return;
     try{
-      await run(()=>save(draft));
+      const result=await run(()=>save(draft));
+      if(!result)return;
       setToast({id:Date.now(),tone:"success",message:"设置已保存到本地数据库。"});
     }catch(e){
       setToast({id:Date.now(),tone:"danger",message:e instanceof Error?e.message:"保存失败"});
