@@ -137,7 +137,7 @@ public partial class MainWindow
         var layout=new StackPanel {Margin=new Thickness(22)};
         layout.Children.Add(new TextBlock{Text=message,FontSize=15,FontWeight=FontWeights.SemiBold,
             TextWrapping=TextWrapping.Wrap,Margin=new Thickness(0,0,0,22)});
-        var buttons=new StackPanel {Orientation=Orientation.Horizontal,HorizontalAlignment=HorizontalAlignment.Right};
+        var buttons=new StackPanel {Orientation=System.Windows.Controls.Orientation.Horizontal,HorizontalAlignment=System.Windows.HorizontalAlignment.Right};
         var history=MakeButton("查看历史",DarkPanel);
         history.Click+=(_,_)=>OpenAlertHistory();
         var acknowledge=MakeButton("知道了",AccentGreen);
@@ -206,7 +206,7 @@ public partial class MainWindow
         root.Children.Add(new TextBlock{Text="将立即关闭出站许可、写入停止标记，并停止全部模拟任务；不会自动恢复。",
             TextWrapping=TextWrapping.Wrap,Foreground=Brushes.LightGray,
             Margin=new Thickness(0,0,0,21)});
-        var row=new StackPanel{Orientation=Orientation.Horizontal,HorizontalAlignment=HorizontalAlignment.Right};
+        var row=new StackPanel{Orientation=System.Windows.Controls.Orientation.Horizontal,HorizontalAlignment=System.Windows.HorizontalAlignment.Right};
         var confirm=MakeButton("确认停止",AccentGreen);
         var cancel=MakeButton("取消",AccentRed);
         confirm.Click+=(_,_)=>{dlg.DialogResult=true;dlg.Close();};

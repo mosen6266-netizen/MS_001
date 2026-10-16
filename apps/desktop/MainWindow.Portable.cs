@@ -3,6 +3,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Win32;
+using SaveFileDialog=Microsoft.Win32.SaveFileDialog;
+using OpenFileDialog=Microsoft.Win32.OpenFileDialog;
 using Mosen.GroupScheduler.Persistence;
 using Mosen.GroupScheduler.Scripts.Media;
 using Mosen.GroupScheduler.Scripts.Portable;
