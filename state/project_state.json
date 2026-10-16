@@ -6,7 +6,7 @@
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
   "current_step": "20",
-  "current_step_status": "not_started",
+  "current_step_status": "in_progress",
   "phase": 5,
   "total_steps": 32,
   "completed_steps": [
@@ -43,7 +43,7 @@
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step19: SQLite v8 delivery_attempts + delivery_events, unique run/step and correlation plus account/chat/platform message uniqueness. Offline-only DeliveryJournal stores Planned before transport intent, Submitting and Pending, source-correlated Confirmed; duplicates and out-of-order callbacks guarded, network uncertain => Unknown and no auto resend, definite rejection => Failed, restart quarantines Planned=>Review, Submitting/Pending=>Unknown. Only read-only operations retryable. No TDLib live sends or connector; CI 38960129236 30/30 SUCCESS, Windows/Linux 64 assertions each. Development progress 19/32 59.375%, remaining 13.",
+  "notes": "Step20 recovery code exists and docs in main; offline safety test and 31-job CI queued at GitHub Actions run 38961738009. Not accepted until full CI success. Current progress remains 19/32 (59.375%), next unaccepted step20. Non-destructive SQLite v9 quarantine and simulated crash/sleep/offline coordinator. Real Windows10/11/TDLib deferred.",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
@@ -215,5 +215,7 @@
   "step18_total_ci_jobs": 30,
   "step19_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38960129236",
   "step19_delivery_checks_per_os": 64,
-  "step19_total_ci_jobs": 30
+  "step19_total_ci_jobs": 30,
+  "step20_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38961738009",
+  "step20_source_commit": "ba4a0bdc231162e1fb733571992c6e427e7b021a"
 }

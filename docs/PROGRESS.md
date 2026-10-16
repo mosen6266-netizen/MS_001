@@ -195,3 +195,8 @@
 - 源码提交 [`dcb242c1`](https://github.com/mosen6266-netizen/MS_001/commit/dcb242c1e1d67699ee649c394542d5031a5b5515)；测试编译修正 [`a4f44951`](https://github.com/mosen6266-netizen/MS_001/commit/a4f44951461ccb56ca211c229d354093c0023196)。设计、测试矩阵和验收见 `docs/STEP_19_DELIVERY.md`、`docs/STEP_19_TEST_MATRIX.md`、`docs/STEP_19_ACCEPTANCE.md`。
 - **DEFERRED**：真实可信TDLib回执供应者、实时授权/群级权限及账号锁释放的集成、正式生产outbox、Windows10/11实机断网/崩溃及合法群发送、50群长稳；模块目前纯离线，不会真实向Telegram发消息，MS002保持不动。
 - **开发进度 19/32 = 59.375%，剩余13步**；下一步 **20：断网、崩溃与重启恢复**。
+
+## Step20 — 开发执行中（CI 未验收）
+- 代码已提交：`src/Core/Recovery/`、SQLite v9 损坏记录非破坏隔离、`tests/Recovery/Program.cs`、断网/睡眠/重启的只读恢复报告；当前源码提交 `ba4a0bdc`。
+- GitHub CI [38961738009](https://github.com/mosen6266-netizen/MS_001/actions/runs/38961738009) 等待完整执行（运行器队列）。**没有全部通过前不得标为 done_dev，进度仍19/32**。
+- 真实 Win10/11 系统网络断开/休眠强退、官方 TDLib 会话与实际发送集成均 DEFERRED，不代表实机验收。
