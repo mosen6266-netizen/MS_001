@@ -21,14 +21,15 @@ Assert(TdlibGroupParser.ReadChat(Raw(12,"updateChatTitle","""{"chat_id":-1001234
 var topic=TdlibGroupParser.ReadTopic(Raw(12,"forumTopicInfo","""{"@type":"forumTopicInfo","message_thread_id":99,"name":"项目进度","is_closed":false,"is_hidden":false}"""),group.ChatId,now)!;
 Assert(topic.TopicId=="99"&&topic.Title=="项目进度","forum topic ID and title parsed");
 Assert(TdlibGroupParser.ReadTopic(Raw(12,"forumTopicInfo","""{"chat_id":100,"message_thread_id":99,"name":"别的群"}"""),group.ChatId,now)==null,"cross-chat topic payload rejected");
-var member=TdlibGroupParser.ReadMembership(Raw(12,"chatMember","""{"status":{"@type":"chatMemberStatusMember"}}"""),Guid.NewGuid(),group.ChatId,12,now)!;
+var member=TdlibGroupParser.ReadMembership(Raw(12,"chatMember","""{"member_id":{"@type":"messageSenderUser","user_id":78901234},"status":{"@type":"chatMemberStatusMember"}}"""),Guid.NewGuid(),78901234,group.ChatId,12,now)!;
+Assert(TdlibGroupParser.ReadMembership(Raw(12,"chatMember","""{"member_id":{"@type":"messageSenderUser","user_id":777},"status":{"@type":"chatMemberStatusMember"}}"""),Guid.NewGuid(),78901234,group.ChatId,12,now)==null,"member update for another Telegram user rejected");
 Assert(member.Status=="member"&&!member.CanSendText&&!member.CanSendPhotos,"member status alone never grants sending permission");
 using var d=JsonDocument.Parse("""{"@type":"chatPermissions","can_send_basic_messages":true,"can_send_photos":false}""");
 member=TdlibGroupParser.ApplyChatPermissions(member,d.RootElement);
 Assert(member.CanSendText&&!member.CanSendPhotos,"text-only membership permission respected");
 Assert(TdlibGroupParser.ReadSlowModeSeconds(Raw(12,"updateSupergroupFullInfo","""{"supergroup_id":777,"supergroup_full_info":{"slow_mode_delay":45}}"""))==45,"nested official slow mode delay read correctly");
 Assert(TdlibGroupParser.ReadSlowModeSeconds(Raw(12,"supergroupFullInfo","""{"slow_mode_delay":-5}"""))==0,"invalid slow mode cannot be negative");
-Assert(TdlibGroupParser.ReadMembership(Raw(12,"chatMember","""{"status":{"@type":"chatMemberStatusBanned"}}"""),Guid.NewGuid(),group.ChatId,0,now)!.Status=="banned","banned membership state recognized");
+Assert(TdlibGroupParser.ReadMembership(Raw(12,"chatMember","""{"member_id":{"@type":"messageSenderUser","user_id":78901234},"status":{"@type":"chatMemberStatusBanned"}}"""),Guid.NewGuid(),78901234,group.ChatId,0,now)!.Status=="banned","banned membership state recognized");
 Assert(!GroupPermissionPolicy.Preflight(group,null,null,false,now,true).Allowed,"unknown membership always denied");
 Assert(GroupPermissionPolicy.Preflight(group,null,member,false,now,false).Code=="RECHECK_REQUIRED","old cache cannot replace start-time official recheck");
 Assert(GroupPermissionPolicy.Preflight(group,null,member,false,now.AddMinutes(2),true).Code=="RECHECK_REQUIRED","stale membership not actionable");

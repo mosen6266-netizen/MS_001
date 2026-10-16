@@ -43,12 +43,19 @@ public static class TdlibGroupParser
             GetBool(item,"is_closed"),GetBool(item,"is_hidden"),now);
     }
     public static MembershipInfo? ReadMembership(
-        TdlibEnvelope envelope,Guid verifiedAccountId,string verifiedChatId,
+        TdlibEnvelope envelope,Guid verifiedAccountId,long expectedTelegramUserId,string verifiedChatId,
         int slowModeDelaySeconds,DateTimeOffset now)
     {
         if(envelope.Type!="chatMember"||verifiedAccountId==Guid.Empty||
            slowModeDelaySeconds is < 0 or > 3600)return null;
         var body=envelope.Body;
+        // Official chatMember.member_id must be the logged-in user's own Telegram ID.
+        // A reply about any other member must never be assigned to the local account.
+        if(expectedTelegramUserId<=0 || !body.TryGetProperty("member_id",out var who) ||
+            who.ValueKind!=JsonValueKind.Object ||
+            !who.TryGetProperty("@type",out var kind) || kind.GetString()!="messageSenderUser" ||
+            !TryInt64(who,"user_id",out var memberUserId) || memberUserId!=expectedTelegramUserId)
+            return null;
         if(!body.TryGetProperty("status",out var status)||status.ValueKind!=JsonValueKind.Object ||
            !status.TryGetProperty("@type",out var type)||type.ValueKind!=JsonValueKind.String)return null;
         string state=type.GetString() switch {
