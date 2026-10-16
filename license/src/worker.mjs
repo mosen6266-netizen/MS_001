@@ -64,7 +64,7 @@ async function signLease(env, license,device,nonce,now){
  const key=await crypto.subtle.importKey("pkcs8",pkcs8Decode(env.LICENSE_SIGNING_PKCS8),
    {name:"ECDSA",namedCurve:"P-256"},false,["sign"]);
  const signature=await crypto.subtle.sign({name:"ECDSA",hash:"SHA-256"},key,encoder.encode(canonical));
- return json({ok:status==="valid",claims,signature:b64url(signature)},status==="valid"?200:403);
+ return json({ok:status==="valid",claims,signature:b64url(signature),keyId:env.LICENSE_SIGNING_KID||"tg-v1"},status==="valid"?200:403);
 }
 async function issue(env,body,now){
  if(!exact(body,["durationDays","maxDevices"])||!legalSeconds(body.durationDays)||
@@ -129,6 +129,14 @@ async function client(env,body,now,activate){
  const digest=await digestCard(body.card,env.LICENSE_PEPPER);
  let license=await env.LICENSE_DB.prepare("SELECT * FROM licenses WHERE card_hmac=? AND product_id=?")
    .bind(digest,PRODUCT).first();
+ // Planned pepper rotation: issue with current pepper; check old cards with the
+ // previous Secret until their card_hmac values are migrated. No plaintext stored.
+ if(!license&&typeof env.LICENSE_PEPPER_PREVIOUS==="string"&&
+    env.LICENSE_PEPPER_PREVIOUS.length>=32&&env.LICENSE_PEPPER_PREVIOUS!==env.LICENSE_PEPPER){
+   const older=await digestCard(body.card,env.LICENSE_PEPPER_PREVIOUS);
+   license=await env.LICENSE_DB.prepare("SELECT * FROM licenses WHERE card_hmac=? AND product_id=?")
+    .bind(older,PRODUCT).first();
+ }
  if(!license||license.disabled)return denied();
  if(activate && license.activated_ms===null){
   await env.LICENSE_DB.prepare("UPDATE licenses SET activated_ms=?,expires_ms=? WHERE id=? AND activated_ms IS NULL AND disabled=0")

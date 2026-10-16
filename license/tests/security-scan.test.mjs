@@ -1,0 +1,40 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
+const read=p=>readFileSync(new URL(p,import.meta.url),"utf8");
+const worker=read("../src/worker.mjs");
+const auth=read("../src/admin-security.mjs");
+const config=read("../wrangler.toml");
+const schema=read("../migrations/0002_admin_security.sql");
+const dotnet=read("../../src/Core/Licensing/SignedLicenseVerifier.cs");
+test("Step26 deploy boundary: no Signal binding, no real D1 ID and no public Worker",()=>{
+ assert.match(config,/name = "ms001-telegram-license-staging"/);
+ assert.match(config,/database_name = "ms001-telegram-license-staging"/);
+ assert.match(config,/database_id = "REPLACE_WITH_NEW_TELEGRAM_D1_DATABASE_ID"/);
+ assert.match(config,/workers_dev = false/);
+ assert.doesNotMatch(config,/signal-scheduler-license|ms002|MS002|api[_-]?token\s*=/i);
+ assert.doesNotMatch(worker,/signal-scheduler-license|__SECRET_LITERAL__/);
+ assert.doesNotMatch(config,/-----BEGIN (EC |RSA )?PRIVATE KEY-----/);
+});
+test("Step26 admin endpoints enforce short-session MFA, bearer and CSRF not static token",()=>{
+ assert.doesNotMatch(worker,/adminOk\(/);
+ assert.match(worker,/if\(!session\)return denied\(401\)/);
+ assert.match(worker,/authorize\(env,request,now\)/);
+ assert.match(auth,/x-csrf-token/);
+ assert.match(auth,/ADMIN_TOTP_SECRET/);
+ assert.match(auth,/login_denied/);
+ assert.match(auth,/DELETE FROM admin_recovery WHERE code_digest=\?/);
+ assert.match(auth,/expires_ms\)<=now/);
+ assert.match(auth,/auth_epoch/);
+ assert.match(auth,/last_totp_step<\?/);
+ assert.match(schema,/UNIQUE|PRIMARY KEY/);
+});
+test("Step26 signing trust remains publisher-pinned and offline bounded",()=>{
+ assert.match(dotnet,/pinnedKey/);
+ assert.match(dotnet,/UNPINNED_KEY/);
+ assert.match(dotnet,/Stopwatch\.GetElapsedTime/);
+ assert.match(dotnet,/Invalidate\(\)/);
+ assert.match(worker,/LICENSE_PEPPER_PREVIOUS/);
+ assert.match(worker,/LICENSE_SIGNING_KID/);
+ assert.doesNotMatch(worker,/process\.env\./);
+});

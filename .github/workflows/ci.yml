@@ -413,7 +413,7 @@ jobs:
         with:
           node-version: "24"
       - name: Exercise isolated D1 SQLite, signed leases, card issuance, renewals, disable and concurrent binding
-        run: node --test license/tests/license.test.mjs
+        run: node --test license/tests/license.test.mjs license/tests/security-scan.test.mjs
 
   telegram-license-client:
     name: Telegram-only signed .NET license verification and fail-closed gate - ${{ matrix.os }}

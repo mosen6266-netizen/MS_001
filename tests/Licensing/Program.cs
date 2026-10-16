@@ -107,6 +107,52 @@ try
  Reject<InvalidDataException>(()=>InstallationDeviceId.LoadOrCreate(file),"damaged installation ID fails closed rather than silently rebinding");
 }
 finally{try{Directory.Delete(dir,true);}catch(IOException){}}
+
+// Step26: signed public key rotation, no user-provided public keys, offline clock rollback
+// and attempted tampering fail closed rather than retaining a previously verified lease.
+var legacySpki=Convert.ToBase64String(signing.ExportSubjectPublicKeyInfo());
+var newSpki=Convert.ToBase64String(otherSigner.ExportSubjectPublicKeyInfo());
+var multi=new SignedLicenseVerifier(new Dictionary<string,string>{
+ ["tg-v1"]=legacySpki,["tg-v2"]=newSpki
+},device);
+var signedOld=Signed(baseClaims) with {KeyId="tg-v1"};
+Check(multi.Apply(signedOld,nonce,now).Authorized,"pinned old key remains accepted during two-key rotation");
+var signedNew=Signed(baseClaims,otherSigner) with {KeyId="tg-v2"};
+Check(multi.Apply(signedNew,nonce,now).Authorized,"independently pinned new publisher signing key accepted");
+Check(!multi.Apply(signedNew with {KeyId="untrusted-publisher"},nonce,now).Authorized,
+ "untrusted key ID from response cannot expand the publisher keyring");
+Check(!multi.Offline(now).Authorized,
+ "untrusted key ID revokes any in-memory cached offline gate");
+Check(!multi.Apply(Signed(baseClaims,otherSigner) with {KeyId="tg-v1"},nonce,now).Authorized,
+ "key ID spoof cannot make a new signing key verify as the old one");
+Check(!multi.Offline(now).Authorized,
+ "bad signature clears old cached offline authorization");
+Reject<ArgumentException>(()=>new SignedLicenseVerifier(new Dictionary<string,string>{
+ ["tg-v1"]=legacySpki,["tg-v2"]=newSpki,["third"]=legacySpki
+},device),"more than two developer pinned keys rejected");
+Reject<ArgumentException>(()=>new SignedLicenseVerifier(new Dictionary<string,string>{
+ ["tg-v1"]=legacySpki,["evil/key"]=newSpki
+},device),"invalid signing key identifiers rejected");
+
+var rollbackGuard=new SignedLicenseVerifier(publicKey,device);
+Check(rollbackGuard.Apply(Signed(baseClaims),nonce,now).Authorized,
+ "signed lease anchors monotonic counter when validated");
+Check(rollbackGuard.Offline(now.AddMinutes(40)).Authorized,
+ "signed still-valid clock observation allowed");
+Check(!rollbackGuard.Offline(now.AddMinutes(20)).Authorized,
+ "rolling device clock back after later observation cannot re-extend offline time");
+Check(!rollbackGuard.Offline(now.AddHours(2)).Authorized,
+ "clock cannot exceed signed offline expiry even with in-process cache");
+var invalidGate=new SignedLicenseVerifier(publicKey,device);
+Check(invalidGate.Apply(Signed(baseClaims),nonce,now).Authorized,
+ "second gate independently signs original claims");
+Check(!invalidGate.Apply(Signed(baseClaims) with{
+ Claims=baseClaims with{ExpiresMs=baseClaims.ExpiresMs+86400000}
+},nonce,now).Authorized,"tampered server response explicitly rejected");
+Check(!invalidGate.Offline(now).Authorized,
+ "tampered online license response invalidates prior cached offline lease");
+Console.WriteLine("Step26 publisher key-rotation and offline rollback guard tests completed.");
+
 Console.WriteLine($"SUMMARY: {count} Step25 signed licensing client assertions passed; zero real Cloudflare/Signal modifications.");
 sealed class ReplyHandler(Func<HttpRequestMessage,Task<HttpResponseMessage>> handle):HttpMessageHandler
 {

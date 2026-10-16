@@ -170,3 +170,131 @@ test("security gates: invalid shape, disallowed verbs, malformed credentials and
   assert.equal(env.LICENSE_DB.count("SELECT COUNT(*) AS n FROM licenses"),0);
  }finally{env.LICENSE_DB.close();}
 });
+
+
+test("Step26: MFA TOTP step is single use and denies password-only administrator writes",async()=>{
+ const env=await createEnv();
+ try{
+  const code=await totp(env.ADMIN_TOTP_SECRET,Math.floor(Date.now()/30000));
+  const legacy=await json(await worker.fetch(req("/v1/admin/cards",issues,env.ADMIN_TOKEN),env));
+  assert.equal(legacy.status,401,"master token alone is never accepted for card mutation");
+  const login=await json(await worker.fetch(req("/v1/admin/session",{totp:code},env.ADMIN_TOKEN),env));
+  assert.equal(login.status,200);
+  assert.match(login.data.token,/^[A-Za-z0-9_-]{43}$/);
+  assert.match(login.data.csrfToken,/^[A-Za-z0-9_-]{43}$/);
+  assert.notEqual(login.data.token,login.data.csrfToken);
+  const second=await json(await worker.fetch(req("/v1/admin/session",{totp:code},env.ADMIN_TOKEN),env));
+  assert.equal(second.status,401,"TOTP from same 30-second step is consumed once");
+  assert.equal(env.LICENSE_DB.count("SELECT COUNT(*) AS n FROM admin_sessions"),1);
+  const withoutCsrf=await json(await worker.fetch(req("/v1/admin/cards",issues,login.data.token),env));
+  assert.equal(withoutCsrf.status,401);
+  const badCsrf=await json(await worker.fetch(new Request("https://license-telegram.test/v1/admin/cards",{
+   method:"POST",headers:{"content-type":"application/json",
+     authorization:"Bearer "+login.data.token,"x-csrf-token":login.data.csrfToken.slice(0,-1)+"x"},
+   body:JSON.stringify(issues)}),env));
+  assert.equal(badCsrf.status,401);
+  const crossOrigin=await json(await worker.fetch(new Request("https://license-telegram.test/v1/admin/cards",{
+   method:"POST",headers:{"content-type":"application/json",
+     authorization:"Bearer "+login.data.token,"x-csrf-token":login.data.csrfToken,
+     origin:"https://evil.example"},
+   body:JSON.stringify(issues)}),env));
+  assert.equal(crossOrigin.status,401,"cross-origin mutations denied even with bearer and CSRF");
+  assert.equal(env.LICENSE_DB.count("SELECT COUNT(*) AS n FROM licenses"),0);
+  const active=await json(await worker.fetch(new Request("https://license-telegram.test/v1/admin/cards",{
+   method:"POST",headers:{"content-type":"application/json",
+     authorization:"Bearer "+login.data.token,"x-csrf-token":login.data.csrfToken},
+   body:JSON.stringify(issues)}),env));
+  assert.equal(active.status,201);
+  const before=Date.now,at=before();
+  Date.now=()=>at+16*60000;
+  try{
+   const expired=await json(await worker.fetch(new Request("https://license-telegram.test/v1/admin/cards",{
+    method:"POST",headers:{"content-type":"application/json",
+      authorization:"Bearer "+login.data.token,"x-csrf-token":login.data.csrfToken},
+    body:JSON.stringify(issues)}),env));
+   assert.equal(expired.status,401,"session expires in 15 minutes and cannot renew itself");
+  }finally{Date.now=before;}
+ }finally{env.LICENSE_DB.close();}
+});
+test("Step26: recovery codes single-use, logout, audit, and global session invalidation",async()=>{
+ const env=await createEnv();
+ try{
+  const rotated=await call(env,"/v1/admin/recovery/rotate",{},true);
+  assert.equal(rotated.status,200);
+  assert.equal(rotated.data.recoveryCodes.length,8);
+  assert.equal(new Set(rotated.data.recoveryCodes).size,8);
+  const firstCode=rotated.data.recoveryCodes[0];
+  assert.equal(env.LICENSE_DB.count("SELECT COUNT(*) AS n FROM admin_recovery"),8);
+  assert.ok(!JSON.stringify(env.LICENSE_DB.db.prepare("SELECT * FROM admin_recovery").all()).includes(firstCode),
+    "recovery plaintext must never be in D1");
+  const recovered=await json(await worker.fetch(req("/v1/admin/session",
+      {recoveryCode:firstCode},env.ADMIN_TOKEN),env));
+  assert.equal(recovered.status,200);
+  assert.ok(!JSON.stringify(env.LICENSE_DB.db.prepare("SELECT * FROM admin_sessions").all())
+       .includes(recovered.data.token),"session token itself is only returned once");
+  assert.equal(env.LICENSE_DB.count("SELECT COUNT(*) AS n FROM admin_recovery"),7);
+  assert.equal((await json(await worker.fetch(req("/v1/admin/session",
+    {recoveryCode:firstCode},env.ADMIN_TOKEN),env))).status,401,
+    "reused recovery code must be rejected");
+  const list=await call(env,"/v1/admin/audit",{limit:40,beforeMs:Number.MAX_SAFE_INTEGER},true);
+  assert.equal(list.status,200);
+  assert.ok(list.data.events.some(e=>e.action==="login_recovery"&&e.ok===true));
+  assert.ok(list.data.events.every(e=>!Object.keys(e).includes("token")&&!Object.keys(e).includes("ip")));
+  const revocation=await call(env,"/v1/admin/sessions/revoke",{},true);
+  assert.equal(revocation.status,200);
+  const former=await json(await worker.fetch(new Request("https://license-telegram.test/v1/admin/cards",{
+    method:"POST",headers:{"content-type":"application/json",
+    authorization:"Bearer "+recovered.data.token,"x-csrf-token":recovered.data.csrfToken},
+    body:JSON.stringify(issues)}),env));
+  assert.equal(former.status,401,"security epoch invalidates all old sessions");
+  const key=env._session;
+  const oldAdmin=await json(await worker.fetch(new Request("https://license-telegram.test/v1/admin/cards",{
+    method:"POST",headers:{"content-type":"application/json",
+    authorization:"Bearer "+key.token,"x-csrf-token":key.csrfToken},body:JSON.stringify(issues)}),env));
+  assert.equal(oldAdmin.status,401);
+  // Use a remaining recovery code to sign into a fresh session without reusing OTP.
+  const secondRecovery=await json(await worker.fetch(req("/v1/admin/session",
+     {recoveryCode:rotated.data.recoveryCodes[1]},env.ADMIN_TOKEN),env));
+  assert.equal(secondRecovery.status,200);
+  const logoutReq=new Request("https://license-telegram.test/v1/admin/logout",{
+    method:"POST",headers:{"content-type":"application/json",authorization:"Bearer "+secondRecovery.data.token,
+    "x-csrf-token":secondRecovery.data.csrfToken},body:"{}"});
+  assert.equal((await json(await worker.fetch(logoutReq,env))).status,200);
+  const reused=new Request("https://license-telegram.test/v1/admin/cards",{
+    method:"POST",headers:{"content-type":"application/json",authorization:"Bearer "+secondRecovery.data.token,
+    "x-csrf-token":secondRecovery.data.csrfToken},body:JSON.stringify(issues)});
+  assert.equal((await json(await worker.fetch(reused,env))).status,401,"logout immediately invalidates session");
+ }finally{env.LICENSE_DB.close();}
+});
+test("Step26: brute-force rate caps, wrong product, staged pepper + signing rotation",async()=>{
+ const env=await createEnv();
+ try{
+  for(let i=0;i<8;i++)
+    assert.equal((await json(await worker.fetch(req("/v1/admin/session",{totp:"000000"},"WRONG-"+i),env))).status,401);
+  assert.equal((await json(await worker.fetch(req("/v1/admin/session",{totp:"000000"},env.ADMIN_TOKEN),env))).status,429,
+    "ninth login in fixed five-minute bucket is limited");
+  const other=await createEnv();
+  try{
+   const originalPepper=other.LICENSE_PEPPER;
+   const first=await call(other,"/v1/admin/cards",{durationDays:2,maxDevices:1},true);
+   const body={card:first.data.code,deviceHash:device("e"),nonce:nonce("a")};
+   assert.equal((await call(other,"/v1/license/activate",body)).status,200);
+   other.LICENSE_PEPPER="new-independent-pepper-"+("M".repeat(40));
+   other.LICENSE_PEPPER_PREVIOUS=originalPepper;
+   assert.equal((await call(other,"/v1/license/check",body)).status,200,
+      "rotating card-HMAC secret preserves already issued cards only with explicit old Secret");
+   other.LICENSE_PEPPER_PREVIOUS="";
+   assert.equal((await call(other,"/v1/license/check",body)).status,403,
+      "retiring old pepper stops old lookup once migration has not occurred");
+   const next=await crypto.subtle.generateKey({name:"ECDSA",namedCurve:"P-256"},true,["sign","verify"]);
+   other.LICENSE_SIGNING_PKCS8=Buffer.from(await crypto.subtle.exportKey("pkcs8",next.privateKey)).toString("base64");
+   other.LICENSE_SIGNING_KID="tg-v2";
+   const newer=await call(other,"/v1/admin/cards",{durationDays:2,maxDevices:1},true);
+   const result=await call(other,"/v1/license/activate",{...body,card:newer.data.code});
+   assert.equal(result.status,200);
+   assert.equal(result.data.keyId,"tg-v2");
+   assert.equal(await signed(result,{publicKey:next.publicKey}),true);
+   assert.equal(await signed(result,other),false,"old key cannot validate new signing-key ID");
+  }finally{other.LICENSE_DB.close();}
+ }finally{env.LICENSE_DB.close();}
+});
