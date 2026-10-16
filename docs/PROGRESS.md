@@ -186,3 +186,12 @@
 - 源码主要提交 [`bf20488a`](https://github.com/mosen6266-netizen/MS_001/commit/bf20488ab799e1cf129ad2ec112a37c4440e5e4a)；测试修正 [`b1ac1e75`](https://github.com/mosen6266-netizen/MS_001/commit/b1ac1e7525c57f31b87a29672af7b3166156df3e)。规则与验收记录：`docs/STEP_18_OUTBOUND_POLICY.md`、`docs/STEP_18_TEST_MATRIX.md`、`docs/STEP_18_ACCEPTANCE.md`。
 - **DEFERRED**：实时TDLib授权/权限事实提供者、官方服务器返回错误码与冻结后的动态权限对接、跨重启正式发送速率预算、真实 outbox 与回执状态、Windows10/11正式客户端、合法群实际发送/50群长稳。不得声称正式发送功能可用；MS002及生产Cloudflare服务未修改。
 - 开发进度 **18/32（56.25%），剩余14步**；下一步 **19：发送回执和去重保护**。
+
+## Step19 — 持久消息回执与事务去重（2026-10-16）
+- **开发阶段完成 done_dev**：SQLite v8 新增 `delivery_attempts` / `delivery_events`。每条冻结的运行+消息步骤只允许一笔投递事务，许可与冻结账号/群/话题/步键严格关联；先记录 Planned，再登记 Submitting，传输确认 Pending 不等于 Telegram 确认。
+- **官方可信回执模型**：检查相关令牌、账号、群、话题、来源真实性及平台消息 ID，精确匹配才写 Confirmed。重复回执幂等，矛盾回执、跨账户消息复用或迟到 Pending 不会冲掉已确认结果；确认先于 Pending 到达也可安全关联。
+- **错误分类与恢复**：超时、断线、未经证实的响应为 Unknown/Review；仅平台可信明示未送达可 Failed；同一步永久禁止盲目重新发送。重启 Planned→Review、Submitting/Pending→Unknown，真正 Confirmed 保留。纯读取状态/权限可安全重试，消息、照片提交没有自动重试入口。
+- 首轮新增测试因同一 `var` 语句声明多个变量触发编译错误，真实修复并重新跑全部测试。Windows/Linux `tests/Delivery/Program.cs` **各64/64通过**，完整 [CI 38960129236](https://github.com/mosen6266-netizen/MS_001/actions/runs/38960129236) **30/30 SUCCESS**，包含旧数据库 v8、预检、50群调度、出站规则、账号安全和 UI 回归。
+- 源码提交 [`dcb242c1`](https://github.com/mosen6266-netizen/MS_001/commit/dcb242c1e1d67699ee649c394542d5031a5b5515)；测试编译修正 [`a4f44951`](https://github.com/mosen6266-netizen/MS_001/commit/a4f44951461ccb56ca211c229d354093c0023196)。设计、测试矩阵和验收见 `docs/STEP_19_DELIVERY.md`、`docs/STEP_19_TEST_MATRIX.md`、`docs/STEP_19_ACCEPTANCE.md`。
+- **DEFERRED**：真实可信TDLib回执供应者、实时授权/群级权限及账号锁释放的集成、正式生产outbox、Windows10/11实机断网/崩溃及合法群发送、50群长稳；模块目前纯离线，不会真实向Telegram发消息，MS002保持不动。
+- **开发进度 19/32 = 59.375%，剩余13步**；下一步 **20：断网、崩溃与重启恢复**。
