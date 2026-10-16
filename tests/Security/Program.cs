@@ -39,8 +39,11 @@ Check(!IpcRequestGuard.TryValidate(scriptList.Replace("\"query\":\"\"","\"query\
 Check(!IpcRequestGuard.TryValidate(scriptSave.Replace("\"expectedRevision\":1","\"expectedRevision\":1,\"expectedRevision\":2"),out _),"duplicate draft revision rejected");
 Check(!IpcRequestGuard.TryValidate(new string('X',600000),out _),"unbounded script payload rejected");
 
-string mediaImport="""{"protocol":"mosen.desktop.v1","requestId":"m-1","type":"media.import","payload":{"fileName":"公告.png","mimeType":"image/png","base64":""""+new string('A',80)+""""}}""";
-string mediaPreview="""{"protocol":"mosen.desktop.v1","requestId":"m-2","type":"media.preview","payload":{"reference":{"assetId":""""+new string('a',64)+"""","mimeType":"image/png","byteLength":100,"width":1,"height":1,"fileName":"image.png"}}}""";
+string mediaImport=System.Text.Json.JsonSerializer.Serialize(new {protocol="mosen.desktop.v1",requestId="m-1",
+ type="media.import",payload=new {fileName="公告.png",mimeType="image/png",base64=new string('A',80)}});
+string mediaPreview=System.Text.Json.JsonSerializer.Serialize(new {protocol="mosen.desktop.v1",requestId="m-2",
+ type="media.preview",payload=new {reference=new {assetId=new string('a',64),mimeType="image/png",
+ byteLength=100,width=1,height=1,fileName="image.png"}}});
 Check(IpcRequestGuard.TryValidate(mediaImport,out operation)&&operation==AllowedIpcOperation.MediaImport,
       "bounded image import accepted only via explicit local media command");
 Check(IpcRequestGuard.TryValidate(mediaPreview,out operation)&&operation==AllowedIpcOperation.MediaPreview,
