@@ -161,7 +161,9 @@ public partial class MainWindow : Window
                 AllowedIpcOperation.ScriptsCreate or AllowedIpcOperation.ScriptsSave or
                 AllowedIpcOperation.ScriptsDuplicate or AllowedIpcOperation.ScriptsArchive or
                 AllowedIpcOperation.ScriptsRestore or AllowedIpcOperation.ScriptsExport or
-                AllowedIpcOperation.ScriptsImport)
+                AllowedIpcOperation.ScriptsImport or AllowedIpcOperation.ScriptsPublish or
+                AllowedIpcOperation.ScriptsVersions or AllowedIpcOperation.ScriptsPreview or
+                AllowedIpcOperation.ScriptsPreflight)
             {
                 await HandleScriptRequestAsync(jsonMessage,request.RequestId,request.Type);
                 return;

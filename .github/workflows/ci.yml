@@ -263,3 +263,18 @@ jobs:
           dotnet-version: "10.0.x"
       - name: Test cross-device archive compatibility, role ambiguity and ZIP attacks
         run: dotnet run --project tests/Scripts/Portable/Mosen.GroupScheduler.ScriptPortable.Tests.csproj --configuration Release
+
+  script-preflight:
+    name: Published snapshots and start preflight - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: Test immutable versions, group permission matrix and frozen bindings
+        run: dotnet run --project tests/Preflight/Mosen.GroupScheduler.Preflight.Tests.csproj --configuration Release

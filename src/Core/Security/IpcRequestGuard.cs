@@ -2,7 +2,7 @@ using System.Text.Json;
 
 namespace Mosen.GroupScheduler.Core.Security;
 
-public enum AllowedIpcOperation { SystemPing, AppInfo, SettingsGet, SettingsSave, DiagnosticsGet, AccountsList, AccountsCreate, AccountsEdit, AccountsArchive, AccountsRestore, GroupsList, GroupsTopics, GroupsMembers, ScriptsList, ScriptsGet, ScriptsCreate, ScriptsSave, ScriptsDuplicate, ScriptsArchive, ScriptsRestore, ScriptsExport, ScriptsImport, MediaImport, MediaPreview }
+public enum AllowedIpcOperation { SystemPing, AppInfo, SettingsGet, SettingsSave, DiagnosticsGet, AccountsList, AccountsCreate, AccountsEdit, AccountsArchive, AccountsRestore, GroupsList, GroupsTopics, GroupsMembers, ScriptsList, ScriptsGet, ScriptsCreate, ScriptsSave, ScriptsDuplicate, ScriptsArchive, ScriptsRestore, ScriptsExport, ScriptsImport, ScriptsPublish, ScriptsVersions, ScriptsPreview, ScriptsPreflight, MediaImport, MediaPreview }
 
 /// <summary>Fail-closed JSON input gate: exact origin is checked separately by WebView2 host.</summary>
 public static class IpcRequestGuard
@@ -55,6 +55,10 @@ public static class IpcRequestGuard
                 case "scripts.restore": operation=AllowedIpcOperation.ScriptsRestore; break;
                 case "scripts.export": operation=AllowedIpcOperation.ScriptsExport; break;
                 case "scripts.import": operation=AllowedIpcOperation.ScriptsImport; break;
+                case "scripts.publish": operation=AllowedIpcOperation.ScriptsPublish; break;
+                case "scripts.versions": operation=AllowedIpcOperation.ScriptsVersions; break;
+                case "scripts.preview": operation=AllowedIpcOperation.ScriptsPreview; break;
+                case "scripts.preflight": operation=AllowedIpcOperation.ScriptsPreflight; break;
                 case "media.import": operation=AllowedIpcOperation.MediaImport; break;
                 case "media.preview": operation=AllowedIpcOperation.MediaPreview; break;
                 default: return false;
@@ -72,7 +76,9 @@ public static class IpcRequestGuard
                 AllowedIpcOperation.ScriptsCreate or AllowedIpcOperation.ScriptsSave or
                 AllowedIpcOperation.ScriptsDuplicate or AllowedIpcOperation.ScriptsArchive or
                 AllowedIpcOperation.ScriptsRestore or AllowedIpcOperation.ScriptsExport or
-                AllowedIpcOperation.ScriptsImport)
+                AllowedIpcOperation.ScriptsImport or AllowedIpcOperation.ScriptsPublish or
+                AllowedIpcOperation.ScriptsVersions or AllowedIpcOperation.ScriptsPreview or
+                AllowedIpcOperation.ScriptsPreflight)
             {
                 if(!ExactFields(root,RootWriteFields) || !root.TryGetProperty("payload",out var data))
                     return false;
@@ -154,6 +160,10 @@ public static class IpcRequestGuard
             AllowedIpcOperation.ScriptsSave=>new HashSet<string>{"id","expectedRevision","document"},
             AllowedIpcOperation.ScriptsArchive=>new HashSet<string>{"id","expectedRevision","confirmation"},
             AllowedIpcOperation.ScriptsImport=>new HashSet<string>(),
+            AllowedIpcOperation.ScriptsPublish=>new HashSet<string>{"id","expectedRevision"},
+            AllowedIpcOperation.ScriptsPreview or AllowedIpcOperation.ScriptsPreflight=>
+                operation==AllowedIpcOperation.ScriptsPreview?new HashSet<string>{"id","version"}:
+                new HashSet<string>{"id","version","targets","choices"},
             AllowedIpcOperation.ScriptsRestore=>new HashSet<string>{"id","expectedRevision"},
             _=>new HashSet<string>{"id"}
         };
@@ -166,10 +176,16 @@ public static class IpcRequestGuard
             return Label(p,"title",128,false);
         if(p.GetProperty("id").ValueKind!=JsonValueKind.String ||
            !Guid.TryParseExact(p.GetProperty("id").GetString(),"D",out var id) || id==Guid.Empty)return false;
-        if(operation is AllowedIpcOperation.ScriptsSave or AllowedIpcOperation.ScriptsArchive or AllowedIpcOperation.ScriptsRestore)
+        if(operation is AllowedIpcOperation.ScriptsSave or AllowedIpcOperation.ScriptsArchive or
+           AllowedIpcOperation.ScriptsRestore or AllowedIpcOperation.ScriptsPublish)
         {
             if(p.GetProperty("expectedRevision").ValueKind!=JsonValueKind.Number ||
                !p.GetProperty("expectedRevision").TryGetInt64(out long revision) || revision<1)return false;
+        }
+        if(operation is AllowedIpcOperation.ScriptsPreview or AllowedIpcOperation.ScriptsPreflight)
+        {
+            if(!IntegerValue(p,"version",1,1000000))return false;
+            if(operation==AllowedIpcOperation.ScriptsPreflight)return ValidatePreflightPayload(p);
         }
         if(operation==AllowedIpcOperation.ScriptsArchive)
             return p.GetProperty("confirmation").ValueKind==JsonValueKind.String &&
@@ -184,6 +200,42 @@ public static class IpcRequestGuard
                !doc.TryGetProperty("steps",out var steps)||steps.ValueKind!=JsonValueKind.Array||
                steps.GetArrayLength()>1000)return false;
             return Label(doc,"title",128,false); // deeper per-item validation in EditorDocumentRules.Parse
+        }
+        return true;
+    }
+
+
+    private static bool ValidatePreflightPayload(JsonElement p)
+    {
+        if(!p.TryGetProperty("targets",out var groups)||groups.ValueKind!=JsonValueKind.Array||
+           groups.GetArrayLength() is <1 or >50 ||
+           !p.TryGetProperty("choices",out var choices)||choices.ValueKind!=JsonValueKind.Array||
+           choices.GetArrayLength()>200)return false;
+        static bool ValidChat(JsonElement item)
+        {
+            if(!item.TryGetProperty("chatId",out var chat)||chat.ValueKind!=JsonValueKind.String||
+                !long.TryParse(chat.GetString(),out var parsed)||parsed==0)return false;
+            if(item.TryGetProperty("topicId",out var topic)&&
+               (topic.ValueKind!=JsonValueKind.String||!long.TryParse(topic.GetString(),out var t)||t<=0))
+                return false;
+            return true;
+        }
+        foreach(var target in groups.EnumerateArray())
+        {
+            if(!ExactFields(target,new HashSet<string>{"chatId"}) &&
+               !ExactFields(target,new HashSet<string>{"chatId","topicId"}))return false;
+            if(!ValidChat(target))return false;
+        }
+        foreach(var choice in choices.EnumerateArray())
+        {
+            if(!ExactFields(choice,new HashSet<string>{"chatId","roleKey","accountId"}) &&
+               !ExactFields(choice,new HashSet<string>{"chatId","topicId","roleKey","accountId"}))return false;
+            if(!ValidChat(choice))return false;
+            if(choice.GetProperty("roleKey").ValueKind!=JsonValueKind.String||
+               !Guid.TryParseExact(choice.GetProperty("roleKey").GetString(),"D",out var role)||role==Guid.Empty ||
+               choice.GetProperty("accountId").ValueKind!=JsonValueKind.String||
+               !Guid.TryParseExact(choice.GetProperty("accountId").GetString(),"D",out var account)||account==Guid.Empty)
+                return false;
         }
         return true;
     }

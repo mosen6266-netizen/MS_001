@@ -21,6 +21,10 @@ public partial class MainWindow
                     type=="scripts.export"?p.GetProperty("id").GetString():null);
                 return;
             }
+            if(type is "scripts.publish" or "scripts.versions" or "scripts.preview" or "scripts.preflight")
+            {
+                await HandlePublicationRequestAsync(id,type,p);return;
+            }
             object output=await Task.Run<object>(()=>type switch
             {
                 "scripts.list" => new {items=_editor.List(

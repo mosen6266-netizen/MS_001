@@ -13,7 +13,7 @@ export type MemberRecord={accountId:string;alias:string;status:string;canSendTex
 export type GroupPage={items:GroupRecord[];total:number;page:number;pageSize:number};
 export type TopicPage={items:TopicRecord[];total:number;page:number;pageSize:number};
 export type GroupRequest={protocol:typeof IPC_PROTOCOL;requestId:string;type:GroupAction;payload:Record<string,unknown>};
-export type ScriptAction="scripts.list"|"scripts.get"|"scripts.create"|"scripts.save"|"scripts.duplicate"|"scripts.archive"|"scripts.restore"|"scripts.export"|"scripts.import";
+export type ScriptAction="scripts.list"|"scripts.get"|"scripts.create"|"scripts.save"|"scripts.duplicate"|"scripts.archive"|"scripts.restore"|"scripts.export"|"scripts.import"|"scripts.publish"|"scripts.versions"|"scripts.preview"|"scripts.preflight";
 export type EditorRole={roleKey:string;roleLabel:string};
 export type TimingProfile={preSendDelayMs:number;typingDurationMs:number;postSendDelayMs:number};
 export type MediaReference={assetId:string;mimeType:"image/png"|"image/jpeg"|"image/webp";byteLength:number;width:number;height:number;fileName:string};
@@ -63,7 +63,9 @@ export function isBridgeRequest(v:unknown):v is BridgeRequest {
       "scripts.list":["query","archived"],"scripts.get":["id"],
       "scripts.create":["title"],"scripts.save":["id","expectedRevision","document"],
       "scripts.duplicate":["id"],"scripts.archive":["id","expectedRevision","confirmation"],
-      "scripts.restore":["id","expectedRevision"],"scripts.export":["id"],"scripts.import":[]
+      "scripts.restore":["id","expectedRevision"],"scripts.export":["id"],"scripts.import":[],
+      "scripts.publish":["id","expectedRevision"],"scripts.versions":["id"],
+      "scripts.preview":["id","version"],"scripts.preflight":["id","version","targets","choices"]
     };
     if(!(v.type in schema)||!isRecord(v.payload)||Object.keys(v).length!==4)return false;
     const action=v.type as ScriptAction;
@@ -73,8 +75,25 @@ export function isBridgeRequest(v:unknown):v is BridgeRequest {
     if(action==="scripts.import")return true;
     if(action==="scripts.create")return typeof p.title==="string"&&p.title.trim().length>0&&p.title.length<=128;
     if(typeof p.id!=="string"||!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(p.id))return false;
-    if(action==="scripts.save"||action==="scripts.archive"||action==="scripts.restore"){
+    if(action==="scripts.save"||action==="scripts.archive"||action==="scripts.restore"||action==="scripts.publish"){
       if(!Number.isSafeInteger(p.expectedRevision)||Number(p.expectedRevision)<1)return false;
+    }
+    if(action==="scripts.preview"||action==="scripts.preflight"){
+      if(!Number.isSafeInteger(p.version)||Number(p.version)<1||Number(p.version)>1000000)return false;
+      if(action==="scripts.preflight"){
+        if(!Array.isArray(p.targets)||p.targets.length<1||p.targets.length>50||
+           !Array.isArray(p.choices)||p.choices.length>200)return false;
+        const validTarget=(v:unknown):v is Record<string,unknown>=>isRecord(v)&&
+          Object.keys(v).every(k=>k==="chatId"||k==="topicId")&&
+          Object.keys(v).includes("chatId")&&safeId(v.chatId)&&
+          (v.topicId===undefined||(safeId(v.topicId)&&Number(v.topicId)>0));
+        const validChoice=(v:unknown)=>validTarget(v)&&
+          Object.keys(v).every(k=>["chatId","topicId","roleKey","accountId"].includes(k))&&
+          typeof v.roleKey==="string"&&typeof v.accountId==="string"&&
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v.roleKey)&&
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v.accountId);
+        if(!p.targets.every(validTarget)||!p.choices.every(validChoice))return false;
+      }
     }
     if(action==="scripts.archive")return p.confirmation==="归档剧本";
     if(action==="scripts.save")return isEditorDoc(p.document);
