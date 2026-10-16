@@ -6,7 +6,7 @@ int checks=0;void Verify(bool yes,string msg){if(!yes)throw new Exception("FAIL 
 var root=Path.Combine(Path.GetTempPath(),"ms001-editor-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(root);
 try
 {
- var db=new AppDatabase(Path.Combine(root,"app.db"));var scripts=new EditorDraftRepository(db);
+ var db=new AppDatabase(Path.Combine(root,"app.db"));db.Initialize();var scripts=new EditorDraftRepository(db);
  Verify(db.GetSchemaVersion()==5,"draft schema upgrades to v5");
  var created=scripts.Create("示例剧本");
  Verify(created.Revision==1&&created.Document.Roles.Count==0,"empty script draft created locally");
