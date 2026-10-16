@@ -15,13 +15,16 @@
   "production_deployment_authorized": false,
   "real_telegram_login_or_send_authorized": false,
   "icon_source_received": true,
-  "icon_asset_upload_verified": false,
+  "icon_asset_upload_verified": true,
   "exact_timing_contract": "wait preSendDelayMs -> typing typingDurationMs -> send; 30s+5s=35s; no overlap",
-  "last_verified_commit_sha": null,
+  "last_verified_commit_sha": "7f70491032a97234f11afce6f364eac42398a0b9",
   "last_updated": "2026-10-16",
   "blocking_issues": [
-    "icon 原始文件待二进制资源提交、透明化及商标审核",
-    "步骤 01 仍需需求与测试门槛评审，尚未验收"
+    "步骤 01 产品需求/品牌与最终验收门槛需审查（不是已完成）",
+    "图标已转换为透明 SVG，公开发行前需审查第三方 Telegram 商标使用",
+    "步骤02及后续 Windows/TDLib 实测依赖正式测试环境"
   ],
-  "notes": "步骤01的规划仓库初始化进行中；0/32步完成。不要伪造测试通过或将初始化视为正式发布。"
+  "notes": "步骤01的规划仓库初始化进行中；0/32步完成。不要伪造测试通过或将初始化视为正式发布。",
+  "icon_asset_path": "assets/branding/icon.svg",
+  "icon_conversion_builder_path": "tools/branding/build_icons.py"
 }
