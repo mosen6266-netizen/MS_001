@@ -1,0 +1,6 @@
+.ui-account-row>div:first-child{display:flex;flex-direction:column;gap:2px;min-width:0}
+.ui-account-row strong{font-size:var(--font-size-md);font-weight:600;color:var(--fg-primary);overflow-wrap:anywhere}
+.ui-account-row .ui-action-row{justify-content:flex-end}
+.ui-account-row .ui-button{min-height:32px;padding:5px 10px;font-size:var(--font-size-xs)}
+.ui-account-confirm{position:fixed;left:50%;top:calc(50% + 156px);transform:translateX(-50%);z-index:1301;width:min(400px,calc(100vw - 48px));background:var(--surface-panel);border:1px solid var(--stroke-strong);border-radius:var(--radius-md);padding:9px 12px}
+@media(max-width:720px){.ui-account-row .ui-action-row{justify-content:flex-start}}
