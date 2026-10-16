@@ -6,7 +6,7 @@
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
   "current_step": "11",
-  "current_step_status": "not_started",
+  "current_step_status": "in_progress",
   "phase": 3,
   "total_steps": 32,
   "completed_steps": [
@@ -34,7 +34,7 @@
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step10 TDLib认证状态机/受限官方JSON请求/客户端隔离与QR去重/取消优先/close去重/前端中文模拟已通过GitHub CI 38935436769（15 job，Windows/Linux各94认证断言，UI26，历史回归通过）。TDLib原生DLL与账号真实登录未完成，DEFERRED。开发10/32=31.25%。",
+  "notes": "Step11 开发中：SQLite v3账号注册表、300条查询、目录隔离与Windows DPAPI per-account key vault、有限活跃会话池、重复账号ID拒绝、二次确认软删除；真实TDLib联网 deferred",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
