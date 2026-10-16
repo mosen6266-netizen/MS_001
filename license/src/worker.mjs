@@ -1,4 +1,5 @@
 // MS_001 Telegram ONLY. No Signal product IDs, bindings, URLs or secrets.
+import {configured,login,authorize,rateLimit,rotateRecovery,logout,revokeSessions,readSecurityAudit} from "./admin-security.mjs";
 export const PRODUCT = "MOSEN_TELEGRAM_SCHEDULER";
 const MAX_BODY = 2048;
 const MAX_DURATION = 1825 * 86400;
@@ -14,7 +15,7 @@ const denied = (status=403)=>json({ok:false,code:"DENIED"},status);
 function environment(env){
   return env?.PRODUCT_ID===PRODUCT && env?.LICENSE_DB &&
    typeof env?.LICENSE_PEPPER==="string" && env.LICENSE_PEPPER.length>=32 &&
-   typeof env?.ADMIN_TOKEN==="string" && env.ADMIN_TOKEN.length>=32 &&
+   configured(env) &&
    typeof env?.LICENSE_SIGNING_PKCS8==="string" && env.LICENSE_SIGNING_PKCS8.length>50;
 }
 async function payload(request){
@@ -36,15 +37,6 @@ function pkcs8Decode(value){const binary=atob(value.replace(/-/g,"+").replace(/_
 export async function digestCard(card,pepper){
  const key=await crypto.subtle.importKey("raw",encoder.encode(pepper),{name:"HMAC",hash:"SHA-256"},false,["sign"]);
  return bytesToHex(new Uint8Array(await crypto.subtle.sign("HMAC",key,encoder.encode(card))));
-}
-async function adminOk(request,env){
- const key=request.headers.get("authorization");
- if(!key?.startsWith("Bearer ")||key.length>1024)return false;
- // HMAC comparison of equally-sized constant-length digests avoids string-compare timing leaks.
- const hash=async value=>new Uint8Array(await crypto.subtle.digest("SHA-256",encoder.encode(value)));
- const a=await hash(key.slice(7)),b=await hash(env.ADMIN_TOKEN);
- let difference=0;for(let i=0;i<32;i++)difference|=a[i]^b[i];
- return difference===0;
 }
 function newCode(){
  const bytes=new Uint8Array(16);crypto.getRandomValues(bytes);
@@ -166,15 +158,32 @@ export default {
    if(request.method!=="POST"||!url.pathname.startsWith("/v1/"))return denied(404);
    const body=await payload(request);if(!body)return denied(400);
    const now=Date.now();
+   if(url.pathname==="/v1/admin/session")return login(env,request,body,now);
    if(url.pathname.startsWith("/v1/admin/")){
-    if(!await adminOk(request,env))return denied(401);
+    const session=await authorize(env,request,now);
+    if(!session)return denied(401);
     if(url.pathname==="/v1/admin/cards")return issue(env,body,now);
     if(url.pathname==="/v1/admin/renew")return renew(env,body,now);
     if(url.pathname==="/v1/admin/disable")return disable(env,body,now);
+    if(url.pathname==="/v1/admin/recovery/rotate"){
+      if(!exact(body,[]))return denied(400);
+      return rotateRecovery(env,now);
+    }
+    if(url.pathname==="/v1/admin/logout"){
+      if(!exact(body,[]))return denied(400);
+      return logout(env,session.tokenDigest,now);
+    }
+    if(url.pathname==="/v1/admin/sessions/revoke"){
+      if(!exact(body,[]))return denied(400);
+      return revokeSessions(env,now);
+    }
+    if(url.pathname==="/v1/admin/audit")return readSecurityAudit(env,body);
     return denied(404);
    }
-   if(url.pathname==="/v1/license/activate")return client(env,body,now,true);
-   if(url.pathname==="/v1/license/check")return client(env,body,now,false);
+   if(url.pathname==="/v1/license/activate"||url.pathname==="/v1/license/check"){
+      if(!await rateLimit(env,request,"licensing",120,60000,now))return denied(429);
+      return client(env,body,now,url.pathname==="/v1/license/activate");
+   }
    return denied(404);
   }catch{ // No DB driver errors, token or sensitive data in HTTP responses or logs.
    return denied(503);
