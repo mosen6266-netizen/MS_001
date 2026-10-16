@@ -390,9 +390,24 @@
     "step": "18",
     "title": "账号与群发送规则协调",
     "phase": 5,
-    "status": "not_started",
-    "acceptance_evidence": [],
-    "last_commit_sha": null
+    "status": "done_dev",
+    "acceptance_evidence": [
+      "src/Core/OutboundPolicy/OutboundCoordinator.cs",
+      "src/Core/OutboundPolicy/Mosen.GroupScheduler.OutboundPolicy.csproj",
+      "tests/Policy/Program.cs",
+      "docs/STEP_18_OUTBOUND_POLICY.md",
+      "docs/STEP_18_TEST_MATRIX.md",
+      "docs/STEP_18_ACCEPTANCE.md",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/38958656142"
+    ],
+    "last_commit_sha": "b1ac1e7525c57f31b87a29672af7b3166156df3e",
+    "deferred_release_acceptance": [
+      "OUTBOUND-REAL-OFFICIAL-LIMITS",
+      "SCHEDULER-REAL-50GROUP",
+      "AUTH-REAL-ACCOUNT",
+      "GROUPS-REAL-SYNC",
+      "TDLIB-NATIVE-BINARY"
+    ]
   },
   {
     "step": "19",

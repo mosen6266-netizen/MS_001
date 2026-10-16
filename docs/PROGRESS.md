@@ -177,3 +177,12 @@
 - 源码提交 [`8bf4e702`](https://github.com/mosen6266-netizen/MS_001/commit/8bf4e7028aec53b0449e05f4134f1aefddeb176b)，设计与证据见 `docs/STEP_17_SCHEDULER.md`、`docs/STEP_17_TEST_MATRIX.md`、`docs/STEP_17_ACCEPTANCE.md`。
 - **仍 DEFERRED**：真实 Telegram 原生账号授权/群实时权限、正式 `runs/outbox` 持久化与实际发送、Windows10/11控制界面、50 群/300会话持续压测，预计按用户指示最终集中实机测试。此步骤没有启动自动群发功能，不能等同可用正式版。
 - 进度 **17/32 = 53.125%**；剩余 **15步**，下一步 **18 账号与群发送规则协调**。
+
+## Step18 — 账号级出站规则协调与频率预算（2026-10-16）
+- **开发阶段 done_dev**：新增 `src/Core/OutboundPolicy/OutboundCoordinator.cs`，可在第17步 `Running/AwaitingSend` 状态为冻结的账号、群和话题签发仅供模拟的单次许可；没有真实Telegram网络发送/TDLib连接或后台出站线程。
+- 安全约束：单账号全群串行（包括50个并发群）、30秒内的即时授权验证、每次发送权限刷新、官方群/话题和对应消息文字/照片权限、不可重绑定角色。未知回执持有账号锁等待人工复核，不能当做失败盲目重试。
+- 保守预算：默认每账号出站许可间隔3s、群级间隔3s、账号一分钟最多6次，不得降低安全底限；按官方群速模式和服务端账号 FloodWait 延长阻断期限，保护受影响群防止通过更换账号绕过限制，不能用短等待覆盖更长等待。
+- 首次CI发现“未知回执阻止重发”的合成测试复用了过期授权而被错误的安全门先拦截，已修正合成授权时间。修正后 Windows/Linux `tests/Policy/Program.cs` 各 **62/62 PASS**；完整 [GitHub Actions 38958656142](https://github.com/mosen6266-netizen/MS_001/actions/runs/38958656142) **30/30 SUCCESS**，覆盖原有群/会话、预检、调度、SQLite、UI和安全回归。
+- 源码主要提交 [`bf20488a`](https://github.com/mosen6266-netizen/MS_001/commit/bf20488ab799e1cf129ad2ec112a37c4440e5e4a)；测试修正 [`b1ac1e75`](https://github.com/mosen6266-netizen/MS_001/commit/b1ac1e7525c57f31b87a29672af7b3166156df3e)。规则与验收记录：`docs/STEP_18_OUTBOUND_POLICY.md`、`docs/STEP_18_TEST_MATRIX.md`、`docs/STEP_18_ACCEPTANCE.md`。
+- **DEFERRED**：实时TDLib授权/权限事实提供者、官方服务器返回错误码与冻结后的动态权限对接、跨重启正式发送速率预算、真实 outbox 与回执状态、Windows10/11正式客户端、合法群实际发送/50群长稳。不得声称正式发送功能可用；MS002及生产Cloudflare服务未修改。
+- 开发进度 **18/32（56.25%），剩余14步**；下一步 **19：发送回执和去重保护**。

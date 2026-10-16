@@ -5,7 +5,7 @@
   "default_branch": "main",
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
-  "current_step": "18",
+  "current_step": "19",
   "current_step_status": "not_started",
   "phase": 5,
   "total_steps": 32,
@@ -26,7 +26,8 @@
     "14",
     "15",
     "16",
-    "17"
+    "17",
+    "18"
   ],
   "development_started": true,
   "functional_code_started": true,
@@ -35,13 +36,13 @@
   "icon_source_received": true,
   "icon_asset_upload_verified": true,
   "exact_timing_contract": "wait preSendDelayMs -> typing typingDurationMs -> send; 30s+5s=35s; no overlap",
-  "last_verified_commit_sha": "8bf4e7028aec53b0449e05f4134f1aefddeb176b",
+  "last_verified_commit_sha": "b1ac1e7525c57f31b87a29672af7b3166156df3e",
   "last_updated": "2026-10-16",
   "blocking_issues": [
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step17 SQLite v7 simulation-only scheduler: 50 group independent durable virtual clocks, RR round-robin tick, 30s pre-wait then 5s typing, explicitly simulated receipt before 12s post-send wait, per-group pause/resume/stop/fail/review, atomic StopAll, crash/restart Ready/Running/Paused => Review and never background resume. No Telegram outbound IPC; Step18/19 will add separate real outbound policy and receipts. CI 38957627884 29/29 SUCCESS; Scheduler 37 tests each Windows/Linux; Win-x64 published. Development 17/32=53.125%, 15 remain.",
+  "notes": "Step18 develops offline-only OutboundCoordinator safety policy: 1 active permit/account across groups, exact pinned run/account/chat/topic, 30-second fresh auth and send-time group membership check, permission and conservative budget (default 3s account, 3s chat, 6 permits per account per min), per-member slow-mode, official chat-wide slow wait and account FLOOD_WAIT with affected-chat hold, unknown outcome locks; no account rotation or blind retry. Windows/Linux 62 assertions each and complete CI 38958656142 30/30 SUCCESS. No TDLib network or real sender; Step19 implement persistent delivery/outbox and official receipts. Development progress 18/32 56.25%, 14 remain.",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
@@ -148,6 +149,11 @@
       "id": "SCHEDULER-REAL-50GROUP",
       "status": "DEFERRED",
       "detail": "Step17 only runs deterministic simulator and SQLite simulation checkpoints; no actual TDLib Telegram sends. Future real durable runs/outbox integration, Windows10/11 control panel interactions, 50 legal Telegram group tasks, session/permission reevaluation, network/sleep/crash recovery and 72h pressure testing require final user verification."
+    },
+    {
+      "id": "OUTBOUND-REAL-OFFICIAL-LIMITS",
+      "status": "DEFERRED",
+      "detail": "Step18 uses trusted SendAuthority inputs from synthetic tests only. Must integrate TDLib official per-send authorization/permissions, real SLOWMODE_WAIT and FLOOD_WAIT codes, persistent production cooldown/outbox, Windows10/11 UI, legal group actual sending/50-group long-run, 72-hour stability. Existing desktop real sending remains disabled."
     }
   ],
   "step03_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38921641970",
@@ -197,5 +203,8 @@
   "step16_total_ci_jobs": 27,
   "step17_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38957627884",
   "step17_scheduler_checks_per_os": 37,
-  "step17_total_ci_jobs": 29
+  "step17_total_ci_jobs": 29,
+  "step18_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38958656142",
+  "step18_policy_checks_per_os": 62,
+  "step18_total_ci_jobs": 30
 }
