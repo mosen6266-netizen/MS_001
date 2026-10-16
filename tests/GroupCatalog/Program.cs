@@ -89,7 +89,7 @@ try
     {
         raw.Open();using var cmd=raw.CreateCommand();
         cmd.CommandText="SELECT chat_id||':'||topic_id FROM group_bindings WHERE binding_id='binding-1';";
-        Assert((string)cmd.ExecuteScalar()!=="-1001234567:99","script binding unchanged across chat rename");
+        Assert((string)cmd.ExecuteScalar()! == "-1001234567:99","script binding unchanged across chat rename");
     }
     var accountIdA=Guid.Parse(accountA.Id);
     bool noIdentity=false;
