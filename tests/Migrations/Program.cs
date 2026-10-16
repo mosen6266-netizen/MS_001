@@ -89,11 +89,11 @@ try
     }
 
     db.Initialize(); // normal restart succeeds
-    Check(db.GetSchemaVersion() == 2, "restart upgrades to v2");
+    Check(db.GetSchemaVersion() == 3, "restart upgrades to v3");
     db.Initialize();
     using (var c = Open(dbPath))
     {
-        Check(Count(c, "schema_migrations") == 2, "migrations idempotent under repeated startup");
+        Check(Count(c, "schema_migrations") == 3, "migrations idempotent under repeated startup");
         Check(Count(c, "accounts") == 1, "account metadata preserved through upgrade");
         Check(Count(c, "script_steps") == 1, "script content preserved through upgrade");
         Check(Count(c, "outbox") == 0, "outbox prepared but no send automatically started");
@@ -107,7 +107,7 @@ try
     string candidate = db.PrepareRestore(snapshotV1);
     Check(File.Exists(candidate) && candidate != dbPath, "rollback creates separate verified restore candidate");
     Check(new AppDatabase(candidate).GetSchemaVersion() == 1, "restore candidate is original v1");
-    Check(db.GetSchemaVersion() == 2, "live upgraded DB remains unchanged during restore preparation");
+    Check(db.GetSchemaVersion() == 3, "live upgraded DB remains unchanged during restore preparation");
     var restored = new AppDatabase(candidate);
     restored.Initialize();
     using (var c = Open(candidate)) Check(Count(c, "accounts") == 1, "restored and re-upgraded metadata retained");
