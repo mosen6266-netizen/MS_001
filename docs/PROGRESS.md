@@ -227,3 +227,13 @@
 - 开发期间首次测试C#变量声明错误，随后WPF/WinForms类型重名，均修复并重新全量CI验证。源码主要提交 [`28fefa70`](https://github.com/mosen6266-netizen/MS_001/commit/28fefa70516e80c4dd75d3d0de8d55feb45ba3c3)，最终构建修复 [`76270f9b`](https://github.com/mosen6266-netizen/MS_001/commit/76270f9b9be8a5619f298a896ff52a4341933b15)；详细见 `docs/STEP_22_NOTIFICATIONS.md`、`docs/STEP_22_TEST_MATRIX.md`、`docs/STEP_22_ACCEPTANCE.md`。
 - **DEFERRED**：真实Win10/11托盘/休眠/锁屏置顶表现、TDLib官方发送前统一停止闩锁核对、正式账号与群交互、50群压力和72小时运行。Signal MS002、Cloudflare生产授权后台未修改。
 - **进度22/32（68.75%），剩余10步，下一步23：历史、审计与安全导出**。
+
+## Step23 — 历史、审计与安全导出（2026-10-16）
+- **开发阶段 done_dev**：SQLite v10 独立派生历史表、来源事件去重、固定审计类别和级别、索引游标分页，保留原始任务与投递回执。
+- Windows“任务历史”入口支持10条分页、异常筛选、脱敏诊断ZIP和保留7/30/90/180/365天或强确认清空历史；纯派生数据清理后留存审计标记，绝不删除任务、原始回执、账号与紧急停止闩锁。
+- 支持ZIP固定3文件、最多200条类型事件、最大256KiB，无群号/账号/任务/投递GUID、消息、数据库、路径。固定名称诊断日志保留接口防误删，独立运维文档 `docs/OPERATIONS.md`。
+- Windows/Linux `tests/History/Program.cs` **各48项断言通过**，真实注入100,000行，100页索引查询、严格导出内容检查、清理原始数据完整性；Linux插入约3231毫秒/100页125毫秒；Windows插入约4436毫秒/100页196毫秒（CI环境仅供基线参考）。
+- 完整 [CI 38971446337](https://github.com/mosen6266-netizen/MS_001/actions/runs/38971446337) **41/41 SUCCESS**；WPF win-x64完整构建发布，历史迁移与既有安全/调度/恢复回归全部通过。
+- 源码提交 [`b2a363a6`](https://github.com/mosen6266-netizen/MS_001/commit/b2a363a6086b33ba77dd27c36f277996667fd445)。设计、测试、验收见 `docs/STEP_23_HISTORY.md`、`docs/STEP_23_TEST_MATRIX.md`、`docs/STEP_23_ACCEPTANCE.md`。
+- **DEFERRED**：Win10/11实机历史/文件对话框、正式TDLib在线任务与官方回执、长时50群性能；目前是离线模拟持久数据。Signal MS002与Cloudflare生产资源未更改。
+- **开发进度23/32（71.875%），剩余9步；下一步24性能剖析与资源防泄漏。**

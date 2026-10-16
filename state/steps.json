@@ -518,9 +518,28 @@
     "step": "23",
     "title": "历史、审计与安全导出",
     "phase": 6,
-    "status": "not_started",
-    "acceptance_evidence": [],
-    "last_commit_sha": null
+    "status": "done_dev",
+    "acceptance_evidence": [
+      "src/Infrastructure/Persistence/Migrations/0010_history_audit.sql",
+      "src/Features/History/HistoryRepository.cs",
+      "src/Features/History/SupportBundleBuilder.cs",
+      "apps/desktop/MainWindow.History.cs",
+      "apps/desktop/MainWindow.xaml",
+      "tests/History/Program.cs",
+      "docs/STEP_23_HISTORY.md",
+      "docs/STEP_23_TEST_MATRIX.md",
+      "docs/OPERATIONS.md",
+      "docs/STEP_23_ACCEPTANCE.md",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/38971446337"
+    ],
+    "last_commit_sha": "b2a363a6086b33ba77dd27c36f277996667fd445",
+    "deferred_release_acceptance": [
+      "HISTORY-REAL-PRODUCTION-AUDIT",
+      "ALERTS-REAL-WINDOWS-TDLIB",
+      "DELIVERY-OFFICIAL-TDLIB-REAL",
+      "RECOVERY-REAL-POWER-NETWORK",
+      "TDLIB-NATIVE-BINARY"
+    ]
   },
   {
     "step": "24",
