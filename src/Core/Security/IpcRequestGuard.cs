@@ -2,12 +2,13 @@ using System.Text.Json;
 
 namespace Mosen.GroupScheduler.Core.Security;
 
-public enum AllowedIpcOperation { SystemPing, AppInfo, SettingsGet, SettingsSave, DiagnosticsGet, AccountsList, AccountsCreate, AccountsEdit, AccountsArchive, AccountsRestore, GroupsList, GroupsTopics, GroupsMembers, ScriptsList, ScriptsGet, ScriptsCreate, ScriptsSave, ScriptsDuplicate, ScriptsArchive, ScriptsRestore }
+public enum AllowedIpcOperation { SystemPing, AppInfo, SettingsGet, SettingsSave, DiagnosticsGet, AccountsList, AccountsCreate, AccountsEdit, AccountsArchive, AccountsRestore, GroupsList, GroupsTopics, GroupsMembers, ScriptsList, ScriptsGet, ScriptsCreate, ScriptsSave, ScriptsDuplicate, ScriptsArchive, ScriptsRestore, MediaImport, MediaPreview }
 
 /// <summary>Fail-closed JSON input gate: exact origin is checked separately by WebView2 host.</summary>
 public static class IpcRequestGuard
 {
-    private const int MaxMessageChars = 524288;
+    private const int MaxMessageChars = 7400000;
+    private const int DraftMessageLimit = 524288;
     private const int StandardMessageLimit = 8192;
     private static readonly HashSet<string> RootReadFields = ["protocol","requestId","type"];
     private static readonly HashSet<string> RootWriteFields = ["protocol","requestId","type","payload"];
@@ -52,9 +53,19 @@ public static class IpcRequestGuard
                 case "scripts.duplicate": operation=AllowedIpcOperation.ScriptsDuplicate; break;
                 case "scripts.archive": operation=AllowedIpcOperation.ScriptsArchive; break;
                 case "scripts.restore": operation=AllowedIpcOperation.ScriptsRestore; break;
+                case "media.import": operation=AllowedIpcOperation.MediaImport; break;
+                case "media.preview": operation=AllowedIpcOperation.MediaPreview; break;
                 default: return false;
             }
-            if(operation != AllowedIpcOperation.ScriptsSave && raw.Length>StandardMessageLimit)return false;
+            if(operation==AllowedIpcOperation.ScriptsSave && raw.Length>DraftMessageLimit)return false;
+            if(operation is not (AllowedIpcOperation.ScriptsSave or AllowedIpcOperation.MediaImport)
+                && raw.Length>StandardMessageLimit)return false;
+            if(operation is AllowedIpcOperation.MediaImport or AllowedIpcOperation.MediaPreview)
+            {
+                if(!ExactFields(root,RootWriteFields) || !root.TryGetProperty("payload",out var body))
+                    return false;
+                return ValidateMediaPayload(operation,body);
+            }
             if(operation is AllowedIpcOperation.ScriptsList or AllowedIpcOperation.ScriptsGet or
                 AllowedIpcOperation.ScriptsCreate or AllowedIpcOperation.ScriptsSave or
                 AllowedIpcOperation.ScriptsDuplicate or AllowedIpcOperation.ScriptsArchive or
@@ -96,6 +107,38 @@ public static class IpcRequestGuard
             return ExactFields(root, RootReadFields); // remaining read operations have no payload
         }
         catch (JsonException) { return false; }
+    }
+
+    private static bool ValidateMediaPayload(AllowedIpcOperation op,JsonElement p)
+    {
+        if(op==AllowedIpcOperation.MediaImport)
+        {
+            if(!ExactFields(p,new HashSet<string>{"fileName","mimeType","base64"}))return false;
+            if(!Label(p,"fileName",128,false))return false;
+            if(p.GetProperty("mimeType").ValueKind!=JsonValueKind.String ||
+               p.GetProperty("mimeType").GetString() is not ("image/png" or "image/jpeg" or "image/webp"))
+                return false;
+            var payload=p.GetProperty("base64");
+            if(payload.ValueKind!=JsonValueKind.String)return false;
+            string? base64=payload.GetString();
+            return base64 is {Length:>=40 and <=6990516} &&
+                base64.All(c=>c is >= 'A' and <= 'Z' or >= 'a' and <= 'z' or >= '0' and <= '9' or '+' or '/' or '=');
+        }
+        if(!ExactFields(p,new HashSet<string>{"reference"}))return false;
+        JsonElement reference=p.GetProperty("reference");
+        if(!ExactFields(reference,new HashSet<string>{"assetId","mimeType","byteLength","width","height","fileName"}))
+            return false;
+        if(reference.GetProperty("assetId").ValueKind!=JsonValueKind.String ||
+           reference.GetProperty("assetId").GetString() is not string hash || hash.Length!=64 ||
+           hash.Any(c=>c is not (>= '0' and <= '9' or >= 'a' and <= 'f')))
+            return false;
+        if(reference.GetProperty("mimeType").ValueKind!=JsonValueKind.String ||
+           reference.GetProperty("mimeType").GetString() is not ("image/png" or "image/jpeg" or "image/webp"))
+            return false;
+        return IntegerValue(reference,"width",1,8192)&&IntegerValue(reference,"height",1,8192)&&
+            Label(reference,"fileName",128,false) &&
+            reference.GetProperty("byteLength").ValueKind==JsonValueKind.Number &&
+            reference.GetProperty("byteLength").TryGetInt64(out long count) && count is >=32 and <=5242880;
     }
 
     private static bool ValidateScriptsPayload(AllowedIpcOperation operation,JsonElement p)
