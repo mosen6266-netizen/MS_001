@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "project": "MOSEN Group Scheduler",
+  "repository": "mosen6266-netizen/MS_001",
+  "default_branch": "main",
+  "plan_version": "PLAN-1.1",
+  "plan_date": "2026-10-16",
+  "current_step": "01",
+  "current_step_status": "in_progress",
+  "phase": 1,
+  "total_steps": 32,
+  "completed_steps": [],
+  "development_started": true,
+  "functional_code_started": false,
+  "production_deployment_authorized": false,
+  "real_telegram_login_or_send_authorized": false,
+  "icon_source_received": true,
+  "icon_asset_upload_verified": false,
+  "exact_timing_contract": "wait preSendDelayMs -> typing typingDurationMs -> send; 30s+5s=35s; no overlap",
+  "last_verified_commit_sha": null,
+  "last_updated": "2026-10-16",
+  "blocking_issues": [
+    "icon 原始文件待二进制资源提交、透明化及商标审核",
+    "步骤 01 仍需需求与测试门槛评审，尚未验收"
+  ],
+  "notes": "步骤01的规划仓库初始化进行中；0/32步完成。不要伪造测试通过或将初始化视为正式发布。"
+}

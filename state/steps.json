@@ -1,0 +1,258 @@
+[
+  {
+    "step": "01",
+    "title": "范围、许可与需求冻结",
+    "phase": 1,
+    "status": "in_progress",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "02",
+    "title": "关键技术原型与风险验证",
+    "phase": 1,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "03",
+    "title": "基础工程与持续集成",
+    "phase": 1,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "04",
+    "title": "数据合同与迁移框架",
+    "phase": 1,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "05",
+    "title": "Windows 容器与导航框架",
+    "phase": 2,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "06",
+    "title": "深色 UI 设计系统",
+    "phase": 2,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "07",
+    "title": "设置、搜索与状态管理",
+    "phase": 2,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "08",
+    "title": "客户端本地安全和诊断基础",
+    "phase": 2,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "09",
+    "title": "TDLib 通信适配层",
+    "phase": 3,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "10",
+    "title": "登录与身份验证状态机",
+    "phase": 3,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "11",
+    "title": "账号注册表及会话生命周期",
+    "phase": 3,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "12",
+    "title": "群组、话题与账号权限目录",
+    "phase": 3,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "13",
+    "title": "可视化剧本编辑器",
+    "phase": 4,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "14",
+    "title": "三段时间与媒体编辑",
+    "phase": 4,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "15",
+    "title": "角色备注移植与剧本格式",
+    "phase": 4,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "16",
+    "title": "发布快照、预览和启动预检",
+    "phase": 4,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "17",
+    "title": "任务状态机与 50 群调度",
+    "phase": 5,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "18",
+    "title": "账号与群发送规则协调",
+    "phase": 5,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "19",
+    "title": "发送回执和去重保护",
+    "phase": 5,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "20",
+    "title": "断网、崩溃与重启恢复",
+    "phase": 5,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "21",
+    "title": "运行中心与实时状态",
+    "phase": 6,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "22",
+    "title": "Windows 提醒与紧急停止",
+    "phase": 6,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "23",
+    "title": "历史、审计与安全导出",
+    "phase": 6,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "24",
+    "title": "性能剖析与资源防泄漏",
+    "phase": 6,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "25",
+    "title": "独立卡密产品授权",
+    "phase": 7,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "26",
+    "title": "云端授权安全性与离线策略",
+    "phase": 7,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "27",
+    "title": "完整 Windows 安装与用户数据独立",
+    "phase": 7,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "28",
+    "title": "签名更新与安全回滚",
+    "phase": 7,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "29",
+    "title": "全功能自动化回归",
+    "phase": 8,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "30",
+    "title": "300 账号/50 群容量和长稳测试",
+    "phase": 8,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "31",
+    "title": "安全审计、数据恢复和发布阻断",
+    "phase": 8,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  },
+  {
+    "step": "32",
+    "title": "文档、安装包与 V1.0 发布签收",
+    "phase": 8,
+    "status": "not_started",
+    "acceptance_evidence": [],
+    "last_commit_sha": null
+  }
+]
