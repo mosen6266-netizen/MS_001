@@ -1,0 +1,43 @@
+:root {
+  color-scheme: dark;
+  --surface-root: #0d1014;
+  --surface-nav: #11151a;
+  --surface-panel: #191f26;
+  --surface-raised: #222a33;
+  --surface-hover: #2b3541;
+  --surface-overlay: #080b10d9;
+  --stroke-subtle: #343e4a;
+  --stroke-strong: #566473;
+  --fg-primary: #f1f5f9;
+  --fg-muted: #b6c3d0;
+  --fg-subtle: #96a8b9;
+  --fg-on-success: #081e13;
+  --fg-on-danger: #2d080d;
+  --action-success: #62d49b;
+  --action-success-hover: #8ce7b6;
+  --action-danger: #ef8991;
+  --action-danger-hover: #f9a5aa;
+  --action-focus: #add2ff;
+  --status-warning: #f5cb83;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --font-body: "Segoe UI", Inter, "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+  --font-size-xs: 12px;
+  --font-size-sm: 13px;
+  --font-size-md: 14px;
+  --font-size-lg: 20px;
+  --line-body: 1.6;
+  --control-height: 40px;
+  --z-toast: 1200;
+  --z-dialog: 1300;
+  --motion-fast: 120ms;
+}
+@media (prefers-reduced-motion: reduce) { :root { --motion-fast: 0ms; } }

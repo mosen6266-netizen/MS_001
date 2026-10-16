@@ -1,0 +1,75 @@
+/* Shared interactive primitives: all application pages must reuse these semantic styles. */
+.ui-button {
+  min-height: var(--control-height);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font: 600 var(--font-size-md)/1.25 var(--font-body);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--motion-fast) ease, border-color var(--motion-fast) ease;
+}
+.ui-button--success { background: var(--action-success); color: var(--fg-on-success); }
+.ui-button--success:hover:enabled { background: var(--action-success-hover); }
+.ui-button--danger { background: var(--action-danger); color: var(--fg-on-danger); }
+.ui-button--danger:hover:enabled { background: var(--action-danger-hover); }
+.ui-button--quiet { background: var(--surface-raised); border-color: var(--stroke-subtle); color: var(--fg-primary); }
+.ui-button--quiet:hover:enabled { background: var(--surface-hover); }
+.ui-button--ghost { background: transparent; color: var(--fg-muted); }
+.ui-button--ghost:hover:enabled { background: var(--surface-hover); }
+.ui-button:disabled { cursor: not-allowed; opacity: .45; }
+.ui-button:focus-visible, .ui-field input:focus-visible, .ui-field select:focus-visible, .ui-field textarea:focus-visible,
+.ui-dialog__close:focus-visible, .ui-toast__close:focus-visible {
+  outline: 2px solid var(--action-focus); outline-offset: 2px;
+}
+.ui-field { display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; }
+.ui-field label { font-weight: 600; color: var(--fg-primary); font-size: var(--font-size-sm); }
+.ui-field input, .ui-field select, .ui-field textarea {
+  width: 100%; min-height: var(--control-height); padding: 9px var(--space-3);
+  font: 400 var(--font-size-md)/var(--line-body) var(--font-body);
+  background: var(--surface-root); color: var(--fg-primary);
+  border: 1px solid var(--stroke-strong); border-radius: var(--radius-sm); outline: none;
+}
+.ui-field textarea { min-height: 96px; resize: vertical; }
+.ui-field input:disabled, .ui-field select:disabled, .ui-field textarea:disabled { opacity: .5; cursor: not-allowed; }
+.ui-field--invalid input, .ui-field--invalid select, .ui-field--invalid textarea { border-color: var(--action-danger); }
+.ui-field__help { color: var(--fg-muted); font-size: var(--font-size-xs); line-height: 1.6; }
+.ui-field__error { color: #ffb3b9; font-size: var(--font-size-xs); line-height: 1.6; }
+.ui-pill {
+  display: inline-flex; align-items: center; padding: 5px 9px;
+  border-radius: 99px; font-size: var(--font-size-xs); font-weight: 600;
+  background: var(--surface-raised); border: 1px solid var(--stroke-subtle); color: var(--fg-muted);
+}
+.ui-pill--success { background: #183626; border-color: #447a57; color: #a1f0c1; }
+.ui-pill--danger { background: #402229; border-color: #9a4754; color: #ffb7c0; }
+.ui-pill--warning { background: #3e321e; border-color: #8a6c38; color: #ffdfa6; }
+.ui-dialog-backdrop { position: fixed; inset: 0; display: grid; place-items: center; background: var(--surface-overlay); z-index: var(--z-dialog); padding: var(--space-5); }
+.ui-dialog {
+  width: min(100%, 460px); max-height: min(90dvh, 680px); overflow: auto;
+  background: var(--surface-panel); border: 1px solid var(--stroke-strong);
+  border-radius: var(--radius-lg); padding: var(--space-6);
+  box-shadow: 0 24px 70px #0008;
+}
+.ui-dialog__heading { font-size: var(--font-size-lg); margin: 0 0 10px; }
+.ui-dialog__description { margin: 0; color: var(--fg-muted); font-size: var(--font-size-md); line-height: 1.75; }
+.ui-dialog__actions { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin-top: var(--space-6); }
+.ui-dialog__actions .ui-button { min-width: 0; white-space: normal; }
+.ui-toast-viewport { position: fixed; right: 18px; bottom: 16px; width: min(380px, calc(100vw - 36px)); z-index: var(--z-toast); pointer-events: none; }
+.ui-toast { pointer-events: auto; display: flex; align-items: start; gap: var(--space-3); padding: var(--space-4);
+  border-radius: var(--radius-md); border: 1px solid var(--stroke-strong); background: var(--surface-raised);
+  box-shadow: 0 12px 45px #0009; font-size: var(--font-size-sm); color: var(--fg-primary); line-height: 1.65; }
+.ui-toast--success { border-color: #5baf7e; }
+.ui-toast--danger { border-color: #ba6973; }
+.ui-toast--warning { border-color: #ae8847; }
+.ui-toast__message { margin: 0; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.ui-toast__close { flex: none; cursor: pointer; background: transparent; border: 0; color: var(--fg-primary); border-radius: 6px; width: 28px; height: 28px; }
+.ui-form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); }
+.ui-action-row { display: flex; gap: var(--space-3); align-items: center; flex-wrap: wrap; }
+.ui-demo-section { display: grid; gap: var(--space-4); padding-top: var(--space-3); }
+.ui-demo-box { padding: var(--space-5); border-radius: var(--radius-lg); border: 1px solid var(--stroke-subtle); background: var(--surface-panel); }
+.ui-demo-box h3 { margin: 0 0 12px; font-size: var(--font-size-md); }
+@media (max-width: 700px) { .ui-form-row { grid-template-columns: minmax(0, 1fr); } .ui-dialog { padding: var(--space-4); } }
