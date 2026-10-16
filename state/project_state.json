@@ -6,7 +6,7 @@
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
   "current_step": "24",
-  "current_step_status": "not_started",
+  "current_step_status": "in_progress",
   "phase": 5,
   "total_steps": 32,
   "completed_steps": [
@@ -47,7 +47,7 @@
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step23 done_dev: SQLite v10 fixed-enum derived history and dedup safe import from local simulator + delivery events; bounded keyset paging 10/20/50 and 100k-row database test, 100 pages scanned; Windows WPF task history and severity filter, support ZIP with 3 allowlisted files and at most 200 sanitized events, typed-confirmation 7/30/90/180/365-day pruning. Retention never deletes source delivery receipts or tasks. Windows/Linux 48 assertions each; full CI 38971446337 41/41 success including Win-x64 publish. Source-only development complete; live TDLib and physical Windows tests deferred. Progress 23/32=71.875%, remaining 9.",
+  "notes": "Step24 source committed: ResourceBudgetMonitor, process counters, hysteresis and adaptive readonly polls, 480-minute bounded trend, LRU cache and SubscriptionRegistry; WPF event handlers unsubscribed on close. tests/Performance advances 28800 logical seconds (8h simulation), NOT actual 8 hours. CI 38972790676 queued; previous first run C# inferred-variable declaration error fixed in commit 1b79762. Step24 remains IN_PROGRESS and progress stays 23/32 until all CI jobs successful. No TDLib live send.",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
@@ -255,5 +255,7 @@
   "step23_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38971446337",
   "step23_history_checks_per_os": 48,
   "step23_total_ci_jobs": 41,
-  "step23_benchmark_rows": 100000
+  "step23_benchmark_rows": 100000,
+  "step24_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38972790676",
+  "step24_source_commit": "1b79762a306a3186d54d36ed0fdf5d7523a616f4"
 }

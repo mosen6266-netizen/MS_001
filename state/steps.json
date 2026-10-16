@@ -545,9 +545,20 @@
     "step": "24",
     "title": "性能剖析与资源防泄漏",
     "phase": 6,
-    "status": "not_started",
-    "acceptance_evidence": [],
-    "last_commit_sha": null
+    "status": "in_progress",
+    "acceptance_evidence": [
+      "src/Core/ResourceBudget/ResourceBudget.cs",
+      "src/Core/ResourceBudget/ResourceTrend.cs",
+      "src/Core/ResourceBudget/BoundedLruCache.cs",
+      "src/Core/ResourceBudget/SubscriptionRegistry.cs",
+      "apps/desktop/MainWindow.ResourceHealth.cs",
+      "apps/desktop/MainWindow.xaml.cs",
+      "apps/ui/src/components/RuntimeDashboardPanel.tsx",
+      "tests/Performance/Program.cs",
+      "docs/PERFORMANCE.md",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/38972790676"
+    ],
+    "last_commit_sha": "1b79762a306a3186d54d36ed0fdf5d7523a616f4"
   },
   {
     "step": "25",
