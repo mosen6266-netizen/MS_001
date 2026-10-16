@@ -27,6 +27,19 @@ Check(!IpcRequestGuard.TryValidate(valid.Replace("}",",\"payload\":{\"hack\":1}}
 Check(!IpcRequestGuard.TryValidate(new string('X',8193),out _),"oversize message denied");
 Check(!IpcRequestGuard.TryValidate("{bad json",out _),"malformed JSON denied");
 
+const string scriptId="11111111-1111-4111-8111-111111111111";
+string scriptList="""{"protocol":"mosen.desktop.v1","requestId":"s-1","type":"scripts.list","payload":{"archived":false,"query":""}}""";
+string scriptSave="""{"protocol":"mosen.desktop.v1","requestId":"s-2","type":"scripts.save","payload":{"id":"11111111-1111-4111-8111-111111111111","expectedRevision":1,"document":{"title":"测试","roles":[],"steps":[]}}}""";
+Check(IpcRequestGuard.TryValidate(scriptList,out operation)&&operation==AllowedIpcOperation.ScriptsList,"script draft list allows only local read");
+Check(IpcRequestGuard.TryValidate(scriptSave,out operation)&&operation==AllowedIpcOperation.ScriptsSave,"portable draft save accepted with bounded shape");
+Check(!IpcRequestGuard.TryValidate(scriptSave.Replace("\"expectedRevision\":1","\"expectedRevision\":0"),out _),"stale revision zero blocked");
+Check(!IpcRequestGuard.TryValidate(scriptSave.Replace("\"title\":\"测试\"","\"title\":\"测试\",\"accountId\":\"PRIVATE\""),out _),"local account identity rejected at draft root");
+Check(!IpcRequestGuard.TryValidate(scriptSave.Replace("\"roles\":[]","\"roles\":[],\"phone\":\"SECRET\""),out _),"secret-bearing unknown document field rejected");
+Check(!IpcRequestGuard.TryValidate(scriptList.Replace("\"scripts.list\"","\"scripts.send\""),out _),"arbitrary Telegram script sending forbidden");
+Check(!IpcRequestGuard.TryValidate(scriptList.Replace("\"query\":\"\"","\"query\":\"\",\"apiHash\":\"SECRET\""),out _),"draft query cannot smuggle credentials");
+Check(!IpcRequestGuard.TryValidate(scriptSave.Replace("\"expectedRevision\":1","\"expectedRevision\":1,\"expectedRevision\":2"),out _),"duplicate draft revision rejected");
+Check(!IpcRequestGuard.TryValidate(new string('X',600000),out _),"unbounded script payload rejected");
+
 string tmp=Path.Combine(Path.GetTempPath(),"ms001-security-"+Guid.NewGuid().ToString("N"));
 Directory.CreateDirectory(tmp);
 try
