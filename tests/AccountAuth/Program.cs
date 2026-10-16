@@ -180,8 +180,9 @@ await using(var dispatcher=new TdlibDispatcher(fakeNative,TimeSpan.FromMilliseco
     Check(codeWire.RootElement.GetProperty("code").GetProperty("@type").GetString()=="emailAddressAuthenticationCode",
         "email code uses official nested type");
     await bridge.CloseAsync(client,CancellationToken.None);
-    Check(fakeNative.CloseCount>=1,"cancel uses TDLib close not logout");
+    Check(fakeNative.CloseCount==1,"cancel sends TDLib close exactly once, not logout");
 }
+Check(fakeNative.CloseCount==1,"shutdown never resends close to a cancelled client");
 Check(fakeNative.IsDisposed,"auth transport disposed on dispatcher shutdown");
 Console.WriteLine("SUMMARY: "+count+" authorization state and wire assertions passed (synthetic only).");
 
