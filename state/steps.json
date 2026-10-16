@@ -141,9 +141,23 @@
     "step": "08",
     "title": "客户端本地安全和诊断基础",
     "phase": 2,
-    "status": "in_progress",
-    "acceptance_evidence": [],
-    "last_commit_sha": null
+    "status": "done_dev",
+    "acceptance_evidence": [
+      "docs/STEP_08_ACCEPTANCE.md",
+      "docs/STEP_08_SECURITY.md",
+      "docs/SECURITY_THREAT_MODEL.md",
+      "src/Core/Security/DpapiProtector.cs",
+      "src/Core/Security/IpcRequestGuard.cs",
+      "src/Core/Telemetry/SafeDiagnostics.cs",
+      "tests/Security/Program.cs",
+      "apps/ui/src/components/DiagnosticsPanel.tsx",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/38930950275"
+    ],
+    "last_commit_sha": "c169bc31c87ebe876cfb54ca2d76d90e37e87d9b",
+    "deferred_release_acceptance": [
+      "SECRET-STORAGE",
+      "WIN10-11-GUI"
+    ]
   },
   {
     "step": "09",

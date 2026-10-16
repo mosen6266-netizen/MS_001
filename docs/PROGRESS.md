@@ -97,3 +97,10 @@
 - 修复过首轮 UI 未使用导入引发 lint 失败、双击跳过后误报保存成功；全部有代码和复测记录。
 - **未实测的真正Windows用户操作、群账号接入及磁盘故障标记DEFERRED**，不会冒充已真实登录/发送。
 - Step07 `done_dev`，Step08待开始；进度 **7/32（21.875%）**，剩余25步。详见 `docs/STEP_07_ACCEPTANCE.md`。
+
+## Step08 — 本地安全与脱敏诊断开发验收（2026-10-16）
+- 完成Windows CurrentUser DPAPI保护原语、WebView2来源+严格IPC JSON白名单、固定结构诊断日志/轮转留存、健康快照、崩溃/初始化事件类别记录与设置页只读诊断。
+- [GitHub Actions CI 38930950275](https://github.com/mosen6266-netizen/MS_001/actions/runs/38930950275) **11个job SUCCESS**；Windows安全26项、Linux安全24项；React24项单测、CSS16项、已有SQLite/设置/窗口回归及Windows桌面编译全部通过。
+- 修复前端诊断IPC白名单遗漏/前期导入组件时序导致CI红灯，并将日志测试改为真正触发滚动的故障校验；逐次复测，没有关闭警告或测试。
+- **安全界限**：尚未接入真实TDLib会话，DPAPI只是可信本地保护原语；Windows10/11多账户/ACL/磁盘故障/崩溃转储与账号/群操作均 DEFERRED。
+- 完整记录 `docs/STEP_08_ACCEPTANCE.md`、`docs/STEP_08_SECURITY.md`、`docs/SECURITY_THREAT_MODEL.md`；**开发Step08 done_dev，Step09待开始；进度8/32=25%，剩余24步**。

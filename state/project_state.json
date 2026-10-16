@@ -5,9 +5,9 @@
   "default_branch": "main",
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
-  "current_step": "08",
-  "current_step_status": "in_progress",
-  "phase": 2,
+  "current_step": "09",
+  "current_step_status": "not_started",
+  "phase": 3,
   "total_steps": 32,
   "completed_steps": [
     "01",
@@ -16,7 +16,8 @@
     "04",
     "05",
     "06",
-    "07"
+    "07",
+    "08"
   ],
   "development_started": true,
   "functional_code_started": true,
@@ -25,13 +26,13 @@
   "icon_source_received": true,
   "icon_asset_upload_verified": true,
   "exact_timing_contract": "wait preSendDelayMs -> typing typingDurationMs -> send; 30s+5s=35s; no overlap",
-  "last_verified_commit_sha": "83231c696543e411560ff2c8c907d9aaa59a71f4",
+  "last_verified_commit_sha": "c169bc31c87ebe876cfb54ca2d76d90e37e87d9b",
   "last_updated": "2026-10-16",
   "blocking_issues": [
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step08 in progress: isolated Win32 DPAPI credential envelope, IPC strict allowlist/payload limits, structured redacted diagnostics, health counters and crash reporting. No real Telegram account actions.",
+  "notes": "Step08 Windows DPAPI CurrentUser+严格IPC+脱敏代码枚举JSONL日志/轮转+健康诊断已通过Github CI 38930950275 11 job，全量回归成功。真实Windows账户/权限/TDLib会话/硬件验收DEFERRED。开发进度8/32=25%。",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
@@ -88,6 +89,11 @@
       "id": "SETTINGS-INTERACTION",
       "status": "DEFERRED",
       "detail": "真实 Windows WebView2 连续搜索、分页滚动、数据库设置保存/权限受限/磁盘故障及高DPI视觉操作统一最终验收"
+    },
+    {
+      "id": "SECRET-STORAGE",
+      "status": "DEFERRED",
+      "detail": "真实Windows10/11用户访问控制、DPAPI跨用户隔离、TDLib会话生命周期/备份加密/故障转储隐私及身份验证安全实测"
     }
   ],
   "step03_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38921641970",
@@ -104,5 +110,9 @@
   "step06_visual_artifact_id": 12057250812,
   "step07_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38927977333",
   "step07_ui_test_count": 22,
-  "step07_settings_tests_per_os": 16
+  "step07_settings_tests_per_os": 16,
+  "step08_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38930950275",
+  "step08_windows_security_assertions": 26,
+  "step08_linux_security_assertions": 24,
+  "step08_ui_tests": 24
 }

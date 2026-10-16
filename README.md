@@ -1,6 +1,6 @@
 # MOSEN Group Scheduler — Telegram 真实账号版（开发规划仓库资料）
 
-> **当前状态：第 07 步（设置、搜索与状态管理）开发/CI 验收完成；第 08 步本地安全与诊断基础待开始。开发已完成 7 / 32（21.875%），实际 Win10/11 与 Telegram 账号/群操作测试按用户要求集中到最终验收；目前尚不是完整可用或已部署的正式版。**
+> **当前状态：第08步（本地安全与脱敏诊断基础）开发/CI验收完成，第09步TDLib通信适配层待开始；开发进度 8 / 32（25%）。真实 Windows / Telegram 账号与群任务测试统一留到最后，尚未交付完整正式版。**
 
 用户要求：独立 Windows 桌面程序，可管理最多 300 条合法授权 Telegram 账号会话，管理 50 个群/话题任务；编辑剧本时按账号备注下拉选择发言人；导出导入支持按角色备注跨设备匹配；缺少备注在“开始运行”时提醒；每条消息有发送前等待、正在输入时间、发送后等待三项独立设置。
 
@@ -42,7 +42,7 @@
 已保存透明 SVG：[`assets/branding/icon.svg`](assets/branding/icon.svg)，依据用户提供图形转换；通过 [`tools/branding/build_icons.py`](tools/branding/build_icons.py) 可生成 Windows 多尺寸 ICO 与 PNG。正式发布需要完成商标合规审查，并避免暗示软件是 Telegram 官方产品。
 
 ## 每一步的可视化进度汇报
-完成某步骤的正式验收后必须向用户显示进度条、已完成步骤数 /32、百分比、剩余步骤、当前/下一步以及测试/commit证据；正在进行而未验收的步骤不计入完成。当前第08步待开始；已通过开发阶段验收的为 **7/32（21.875%）**，真实Windows/Telegram测试仍 DEFERRED。详细要求见 `docs/HANDOFF.md`。
+完成某步骤的正式验收后必须向用户显示进度条、已完成步骤数 /32、百分比、剩余步骤、当前/下一步以及测试/commit证据；正在进行而未验收的步骤不计入完成。当前第09步待开始；已通过开发阶段验收的为 **8/32（25%）**，真实Windows/Telegram测试仍 DEFERRED。详细要求见 `docs/HANDOFF.md`。
 
 ## 最新需求冻结文件
 
@@ -59,3 +59,5 @@
 - [Step06 深色UI设计规范](docs/UI_DESIGN.md) · [开发阶段验收](docs/STEP_06_ACCEPTANCE.md) · [CI测试及截图](https://github.com/mosen6266-netizen/MS_001/actions/runs/38926182509)
 
 - [Step07 设置与搜索规范](docs/STEP_07_SETTINGS.md) · [Step07 开发验收](docs/STEP_07_ACCEPTANCE.md) · [9项CI作业](https://github.com/mosen6266-netizen/MS_001/actions/runs/38927977333)
+
+- [Step08 本地安全设计](docs/STEP_08_SECURITY.md) · [威胁模型](docs/SECURITY_THREAT_MODEL.md) · [开发验收](docs/STEP_08_ACCEPTANCE.md) · [CI安全检查](https://github.com/mosen6266-netizen/MS_001/actions/runs/38930950275)
