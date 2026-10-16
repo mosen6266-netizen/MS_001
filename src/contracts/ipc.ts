@@ -214,7 +214,7 @@ export function isEditorDoc(value:unknown):value is EditorDoc{
     if(!isRecord(r)||Object.keys(r).sort().join(",")!=="roleKey,roleLabel"||
        typeof r.roleKey!=="string"||typeof r.roleLabel!=="string"||
        r.roleLabel.trim().length===0||r.roleLabel.length>64||
-       !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(r.roleKey)||
+       !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(r.roleKey)||
        ids.has(r.roleKey)||labels.has(r.roleLabel.trim().normalize("NFC")))return false;
     ids.add(r.roleKey);labels.add(r.roleLabel.trim().normalize("NFC"));
   }
@@ -224,7 +224,7 @@ export function isEditorDoc(value:unknown):value is EditorDoc{
     if(keys!=="body,postSendDelayMs,preSendDelayMs,roleKey,stepKey,typingDurationMs"&&
        keys!=="body,media,postSendDelayMs,preSendDelayMs,roleKey,stepKey,typingDurationMs")return false;
     if(typeof x.stepKey!=="string"||typeof x.roleKey!=="string"||
-       !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(x.stepKey)||
+       !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(x.stepKey)||
        stepIds.has(x.stepKey)||!ids.has(x.roleKey)||typeof x.body!=="string"||x.body.length>8192||
        !isTimingProfile({preSendDelayMs:x.preSendDelayMs,
           typingDurationMs:x.typingDurationMs,postSendDelayMs:x.postSendDelayMs})||
