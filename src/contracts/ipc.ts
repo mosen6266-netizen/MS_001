@@ -13,7 +13,14 @@ export type MemberRecord={accountId:string;alias:string;status:string;canSendTex
 export type GroupPage={items:GroupRecord[];total:number;page:number;pageSize:number};
 export type TopicPage={items:TopicRecord[];total:number;page:number;pageSize:number};
 export type GroupRequest={protocol:typeof IPC_PROTOCOL;requestId:string;type:GroupAction;payload:Record<string,unknown>};
-export type BridgeRequest = ReadRequest | SettingsSaveRequest | AccountRequest | GroupRequest;
+export type ScriptAction="scripts.list"|"scripts.get"|"scripts.create"|"scripts.save"|"scripts.duplicate"|"scripts.archive"|"scripts.restore";
+export type EditorRole={roleKey:string;roleLabel:string};
+export type EditorMessage={stepKey:string;roleKey:string;body:string;preSendDelayMs:number;typingDurationMs:number;postSendDelayMs:number};
+export type EditorDoc={title:string;roles:EditorRole[];steps:EditorMessage[]};
+export type ScriptSnapshot={scriptId:string;revision:number;document:EditorDoc;archived:boolean};
+export type ScriptSummary={scriptId:string;title:string;revision:number;stepCount:number;archived:boolean};
+export type ScriptRequest={protocol:typeof IPC_PROTOCOL;requestId:string;type:ScriptAction;payload:Record<string,unknown>};
+export type BridgeRequest = ReadRequest | SettingsSaveRequest | AccountRequest | GroupRequest | ScriptRequest;
 export type BridgeResponse = { protocol: typeof IPC_PROTOCOL; requestId:string; ok:boolean; type:string; payload:Record<string,unknown> };
 export type Density = "compact" | "comfortable";
 export type UserPreferences = {density:Density;searchDebounceMs:number;pageSize:10|20|50;desktopNotifications:boolean};
@@ -36,6 +43,27 @@ export function isBridgeRequest(v:unknown):v is BridgeRequest {
   if(v.type==="settings.save"){
     if(Object.keys(v).length!==4||!isRecord(v.payload)||Object.keys(v.payload).length!==2)return false;
     return Number.isSafeInteger(v.payload.expectedRevision) && (v.payload.expectedRevision as number)>=0 && isPreferences(v.payload.preferences);
+  }
+  if(typeof v.type==="string" && v.type.startsWith("scripts.")){
+    const schema:Record<ScriptAction,readonly string[]>={
+      "scripts.list":["query","archived"],"scripts.get":["id"],
+      "scripts.create":["title"],"scripts.save":["id","expectedRevision","document"],
+      "scripts.duplicate":["id"],"scripts.archive":["id","expectedRevision","confirmation"],
+      "scripts.restore":["id","expectedRevision"]
+    };
+    if(!(v.type in schema)||!isRecord(v.payload)||Object.keys(v).length!==4)return false;
+    const action=v.type as ScriptAction;
+    if(Object.keys(v.payload).sort().join(",")!==[...schema[action]].sort().join(","))return false;
+    const p=v.payload;
+    if(action==="scripts.list")return typeof p.query==="string"&&p.query.length<=128&&typeof p.archived==="boolean";
+    if(action==="scripts.create")return typeof p.title==="string"&&p.title.trim().length>0&&p.title.length<=128;
+    if(typeof p.id!=="string"||!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(p.id))return false;
+    if(action==="scripts.save"||action==="scripts.archive"||action==="scripts.restore"){
+      if(!Number.isSafeInteger(p.expectedRevision)||Number(p.expectedRevision)<1)return false;
+    }
+    if(action==="scripts.archive")return p.confirmation==="归档剧本";
+    if(action==="scripts.save")return isEditorDoc(p.document);
+    return true;
   }
   const schemas:Record<AccountAction,readonly string[]>={
     "accounts.list":["query","group","page","pageSize","archived"],
@@ -141,4 +169,45 @@ export function isMemberList(v:unknown):v is MemberRecord[] {
     typeof x.alias==="string"&&typeof x.status==="string"&&typeof x.canSendText==="boolean"&&
     typeof x.canSendPhotos==="boolean"&&Number.isSafeInteger(x.slowModeDelaySeconds)&&
     typeof x.checkedUtc==="string");
+}
+
+export function isEditorDoc(value:unknown):value is EditorDoc{
+  if(!isRecord(value)||Object.keys(value).sort().join(",")!=="roles,steps,title"||
+     typeof value.title!=="string"||!value.title.trim()||value.title.length>128||
+     !Array.isArray(value.roles)||value.roles.length>300||
+     !Array.isArray(value.steps)||value.steps.length>1000)return false;
+  const ids=new Set<string>(),labels=new Set<string>(),stepIds=new Set<string>();
+  for(const r of value.roles){
+    if(!isRecord(r)||Object.keys(r).sort().join(",")!=="roleKey,roleLabel"||
+       typeof r.roleKey!=="string"||typeof r.roleLabel!=="string"||
+       r.roleLabel.trim().length===0||r.roleLabel.length>64||
+       !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(r.roleKey)||
+       ids.has(r.roleKey)||labels.has(r.roleLabel.trim().normalize("NFC")))return false;
+    ids.add(r.roleKey);labels.add(r.roleLabel.trim().normalize("NFC"));
+  }
+  for(const x of value.steps){
+    if(!isRecord(x)||Object.keys(x).sort().join(",")!=="body,postSendDelayMs,preSendDelayMs,roleKey,stepKey,typingDurationMs"||
+       typeof x.stepKey!=="string"||typeof x.roleKey!=="string"||
+       !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(x.stepKey)||
+       stepIds.has(x.stepKey)||!ids.has(x.roleKey)||typeof x.body!=="string"||x.body.length>8192||
+       !Number.isSafeInteger(x.preSendDelayMs)||Number(x.preSendDelayMs)<0||Number(x.preSendDelayMs)>3600000||
+       !Number.isSafeInteger(x.typingDurationMs)||Number(x.typingDurationMs)<0||Number(x.typingDurationMs)>60000||
+       !Number.isSafeInteger(x.postSendDelayMs)||Number(x.postSendDelayMs)<0||Number(x.postSendDelayMs)>3600000)return false;
+    stepIds.add(x.stepKey);
+  }
+  return true;
+}
+export function makeScriptRequest(type:ScriptAction,requestId:string,payload:Record<string,unknown>):ScriptRequest{
+  const req={protocol:IPC_PROTOCOL,requestId,type,payload};
+  if(!isBridgeRequest(req))throw new Error("Invalid script request");
+  return req;
+}
+export function isScriptSnapshot(v:unknown):v is ScriptSnapshot{
+  return isRecord(v)&&typeof v.scriptId==="string"&&Number.isSafeInteger(v.revision)&&Number(v.revision)>0&&
+    typeof v.archived==="boolean"&&isEditorDoc(v.document);
+}
+export function isScriptSummaries(v:unknown):v is ScriptSummary[]{
+  return Array.isArray(v)&&v.length<=300&&v.every(x=>isRecord(x)&&typeof x.scriptId==="string"&&
+    typeof x.title==="string"&&Number.isSafeInteger(x.revision)&&
+    Number.isSafeInteger(x.stepCount)&&typeof x.archived==="boolean");
 }
