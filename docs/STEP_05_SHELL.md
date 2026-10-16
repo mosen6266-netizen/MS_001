@@ -1,6 +1,6 @@
 # Step 05 — Windows 容器与固定导航
 
-**计划步骤：** 05/32 | **阶段：** 2/8 | **结果：** DEV_IMPLEMENTED，等待 CI 复核；真实 Windows 交互测试 DEFERRED。
+**计划步骤：** 05/32 | **阶段：** 2/8 | **结果：** DEV PASS，GitHub CI 全部通过；真实 Windows 交互测试 DEFERRED。
 
 ## 工程内容
 - `src/web/routes.ts` 定义六页白名单与 `ShellState`；导航调用本地 React 状态切换，不更改 URL、不调用 `window.location`，不会触发 WebView2 的整页 Navigate。当前页面内容区域保留独立滚动值。
@@ -21,3 +21,4 @@
 - SSR/状态模型可以证明切换不依赖页面链接，但不能代替浏览器交互、实际窗口 DPI、多屏设备或录屏判断是否出现视觉闪烁。
 - 最终 Windows 10/11 实机要验证加载遮罩、浏览器内视觉闪烁、导航滚动、125/150/200% DPI、断开 WebView2 Runtime、窗口关闭后台释放情况；按用户要求集中于最终验收。
 - 此时没有连接真实账号、没有群组自动发送、没有 Cloudflare 授权部署，旧 Signal MS002 绝不修改。
+\n## 自动化结果\n[CI 38924326676](https://github.com/mosen6266-netizen/MS_001/actions/runs/38924326676)：6个 job success，UI Vitest 8项、Windows/Linux窗口几何各10项、数据库回归与WPF编译通过；最终实机GUI验收仍DEFERRED。\n

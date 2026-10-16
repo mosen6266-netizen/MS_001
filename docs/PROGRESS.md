@@ -77,3 +77,9 @@
 - [CI 38922965210](https://github.com/mosen6266-netizen/MS_001/actions/runs/38922965210) **SUCCESS**：Linux/Windows各27项测试、UI lint/test/build与Windows WPF构建发布均成功。
 - **真实物理断电/本机安装、会话数据库加密和Windows10/11硬件行为仍DEFERRED**，模拟测试不代替真实环境。
 - 第04步状态 `done_dev`，下一步 `05 not_started`，进度 **4/32 = 12.5%**（剩余28步）。详细证据见 `docs/STEP_04_ACCEPTANCE.md`。
+
+## Step05 — Windows 主窗口容器与导航框架（2026-10-16）
+- 完成单文档状态路由、6个主导航页、Alt+1–6快捷键，固定侧栏/内容独立滚动；导航不触发整页刷新。
+- Windows 主窗体实现启动暗色遮罩、离线资源可信域名导航保护、首次初始化单次执行、关闭WebView2清理与窗口几何原子保存；损坏窗口配置自动纠正。
+- [CI 38924326676](https://github.com/mosen6266-netizen/MS_001/actions/runs/38924326676) **SUCCESS**；前端8项测试通过，几何Windows/Linux各10项，原数据库回归及Windows编译通过。对“无视觉闪烁”的结论只限设计与SSR，真机视觉测试留到用户统一验收。
+- **状态 done_dev，下一步06待开始，开发进度 5/32 = 15.625%，剩余27步**；真实运行、DPI与多屏切换仍DEFERRED。

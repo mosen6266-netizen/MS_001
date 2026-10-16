@@ -77,9 +77,21 @@
     "step": "05",
     "title": "Windows 容器与导航框架",
     "phase": 2,
-    "status": "in_progress",
-    "acceptance_evidence": [],
-    "last_commit_sha": null
+    "status": "done_dev",
+    "acceptance_evidence": [
+      "docs/STEP_05_ACCEPTANCE.md",
+      "docs/STEP_05_SHELL.md",
+      "src/web/routes.ts",
+      "apps/ui/src/routes.test.ts",
+      "src/Core/Shell/WindowPlacementPolicy.cs",
+      "tests/UI/Shell/Program.cs",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/38924326676"
+    ],
+    "last_commit_sha": "9249f6b01a8b443c448f1211fa7fb61ca32de392",
+    "deferred_release_acceptance": [
+      "SHELL-UX",
+      "WIN10-11-GUI"
+    ]
   },
   {
     "step": "06",
