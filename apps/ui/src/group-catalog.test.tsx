@@ -21,7 +21,7 @@ describe("trusted group directory read contract",()=>{
   it("labels empty state as disconnected rather than simulated online groups",()=>{
     const html=renderToStaticMarkup(<GroupCatalogPanel preferences={DEFAULT_PREFERENCES}/>);
     expect(html).toContain("真实群组同步尚未接入");
-    expect(html).toContain("尚无来自已验证 Telegram");
+    expect(html).toContain("正在读取群组");
     expect(html).not.toContain("群组消息已发送");
   });
 });
