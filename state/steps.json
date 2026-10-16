@@ -573,7 +573,7 @@
     "step": "25",
     "title": "独立卡密产品授权",
     "phase": 7,
-    "status": "in_progress",
+    "status": "done_dev",
     "acceptance_evidence": [
       "license/src/worker.mjs",
       "license/migrations/0001_license.sql",
@@ -584,9 +584,17 @@
       "src/Core/Licensing/InstallationDeviceId.cs",
       "tests/Licensing/Program.cs",
       "docs/STEP_25_LICENSING.md",
-      "https://github.com/mosen6266-netizen/MS_001/actions/runs/38974642970"
+      "docs/STEP_25_TEST_MATRIX.md",
+      "docs/STEP_25_ACCEPTANCE.md",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/38974949818"
     ],
-    "last_commit_sha": "f394b334054881b171abb2c54c872b28c0b01c06"
+    "last_commit_sha": "2f72fd45a07fdcbf915472072f7af2b45604b0f3",
+    "deferred_release_acceptance": [
+      "LICENSE-CLOUDFLARE-STAGING-LIVE",
+      "LICENSE-WPF-REAL-GATE",
+      "TDLIB-NATIVE-BINARY",
+      "AUTH-REAL-ACCOUNT"
+    ]
   },
   {
     "step": "26",

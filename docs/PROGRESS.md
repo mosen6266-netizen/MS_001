@@ -248,7 +248,13 @@
 - **DEFERRED**：实际Win10/11八小时50群真实账号负载、真实TDLib，WebView2子进程内存和GPU句柄、72小时稳定性、杀软/休眠与唤醒实测；目前仅开发模拟。没有修改Signal MS002或现有生产授权系统。
 - **开发进度24/32（75%），剩余8步；下一步25独立卡密产品授权**，必须与Signal MS002生产卡密完全隔离。
 
-## Step25 — 独立Telegram产品卡密授权（开发与CI验收中）
-- 已提交全新Worker/D1、卡密HMAC摘要、设备绑定及续费幂等、管理员禁用、ECDSA签名离线窗口及跨平台测试。当前完整CI [38974642970](https://github.com/mosen6266-netizen/MS_001/actions/runs/38974642970) 未完成，不将源码提交当作测试通过。
-- 云端资源**未部署**，不指向MS002生产Worker、D1、卡密或Cloudflare Secrets。正式环境ID、公钥/私钥配置及Windows激活UI仍等待后续安全交付。
-- **保持24/32（75%）开发验收进度，当前第25步in_progress**，待成功CI再进入第26步。
+## Step25 — Telegram独立卡密产品授权（2026-10-17，开发阶段验收）
+
+- **开发阶段 done_dev**：`license/src/worker.mjs` 与专用 `license/migrations/0001_license.sql` 提供 Telegram-only 产品标识 `MOSEN_TELEGRAM_SCHEDULER`、随机128位TG卡密、服务端HMAC-SHA256摘要、卡密首次激活后起算、1–5台独立设备绑定上限、到期、禁用/启用和有幂等操作ID的续费叠加。
+- 云端签名ECDSA P-256，固定字段载荷绑定产品、匿名安装设备、到期、签发时刻、最长1小时离线有效期和每次请求随机nonce。`src/Core/Licensing` 增加只接受HTTPS的签名许可客户端：不接受不同产品ID、错误设备、过期、篡改、超时、未知公钥或重放，线上拒绝后撤销本进程缓存离线许可。设备指纹由本机随机32字节安装种子产生，不使用账号手机号或实际硬件序列号。
+- **隔离边界严格遵守**：Worker配置固定新名称 `ms001-telegram-license-staging`，新D1配置采用未填写占位符，`workers_dev=false`，绝不包含Signal/MS002生产库ID、Secrets或卡密。**本步仅本地隔离D1真实SQLite模拟测试，未在Cloudflare部署任何Worker或创建D1**，不能将开发通过误说成公网激活服务已上线。
+- 测试 `license/tests/license.test.mjs` 在Node24 Windows/Linux各 **4组端到端模拟用例通过**，覆盖15台同时抢2名额、重复/并发续费只累计一次、跨数据库/签名密钥的产品隔离、禁用到期、非法请求和密钥缺失时拒绝。 `tests/Licensing/Program.cs` Windows/Linux各 **39项断言通过**，涵盖实际P256签名、防重放、禁用、1小时离线与稳定匿名设备身份。
+- 首轮Node24加密API属性只读与.NET毫秒精度断言测试差异已修复；第二轮确实发现“续费秒数未转换成毫秒”的业务错误，已修复为时间戳增加`duration_seconds*1000`，且在后续隔离并发测试复核通过。最终 [CI 38974949818](https://github.com/mosen6266-netizen/MS_001/actions/runs/38974949818) **47/47 SUCCESS**，含Windows WPF发布及既有43项安全/调度/历史/性能回归。
+- 源码初版 [`f394b334`](https://github.com/mosen6266-netizen/MS_001/commit/f394b334054881b171abb2c54c872b28c0b01c06)；最终续费修正 [`2f72fd45`](https://github.com/mosen6266-netizen/MS_001/commit/2f72fd45a07fdcbf915472072f7af2b45604b0f3)；文档见 `docs/STEP_25_LICENSING.md`、`docs/STEP_25_TEST_MATRIX.md`、`docs/STEP_25_ACCEPTANCE.md`。
+- **DEFERRED**：独立Cloudflare staging真实创建和部署、Signing Secrets与公钥绑定、WPF卡密激活界面、管理员TOTP/恢复/CSRF/限流、正式TDLib发送前许可核验与Win10/11真人交互，这些在第26步及正式集成/最终验收继续。没有更改Signal MS002。
+- **开发进度25/32（78.125%），剩余7步；下一步26 云端授权安全性与离线策略。**
