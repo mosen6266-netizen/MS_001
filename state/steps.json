@@ -261,9 +261,28 @@
     "step": "13",
     "title": "可视化剧本编辑器",
     "phase": 4,
-    "status": "in_progress",
-    "acceptance_evidence": [],
-    "last_commit_sha": null
+    "status": "done_dev",
+    "acceptance_evidence": [
+      "docs/STEP_13_SCRIPT_EDITOR.md",
+      "docs/STEP_13_TEST_MATRIX.md",
+      "docs/STEP_13_ACCEPTANCE.md",
+      "src/Infrastructure/Persistence/Migrations/0005_script_editor.sql",
+      "src/Features/Scripts/Editor/EditorDocument.cs",
+      "src/Features/Scripts/Editor/EditorDraftRepository.cs",
+      "tests/Scripts/Editor/Program.cs",
+      "apps/desktop/MainWindow.Scripts.cs",
+      "apps/ui/src/components/ScriptEditorPanel.tsx",
+      "apps/ui/src/script-editor/state.ts",
+      "apps/ui/src/script-editor/state.test.ts",
+      "apps/ui/src/script-editor/script-editor.test.tsx",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/38946517290"
+    ],
+    "last_commit_sha": "57b5fbd19d80b7d88f8fb8c1577206e09da378ee",
+    "deferred_release_acceptance": [
+      "EDITOR-WINDOWS-INTERACTION",
+      "TDLIB-NATIVE-BINARY",
+      "AUTH-REAL-ACCOUNT"
+    ]
   },
   {
     "step": "14",

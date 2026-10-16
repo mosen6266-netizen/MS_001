@@ -27,3 +27,6 @@
 - 与Signal MS002完全隔离。正式账号同步与TDLib DLL未构建/接入，无真实Telegram发送。禁止使用多账号轮换规避平台反滥用、权限及限流。
 
 下一步：**Step14 三段时间与媒体编辑**。不要在没有验证后直接修改state步骤状态；以最新Actions全绿为准。
+
+## CI阶段验收归档
+[GitHub Actions 38946517290](https://github.com/mosen6266-netizen/MS_001/actions/runs/38946517290) **21个job全绿**；Windows/Linux脚本草稿持久化各24项，前端40/40，Windows安全35/35，Linux33/33，历史SQLite/安全/TDLib模拟/Window与WPF构建回归通过。详细边界见 [第13步验收报告](STEP_13_ACCEPTANCE.md)。官方账号/完整编辑器真机交互均尚未验收。

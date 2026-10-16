@@ -134,3 +134,11 @@
 - [GitHub Actions 38942859853](https://github.com/mosen6266-netizen/MS_001/actions/runs/38942859853) **19/19 SUCCESS**；Windows/Linux各47个GroupCatalog模拟断言、UI32/32、CSS16/16，数据库迁移/备份、安全/账号生命周期与Windows编译发布回归全部通过。
 - 解决初次C#测试语法、前端TopicPage状态类型、SSR初始加载测试不匹配并加入成员ID安全边界，最终全量CI全绿。
 - `docs/STEP_12_ACCEPTANCE.md` 为详尽验收；真实TDLib DLL、账号登录、官方群/话题同步、实时权限刷新/50群实操仍**DEFERRED**。**Step12 done_dev；下一步Step13可视化剧本编辑器；开发进度12/32=37.5%，剩余20步。**
+
+## Step13 — 可视化剧本编辑器（2026-10-16）
+- v5 SQLite独立草稿表、版本CAS、保存/复制/确认归档/恢复；角色保存`roleKey/roleLabel`，不保存手机号/本机账号ID/API哈希/会话；中文英文emoji换行及草稿备份，目录元信息按需读取。
+- 中文可视剧本编辑页：从已登记的备注下拉选发言角色、消息卡片/多选/复制/拖拽/上下移动/撤销重做/搜索/分页，0.7秒自动保存和手动保存，切换剧本前flush，当前文字输入不重算整份大型剧本。
+- [完整CI 38946517290](https://github.com/mosen6266-netizen/MS_001/actions/runs/38946517290) **21/21 SUCCESS**：Windows/Linux各24项脚本草稿测试、UI40/40、安全Windows35/35及Linux33/33、WPF编译发布/SQLite迁移/账号和TDLib合成回归全绿。
+- 修复SSR双侧栏、类型/编译和首屏异步测试不一致、无用C#变量和快捷键作用范围；全部复测。**UI页面未做Win10/11实机拖拽E2E或真正Telegram授权发送，DEFERRED。**
+- 三段时间编辑及素材是Step14、便携导入导出是Step15、发布预检是Step16；但时间语义仍维持`pre30s + typing5s => 35s后发送`。验收记录`docs/STEP_13_ACCEPTANCE.md`。
+- Step13 `done_dev`，下一步14，开发进度 **13/32（40.625%）**，剩余19步。
