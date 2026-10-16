@@ -6,7 +6,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../../Core/Data/Mosen.GroupScheduler.Core.Data.csproj"/>
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.0"/>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.13"/>
     <EmbeddedResource Include="Migrations/*.sql" />
   </ItemGroup>
 </Project>
