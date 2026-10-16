@@ -31,6 +31,8 @@ public partial class MainWindow
     private Window? _alertWindow;
     private Window? _historyWindow;
     private bool _refreshingAlerts;
+    private DateTimeOffset _lastVisualAlertUtc=DateTimeOffset.MinValue;
+    private string _visibleAlertKey=string.Empty;
 
     private static readonly Brush AccentGreen=new SolidColorBrush(Color.FromRgb(52,143,99));
     private static readonly Brush AccentRed=new SolidColorBrush(Color.FromRgb(177,62,57));
@@ -103,6 +105,9 @@ public partial class MainWindow
         var result=_alerts.Publish(category,key,now);
         if(result.IsNew)_= _alertStore.Save(_alerts.Snapshot(500));
         if(!result.ShouldPop||_closing)return;
+        // Distinct faults still enter history, but one burst must not queue dozens of tray balloons.
+        if(now-_lastVisualAlertUtc<TimeSpan.FromSeconds(20))return;
+        _lastVisualAlertUtc=now;
         var safeText=NotificationCenter.Describe(category);
         if(_tray is not null)
         {
@@ -115,6 +120,7 @@ public partial class MainWindow
     }
     private void ShowSingleTopmostAlert(string message,string alertKey)
     {
+        _visibleAlertKey=alertKey;
         if(_alertWindow is not null)
         {
             if(_alertWindow.Content is StackPanel stack&&stack.Children.OfType<TextBlock>().FirstOrDefault() is { } label)
@@ -126,8 +132,7 @@ public partial class MainWindow
             Title="MOSEN · 任务异常提醒",Width=430,Height=200,
             MinWidth=390,WindowStartupLocation=WindowStartupLocation.CenterScreen,
             ResizeMode=ResizeMode.NoResize,Topmost=true,
-            ShowInTaskbar=false,Background=DarkPanel,Foreground=Brushes.White,
-            Owner=this
+            ShowInTaskbar=true,Background=DarkPanel,Foreground=Brushes.White
         };
         var layout=new StackPanel {Margin=new Thickness(22)};
         layout.Children.Add(new TextBlock{Text=message,FontSize=15,FontWeight=FontWeights.SemiBold,
@@ -136,7 +141,7 @@ public partial class MainWindow
         var history=MakeButton("查看历史",DarkPanel);
         history.Click+=(_,_)=>OpenAlertHistory();
         var acknowledge=MakeButton("知道了",AccentGreen);
-        acknowledge.Click+=(_,_)=>{_alerts.Acknowledge(alertKey);_=_alertStore.Save(_alerts.Snapshot(500));dialog.Close();};
+        acknowledge.Click+=(_,_)=>{_alerts.Acknowledge(_visibleAlertKey);_=_alertStore.Save(_alerts.Snapshot(500));dialog.Close();};
         buttons.Children.Add(history);buttons.Children.Add(acknowledge);
         layout.Children.Add(buttons);dialog.Content=layout;
         dialog.Closed+=(_,_)=>{if(ReferenceEquals(_alertWindow,dialog))_alertWindow=null;};
