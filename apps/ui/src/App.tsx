@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { DesignShowcase } from "./components/DesignShowcase";
 import { isBridgeResponse, makeRequest } from "../../../src/contracts/ipc";
 import { initialShellState, SHELL_ROUTES, shortcutRoute, transitionShellRoute, type ShellRoute } from "../../../src/web/routes";
 declare global {
@@ -70,9 +71,10 @@ export function App() {
           <div className="overview-grid">
             <article className="summary-tile"><h2>已授权账号</h2><strong>尚未接入</strong><p>真实 Telegram 登录将在后续阶段实现</p></article>
             <article className="summary-tile"><h2>运行任务</h2><strong>0</strong><p>目前不执行群消息发送</p></article>
-            <article className="summary-tile"><h2>工程状态</h2><strong>STEP 05</strong><p>Windows 容器与稳定导航框架</p></article>
-            <article className="notice-tile"><h2 id="panel-title">当前开发范围</h2><p>正在完善固定导航、窗口布局和页面切换机制。业务功能尚未实现，不能实际运行。</p></article>
+            <article className="summary-tile"><h2>工程状态</h2><strong>STEP 06</strong><p>深色设计系统与标准交互组件</p></article>
+            <article className="notice-tile"><h2 id="panel-title">当前开发范围</h2><p>正在统一暗色主题、输入框、弹窗和提示样式。后续功能模块还未接入；当前不执行实际发送。</p></article>
           </div> :
+          shell.active === "settings" ? <DesignShowcase /> :
           <div className="blank-panel">
             <h2 id="panel-title">{active.label}</h2>
             <p>{active.description}</p>
