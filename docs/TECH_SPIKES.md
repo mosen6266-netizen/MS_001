@@ -46,3 +46,8 @@ Current Linux container cannot host WPF UI or perform Windows native TDLib login
 - [ ] Native per-session CPU/RAM/handle/disk baseline under actual Windows
 
 **Result: STEP 02 NOT COMPLETE.** Scope should remain 1/32 verified until these exit gates have evidence.
+## Windows x64 portable smoke artifact (CI)
+- CI run [38919854974](https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974) completed with **SUCCESS** (Ubuntu simulated test + Windows WPF build + portable self-contained publish).
+- Produced artifact `MS001-Step02-Windows-x64-Smoke` (GitHub Actions artifact id `12053528530`, approx 65,476,097 bytes), checked available and not expired on 2026-10-16.
+- The portable artifact contains **no supplied Telegram session or TDLib native DLL**; it is for GUI/WebView2 runtime diagnosis only and does not run Telegram login. Download is optional; follow `spikes/step02/WINDOWS_TEST_GUIDE.md` for safe Windows launch.
+- **Step02 remains blocked** until actual Win10/11 GUI, native ABI with TDLib DLL, one authorized login/restart, and native resource measurements are independently verified.

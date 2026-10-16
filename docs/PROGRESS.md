@@ -52,3 +52,8 @@
 - 最初 CI 失败 `https://github.com/mosen6266-netizen/MS_001/actions/runs/38919305431`；修复 DllImport UTF-8 参数声明后通过；记录了失败原因，不把初版失败隐藏。
 - **状态 blocked（Step02未验收）**：尚缺 Windows 10/11 可交互实机验证、TDLib原生DLL加载、本人授权账号的单次登录/重启恢复、实际CPU/RAM/句柄数据。不能以云端编译或模拟300个对象替代。
 - **进度维持：1/32（3.125%），剩余31步**；明确需要本人的Windows测试环境和对自有测试账号的安全授权，云端GitHub不保存任何凭据。
+
+### Windows 测试包已生成（2026-10-16）
+- GitHub Windows CI 成功打包可独立运行的测试程序，`MS001-Step02-Windows-x64-Smoke`，在 [CI run 38919854974](https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974) 的 Artifacts 区域可获取；GitHub Artifact ID `12053528530`，已核实存在。
+- 注意：尚无人实际在 Win10/11 客户端启动该程序，且此包不包含任何 Telegram 登录、群消息发送功能。
+- 在取得本机测试证据前进度不前进：`1/32`（3.125%），Step02 blocked。

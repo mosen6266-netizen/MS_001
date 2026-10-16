@@ -27,7 +27,10 @@
     "Step02需采集实际TDLib native host 的 CPU/RAM/句柄/磁盘使用报告，模拟数字不替代真实性能",
     "软件品牌与图标合规审查仍为发布前门禁；仓库Public不得存放敏感数据"
   ],
-  "notes": "Step02 技术原型源码、GitHub Actions Windows 编译与 Python 300/50 模拟队列测试完成；未完成Win10/Win11真实运行、native TDLib DLL、本人授权单账号登录/重启与性能基线。故暂时阻断验收，已完成仍为1/32。",
+  "notes": "Step02 CI模拟队列与WPF Windows编译及自包含测试包构建通过，artifact已核实；真实Win10/11 GUI启动、TDLib native DLL加载、自有账号授权与重启验证以及资源监测未完成。仍为blocked：1/32。",
   "icon_asset_path": "assets/branding/icon.svg",
-  "icon_conversion_builder_path": "tools/branding/build_icons.py"
+  "icon_conversion_builder_path": "tools/branding/build_icons.py",
+  "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
+  "step02_smoke_artifact_name": "MS001-Step02-Windows-x64-Smoke",
+  "step02_smoke_artifact_verified": true
 }
