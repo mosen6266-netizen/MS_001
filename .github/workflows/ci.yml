@@ -192,3 +192,17 @@ jobs:
           dotnet-version: "10.0.x"
       - name: Exercise QR, code, 2FA, email, cancellation and typed TDLib requests
         run: dotnet run --project tests/AccountAuth/Mosen.GroupScheduler.AccountAuth.Tests.csproj --configuration Release
+  session-lifecycle:
+    name: Account registry, DPAPI vault and connection budget - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: Test 300 account records, backup, independent keys and fake lifecycle
+        run: dotnet run --project tests/SessionLifecycle/Mosen.GroupScheduler.SessionLifecycle.Tests.csproj --configuration Release
