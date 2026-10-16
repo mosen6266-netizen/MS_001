@@ -17,7 +17,7 @@
     "step": "02",
     "title": "关键技术原型与风险验证",
     "phase": 1,
-    "status": "blocked",
+    "status": "done_dev",
     "acceptance_evidence": [
       "docs/TECH_SPIKES.md",
       "docs/RISK_REGISTER.md",
@@ -26,13 +26,19 @@
       ".github/workflows/step02-tech-spike.yml",
       "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919353228"
     ],
-    "last_commit_sha": "7ec32cb9c63c8e334a10d633d84e863203228103"
+    "last_commit_sha": "7ec32cb9c63c8e334a10d633d84e863203228103",
+    "deferred_release_acceptance": [
+      "WIN10-11-GUI",
+      "TDLIB-NATIVE",
+      "OWNED-ACCOUNT",
+      "NATIVE-RESOURCE"
+    ]
   },
   {
     "step": "03",
     "title": "基础工程与持续集成",
     "phase": 1,
-    "status": "not_started",
+    "status": "in_progress",
     "acceptance_evidence": [],
     "last_commit_sha": null
   },

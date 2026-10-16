@@ -57,3 +57,9 @@
 - GitHub Windows CI 成功打包可独立运行的测试程序，`MS001-Step02-Windows-x64-Smoke`，在 [CI run 38919854974](https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974) 的 Artifacts 区域可获取；GitHub Artifact ID `12053528530`，已核实存在。
 - 注意：尚无人实际在 Win10/11 客户端启动该程序，且此包不包含任何 Telegram 登录、群消息发送功能。
 - 在取得本机测试证据前进度不前进：`1/32`（3.125%），Step02 blocked。
+
+## 2026-10-16 — 用户要求实机测试延后，转入第03步
+- 用户明确表示不需要中途本机测试；待全部正式版开发完成后自己安装统一测试。
+- Step02 云端 Windows 构建（Actions 38919353228 / 38919854974）、打包和 Python 300/50 模拟均通过，技术风险及限制已记录。
+- Step02 标记 `done_dev`（**仅开发/CI结束**），Win10/11 GUI启动、tdjson native加载、真实单账号登录/重启及性能指标转移到最终统一验收，状态 `DEFERRED`，不是 PASS。
+- Step03 基础工程与持续集成开始，进度 **2/32 = 6.25%**，剩余30步；仅统计开发完成比例。

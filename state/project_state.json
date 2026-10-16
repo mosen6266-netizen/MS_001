@@ -5,12 +5,13 @@
   "default_branch": "main",
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
-  "current_step": "02",
-  "current_step_status": "blocked",
+  "current_step": "03",
+  "current_step_status": "in_progress",
   "phase": 1,
   "total_steps": 32,
   "completed_steps": [
-    "01"
+    "01",
+    "02"
   ],
   "development_started": true,
   "functional_code_started": false,
@@ -22,15 +23,46 @@
   "last_verified_commit_sha": "7ec32cb9c63c8e334a10d633d84e863203228103",
   "last_updated": "2026-10-16",
   "blocking_issues": [
-    "Step02需在真实Windows 10/11 x64机器启动WPF/WebView2原型并记录实际兼容结果",
-    "Step02需经过用户允许的单个自有Telegram测试账号、tdjson.dll和本地安全凭据进行授权及重启恢复验证",
-    "Step02需采集实际TDLib native host 的 CPU/RAM/句柄/磁盘使用报告，模拟数字不替代真实性能",
-    "软件品牌与图标合规审查仍为发布前门禁；仓库Public不得存放敏感数据"
+    "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
+    "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step02 CI模拟队列与WPF Windows编译及自包含测试包构建通过，artifact已核实；真实Win10/11 GUI启动、TDLib native DLL加载、自有账号授权与重启验证以及资源监测未完成。仍为blocked：1/32。",
+  "notes": "Step02 done_dev (CI/模拟通过，实际Win10/11 native登录与性能 DEFERRED). Step03工程搭建中，开发进度2/32。",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
   "step02_smoke_artifact_name": "MS001-Step02-Windows-x64-Smoke",
-  "step02_smoke_artifact_verified": true
+  "step02_smoke_artifact_verified": true,
+  "progress_definition": "32步开发完成率；本机/真人授权的最终发布验收另由 deferred_release_acceptance 汇总，不得与开发完成混淆",
+  "deferred_release_acceptance": [
+    {
+      "id": "WIN10-11-GUI",
+      "status": "DEFERRED",
+      "detail": "Windows10/11本机WPF/WebView2启动兼容/安装"
+    },
+    {
+      "id": "TDLIB-NATIVE",
+      "status": "DEFERRED",
+      "detail": "tdjson.dll真实加载和TDLib异步事件实测"
+    },
+    {
+      "id": "OWNED-ACCOUNT",
+      "status": "DEFERRED",
+      "detail": "本人授权单账号登录/安全退出与重启恢复"
+    },
+    {
+      "id": "NATIVE-RESOURCE",
+      "status": "DEFERRED",
+      "detail": "实际CPU、内存、句柄、磁盘、连接恢复"
+    },
+    {
+      "id": "FULL-CAPACITY",
+      "status": "DEFERRED",
+      "detail": "300会话目录和50独立任务真实条件容量测试"
+    },
+    {
+      "id": "LONG-SOAK",
+      "status": "DEFERRED",
+      "detail": "72小时长期稳定性、Win10/11正式安装与升级回滚"
+    }
+  ]
 }

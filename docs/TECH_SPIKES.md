@@ -51,3 +51,6 @@ Current Linux container cannot host WPF UI or perform Windows native TDLib login
 - Produced artifact `MS001-Step02-Windows-x64-Smoke` (GitHub Actions artifact id `12053528530`, approx 65,476,097 bytes), checked available and not expired on 2026-10-16.
 - The portable artifact contains **no supplied Telegram session or TDLib native DLL**; it is for GUI/WebView2 runtime diagnosis only and does not run Telegram login. Download is optional; follow `spikes/step02/WINDOWS_TEST_GUIDE.md` for safe Windows launch.
 - **Step02 remains blocked** until actual Win10/11 GUI, native ABI with TDLib DLL, one authorized login/restart, and native resource measurements are independently verified.
+
+## 2026-10-16 用户指令：集中最终本机验证
+本步骤的设计/模拟/CI开发部分已通过；原“Step02 NOT COMPLETE”说明指**真实运行验收**，不是阻碍后续工程开发。已记录并延期：Win10/11交互GUI、TDLib native加载、本人授权测试账号登录和重启、实际内存/CPU/句柄。按项目规则状态 `done_dev`，不可写成已真实通过。
