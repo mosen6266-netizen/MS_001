@@ -59,3 +59,17 @@ jobs:
           path: artifacts/desktop/
           retention-days: 7
           if-no-files-found: error
+  migrations:
+    name: SQLite migrations and recovery - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: Run migration/rollback/backup recovery tests
+        run: dotnet run --project tests/Migrations/Mosen.GroupScheduler.Persistence.Tests.csproj --configuration Release
