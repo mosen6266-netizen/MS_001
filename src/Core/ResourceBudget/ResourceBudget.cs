@@ -65,7 +65,8 @@ public sealed class ResourceBudgetMonitor
     }
     private (PressureLevel level,BudgetSignal signal) Classify(ResourceSample s)
     {
-        var warning=new List<BudgetSignal>(),critical=new List<BudgetSignal>();
+        var warning=new List<BudgetSignal>();
+        var critical=new List<BudgetSignal>();
         void Add(bool w,bool c,BudgetSignal signal){if(c)critical.Add(signal);else if(w)warning.Add(signal);}
         Add(s.CpuPercent>=_limits.CpuWarningPercent,s.CpuPercent>=_limits.CpuCriticalPercent,BudgetSignal.Cpu);
         Add(s.WorkingSetMiB>=_limits.WorkingSetWarningMiB,s.WorkingSetMiB>=_limits.WorkingSetCriticalMiB,BudgetSignal.WorkingSet);
