@@ -110,7 +110,7 @@ export async function login(env,request,body,now){
  if(!accepted){await audit(env,"login_denied",false,now);return denied(401);}
  const token=random(),csrf=random();
  const session=await env.LICENSE_DB.prepare(
-  "SELECT epoch FROM admin_auth_state WHERE id=1").first();
+  "SELECT epoch FROM admin_auth_state WHERE id=1").bind().first();
  await env.LICENSE_DB.prepare(`INSERT INTO admin_sessions
   (token_digest,csrf_digest,created_ms,expires_ms,auth_epoch,used_recovery)
   VALUES(?,?,?,?,?,?)`).bind(await digest(token),await digest(csrf),
@@ -154,7 +154,7 @@ export async function logout(env,tokenDigest,now){
 }
 export async function revokeSessions(env,now){
  // Epoch invalidation atomically makes every previous session stale.
- await env.LICENSE_DB.prepare("UPDATE admin_auth_state SET epoch=epoch+1 WHERE id=1").run();
+ await env.LICENSE_DB.prepare("UPDATE admin_auth_state SET epoch=epoch+1 WHERE id=1").bind().run();
  await audit(env,"sessions_revoked",true,now);return respond({ok:true});
 }
 export async function readSecurityAudit(env,body){
