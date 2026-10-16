@@ -26,7 +26,7 @@ export function isBridgeRequest(v:unknown):v is BridgeRequest {
     if(Object.keys(v).length!==4||!isRecord(v.payload)||Object.keys(v.payload).length!==2)return false;
     return Number.isSafeInteger(v.payload.expectedRevision) && (v.payload.expectedRevision as number)>=0 && isPreferences(v.payload.preferences);
   }
-  return (v.type==="system.ping"||v.type==="app.info"||v.type==="settings.get") && Object.keys(v).length===3;
+  return (v.type==="system.ping"||v.type==="app.info"||v.type==="settings.get"||v.type==="diagnostics.get") && Object.keys(v).length===3;
 }
 export function isBridgeResponse(v:unknown):v is BridgeResponse {
   return isRecord(v)&&v.protocol===IPC_PROTOCOL&&typeof v.requestId==="string"&&v.requestId.length>0&&
