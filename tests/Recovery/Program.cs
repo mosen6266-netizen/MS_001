@@ -115,7 +115,7 @@ try
     {
         c.Open();
         using var cmd=c.CreateCommand();
-        cmd.CommandText="UPDATE scheduler_simulation_jobs SET snapshot_json='not json' WHERE run_id=$run;";
+        cmd.CommandText="UPDATE scheduler_simulation_jobs SET snapshot_json='not-json-broken-not-json-broken-not-json-broken-not-json-broken' WHERE run_id=$run;";
         cmd.Parameters.AddWithValue("$run",extraBad.RunId);
         Check(cmd.ExecuteNonQuery()==1,"fault injection damages one checkpoint without deleting row");
         cmd.Parameters.Clear();
@@ -144,7 +144,7 @@ try
         c.Open();using var cmd=c.CreateCommand();
         cmd.CommandText="SELECT snapshot_json FROM scheduler_simulation_jobs WHERE run_id=$run;";
         cmd.Parameters.AddWithValue("$run",extraBad.RunId);
-        Check(string.Equals(cmd.ExecuteScalar() as string,"not json",StringComparison.Ordinal),
+        Check(string.Equals(cmd.ExecuteScalar() as string,"not-json-broken-not-json-broken-not-json-broken-not-json-broken",StringComparison.Ordinal),
             "original damaged scheduler payload preserved for local diagnosis");
         cmd.Parameters.Clear();
         cmd.CommandText="SELECT account_id FROM delivery_attempts WHERE attempt_id=$id;";
