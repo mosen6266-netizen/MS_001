@@ -144,6 +144,13 @@ public partial class MainWindow : Window
                 await HandleSettingsRequestAsync(jsonMessage, request.RequestId, request.Type);
                 return;
             }
+            if (operation is AllowedIpcOperation.AccountsList or AllowedIpcOperation.AccountsCreate or
+                AllowedIpcOperation.AccountsEdit or AllowedIpcOperation.AccountsArchive or
+                AllowedIpcOperation.AccountsRestore)
+            {
+                await HandleAccountRequestAsync(jsonMessage, request.RequestId, request.Type);
+                return;
+            }
             if (operation == AllowedIpcOperation.DiagnosticsGet)
             {
                 SendSettingResponse(request.RequestId,"diagnostics.get.result",true,_safeTelemetry.Snapshot(_appHealth));
