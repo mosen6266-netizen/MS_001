@@ -31,7 +31,7 @@ string tmp=Path.Combine(Path.GetTempPath(),"ms001-security-"+Guid.NewGuid().ToSt
 Directory.CreateDirectory(tmp);
 try
 {
-    var diagnostics=new SafeDiagnostics(tmp);
+    var diagnostics=new SafeDiagnostics(tmp, maxBytes:2048);
     string trap="INPUT-DO-NOT-LOG +12025550123 @testtoken password=topsecret";
     bool everyWrite=true;
     for(int i=0;i<1200;i++) everyWrite&=diagnostics.Record(i%2==0?DiagnosticEvent.SettingsSaved:DiagnosticEvent.SettingsConflict);
@@ -45,8 +45,8 @@ try
     string combined=string.Join("\n",Directory.GetFiles(tmp).Select(File.ReadAllText));
     Check(!combined.Contains(trap) && !combined.Contains("password=") && !combined.Contains("+12025550123"),
         "logs have no sensitive input values, exception messages or phone content");
-    Check(Directory.GetFiles(tmp).Length<=2,"log retention bounded to current+previous");
-    Check(Directory.GetFiles(tmp).Sum(f=>new FileInfo(f).Length)<600*1024,
+    Check(Directory.GetFiles(tmp).Length==2,"file rollover keeps only current+previous");
+    Check(Directory.GetFiles(tmp).Sum(f=>new FileInfo(f).Length)<5*1024,
         "files rotate before unbounded growth");
     Check(combined.Contains("\"code\"")&&combined.Contains("\"category\""),"fixed code-only JSONL schema");
     Check(FailureClassifier.Classify(new IOException(trap))==FailureCategory.FileSystem,"exception safely categorized");

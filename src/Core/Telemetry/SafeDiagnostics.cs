@@ -25,10 +25,12 @@ public sealed class SafeDiagnostics
     private readonly string _log;
     private readonly string _archive;
     private long _events, _warnings, _failures;
-    private const long LimitBytes = 256 * 1024;
+    private readonly long _limitBytes;
 
-    public SafeDiagnostics(string directory)
+    public SafeDiagnostics(string directory, long maxBytes = 256 * 1024)
     {
+        if (maxBytes is < 1024 or > 256 * 1024) throw new ArgumentOutOfRangeException(nameof(maxBytes));
+        _limitBytes = maxBytes;
         _directory = Path.GetFullPath(directory ?? throw new ArgumentNullException(nameof(directory)));
         _log = Path.Combine(_directory,"events.jsonl");
         _archive = Path.Combine(_directory,"events.previous.jsonl");
@@ -62,7 +64,7 @@ public sealed class SafeDiagnostics
                     code=code.ToString(),
                     category=failure.ToString()
                 },Json)+"\n";
-                if (File.Exists(_log) && new FileInfo(_log).Length+Encoding.UTF8.GetByteCount(line)>LimitBytes)
+                if (File.Exists(_log) && new FileInfo(_log).Length+Encoding.UTF8.GetByteCount(line)>_limitBytes)
                     File.Move(_log,_archive,overwrite:true);
                 // One append is bounded and flushed; never logs content from callers.
                 using var file = new FileStream(_log,FileMode.Append,FileAccess.Write,FileShare.Read,4096,FileOptions.WriteThrough);
