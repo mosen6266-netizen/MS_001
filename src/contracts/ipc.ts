@@ -15,12 +15,16 @@ export type TopicPage={items:TopicRecord[];total:number;page:number;pageSize:num
 export type GroupRequest={protocol:typeof IPC_PROTOCOL;requestId:string;type:GroupAction;payload:Record<string,unknown>};
 export type ScriptAction="scripts.list"|"scripts.get"|"scripts.create"|"scripts.save"|"scripts.duplicate"|"scripts.archive"|"scripts.restore";
 export type EditorRole={roleKey:string;roleLabel:string};
-export type EditorMessage={stepKey:string;roleKey:string;body:string;preSendDelayMs:number;typingDurationMs:number;postSendDelayMs:number};
-export type EditorDoc={title:string;roles:EditorRole[];steps:EditorMessage[]};
+export type TimingProfile={preSendDelayMs:number;typingDurationMs:number;postSendDelayMs:number};
+export type MediaReference={assetId:string;mimeType:"image/png"|"image/jpeg"|"image/webp";byteLength:number;width:number;height:number;fileName:string};
+export type EditorMessage={stepKey:string;roleKey:string;body:string;preSendDelayMs:number;typingDurationMs:number;postSendDelayMs:number;media?:MediaReference|null};
+export type EditorDoc={title:string;roles:EditorRole[];steps:EditorMessage[];defaults?:TimingProfile|null};
+export type MediaAction="media.import"|"media.preview";
+export type MediaRequest={protocol:typeof IPC_PROTOCOL;requestId:string;type:MediaAction;payload:Record<string,unknown>};
 export type ScriptSnapshot={scriptId:string;revision:number;document:EditorDoc;archived:boolean};
 export type ScriptSummary={scriptId:string;title:string;revision:number;stepCount:number;archived:boolean};
 export type ScriptRequest={protocol:typeof IPC_PROTOCOL;requestId:string;type:ScriptAction;payload:Record<string,unknown>};
-export type BridgeRequest = ReadRequest | SettingsSaveRequest | AccountRequest | GroupRequest | ScriptRequest;
+export type BridgeRequest = ReadRequest | SettingsSaveRequest | AccountRequest | GroupRequest | ScriptRequest | MediaRequest;
 export type BridgeResponse = { protocol: typeof IPC_PROTOCOL; requestId:string; ok:boolean; type:string; payload:Record<string,unknown> };
 export type Density = "compact" | "comfortable";
 export type UserPreferences = {density:Density;searchDebounceMs:number;pageSize:10|20|50;desktopNotifications:boolean};
@@ -43,6 +47,16 @@ export function isBridgeRequest(v:unknown):v is BridgeRequest {
   if(v.type==="settings.save"){
     if(Object.keys(v).length!==4||!isRecord(v.payload)||Object.keys(v.payload).length!==2)return false;
     return Number.isSafeInteger(v.payload.expectedRevision) && (v.payload.expectedRevision as number)>=0 && isPreferences(v.payload.preferences);
+  }
+  if(v.type==="media.import"||v.type==="media.preview"){
+    if(!isRecord(v.payload)||Object.keys(v).length!==4)return false;
+    const p=v.payload;
+    if(v.type==="media.preview")return Object.keys(p).length===1&&"reference" in p&&isMediaReference(p.reference);
+    return Object.keys(p).sort().join(",")==="base64,fileName,mimeType"&&
+      typeof p.fileName==="string"&&p.fileName.length>0&&p.fileName.length<=128&&
+      ["image/png","image/jpeg","image/webp"].includes(String(p.mimeType))&&
+      typeof p.base64==="string"&&p.base64.length>=40&&p.base64.length<=6990516&&
+      /^[a-zA-Z0-9+/]+={0,2}$/.test(p.base64);
   }
   if(typeof v.type==="string" && v.type.startsWith("scripts.")){
     const schema:Record<ScriptAction,readonly string[]>={
@@ -171,31 +185,58 @@ export function isMemberList(v:unknown):v is MemberRecord[] {
     typeof x.checkedUtc==="string");
 }
 
+export function isTimingProfile(t:unknown):t is TimingProfile {
+  if(!isRecord(t)||Object.keys(t).sort().join(",")!=="postSendDelayMs,preSendDelayMs,typingDurationMs")return false;
+  return (["preSendDelayMs","typingDurationMs","postSendDelayMs"] as const).every(k=>
+    Number.isSafeInteger(t[k])&&Number(t[k])>=0&&
+    Number(t[k])<=(k==="typingDurationMs"?60000:3600000)&&Number(t[k])%1000===0);
+}
+export function isMediaReference(m:unknown):m is MediaReference {
+  if(!isRecord(m)||Object.keys(m).sort().join(",")!=="assetId,byteLength,fileName,height,mimeType,width")return false;
+  return typeof m.assetId==="string"&&/^[a-f0-9]{64}$/.test(m.assetId)&&
+    ["image/png","image/jpeg","image/webp"].includes(String(m.mimeType))&&
+    Number.isSafeInteger(m.byteLength)&&Number(m.byteLength)>=32&&Number(m.byteLength)<=5242880&&
+    Number.isSafeInteger(m.width)&&Number(m.width)>=1&&Number(m.width)<=8192&&
+    Number.isSafeInteger(m.height)&&Number(m.height)>=1&&Number(m.height)<=8192&&
+    typeof m.fileName==="string"&&m.fileName.length>0&&m.fileName.length<=128&&
+    !/[\/\\:\x00-\x1f\x7f]/.test(m.fileName);
+}
 export function isEditorDoc(value:unknown):value is EditorDoc{
-  if(!isRecord(value)||Object.keys(value).sort().join(",")!=="roles,steps,title"||
-     typeof value.title!=="string"||!value.title.trim()||value.title.length>128||
+  if(!isRecord(value))return false;
+  const fields=Object.keys(value).sort().join(",");
+  if(fields!=="roles,steps,title"&&fields!=="defaults,roles,steps,title")return false;
+  if(typeof value.title!=="string"||!value.title.trim()||value.title.length>128||
      !Array.isArray(value.roles)||value.roles.length>300||
-     !Array.isArray(value.steps)||value.steps.length>1000)return false;
+     !Array.isArray(value.steps)||value.steps.length>1000||
+     (value.defaults!==undefined&&value.defaults!==null&&!isTimingProfile(value.defaults)))return false;
   const ids=new Set<string>(),labels=new Set<string>(),stepIds=new Set<string>();
   for(const r of value.roles){
     if(!isRecord(r)||Object.keys(r).sort().join(",")!=="roleKey,roleLabel"||
        typeof r.roleKey!=="string"||typeof r.roleLabel!=="string"||
        r.roleLabel.trim().length===0||r.roleLabel.length>64||
-       !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(r.roleKey)||
+       !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(r.roleKey)||
        ids.has(r.roleKey)||labels.has(r.roleLabel.trim().normalize("NFC")))return false;
     ids.add(r.roleKey);labels.add(r.roleLabel.trim().normalize("NFC"));
   }
   for(const x of value.steps){
-    if(!isRecord(x)||Object.keys(x).sort().join(",")!=="body,postSendDelayMs,preSendDelayMs,roleKey,stepKey,typingDurationMs"||
-       typeof x.stepKey!=="string"||typeof x.roleKey!=="string"||
-       !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(x.stepKey)||
+    if(!isRecord(x))return false;
+    const keys=Object.keys(x).sort().join(",");
+    if(keys!=="body,postSendDelayMs,preSendDelayMs,roleKey,stepKey,typingDurationMs"&&
+       keys!=="body,media,postSendDelayMs,preSendDelayMs,roleKey,stepKey,typingDurationMs")return false;
+    if(typeof x.stepKey!=="string"||typeof x.roleKey!=="string"||
+       !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(x.stepKey)||
        stepIds.has(x.stepKey)||!ids.has(x.roleKey)||typeof x.body!=="string"||x.body.length>8192||
-       !Number.isSafeInteger(x.preSendDelayMs)||Number(x.preSendDelayMs)<0||Number(x.preSendDelayMs)>3600000||
-       !Number.isSafeInteger(x.typingDurationMs)||Number(x.typingDurationMs)<0||Number(x.typingDurationMs)>60000||
-       !Number.isSafeInteger(x.postSendDelayMs)||Number(x.postSendDelayMs)<0||Number(x.postSendDelayMs)>3600000)return false;
+       !isTimingProfile({preSendDelayMs:x.preSendDelayMs,
+          typingDurationMs:x.typingDurationMs,postSendDelayMs:x.postSendDelayMs})||
+       (x.media!==undefined&&x.media!==null&&!isMediaReference(x.media)))return false;
     stepIds.add(x.stepKey);
   }
   return true;
+}
+export function makeMediaRequest(type:MediaAction,requestId:string,payload:Record<string,unknown>):MediaRequest{
+  const req={protocol:IPC_PROTOCOL,requestId,type,payload};
+  if(!isBridgeRequest(req))throw new Error("Invalid media request");
+  return req;
 }
 export function makeScriptRequest(type:ScriptAction,requestId:string,payload:Record<string,unknown>):ScriptRequest{
   const req={protocol:IPC_PROTOCOL,requestId,type,payload};
