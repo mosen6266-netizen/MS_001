@@ -57,7 +57,7 @@
     "step": "04",
     "title": "数据合同与迁移框架",
     "phase": 1,
-    "status": "not_started",
+    "status": "in_progress",
     "acceptance_evidence": [],
     "last_commit_sha": null
   },
