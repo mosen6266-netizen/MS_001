@@ -8,6 +8,7 @@ using Mosen.GroupScheduler.Groups;
 using Mosen.GroupScheduler.Persistence;
 using Mosen.GroupScheduler.Preflight;
 using Mosen.GroupScheduler.Scripts.Media;
+using Mosen.GroupScheduler.Scripts.Editor;
 using Mosen.GroupScheduler.Scripts.Preview;
 
 namespace Mosen.GroupScheduler.Desktop;

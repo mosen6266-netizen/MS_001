@@ -4,7 +4,7 @@ using Mosen.GroupScheduler.Scripts.Timing;
 
 namespace Mosen.GroupScheduler.Scripts.Preview;
 public sealed record LinkEntity(int Start,int Length,string Url);
-public sealed record PreviewEntry(int Ordinal,string StepKey,string RoleLabel,string Body,
+public sealed record PreviewEntry(int Ordinal,string StepKey,string RoleKey,string RoleLabel,string Body,
     string? ImageName,long WaitingMs,long TypingMs,long PostSendMs,long EarliestSendFromStepStartMs,
     IReadOnlyList<LinkEntity> Links);
 public sealed record ScriptPreviewReport(int Version,string Sha256,IReadOnlyList<PreviewEntry> Entries,long MinimumDurationWithoutNetworkMs);
@@ -33,7 +33,7 @@ public static partial class ScriptPreviewBuilder
                     entities.Add(new(match.Index,text.Length,text));
                 else throw new InvalidDataException("Invalid URL in published script.");
             }
-            entries.Add(new(i+1,step.StepKey,labels[step.RoleKey],step.Body,step.Media?.FileName,
+            entries.Add(new(i+1,step.StepKey,step.RoleKey,labels[step.RoleKey],step.Body,step.Media?.FileName,
                 step.PreSendDelayMs,step.TypingDurationMs,step.PostSendDelayMs,timing.ReadyToSendAtMs,entities));
             minimum=checked(minimum+step.PreSendDelayMs+step.TypingDurationMs+step.PostSendDelayMs);
         }

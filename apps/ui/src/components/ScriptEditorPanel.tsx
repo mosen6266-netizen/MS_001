@@ -1,15 +1,16 @@
 import {forwardRef,useCallback,useEffect,useImperativeHandle,useReducer,useRef,useState} from "react";
 import {ActionButton,ConfirmDialog,StatusPill,TextField} from "./DesignSystem";
-import {isBridgeResponse,isAccountPage,isScriptSnapshot,isScriptSummaries,makeAccountRequest,makeScriptRequest,makeMediaRequest,
- type ScriptAction,type MediaAction,type MediaReference,type TimingProfile,type ScriptSnapshot,type ScriptSummary,type AccountPage,type UserPreferences} from "../../../../src/contracts/ipc";
+import {isBridgeResponse,isAccountPage,isScriptSnapshot,isScriptSummaries,makeAccountRequest,makeScriptRequest,makeMediaRequest,makeGroupRequest,
+ type ScriptAction,type MediaAction,type GroupAction,type MediaReference,type TimingProfile,type ScriptSnapshot,type ScriptSummary,type AccountPage,type UserPreferences} from "../../../../src/contracts/ipc";
 import {editorReducer,newEditorState,normalizedLabel,keyboardAction,DEFAULT_STEP_TIMES,type ScriptDoc,type EditorState} from "../script-editor/state";
 import {TimingField} from "../script-editor/TimingField";
 import {MediaAttachment} from "../script-editor/MediaAttachment";
+import {PublicationPanel} from "./PublicationPanel";
 
 type WorkspaceHandle={flush:()=>Promise<boolean>};
 function useLocalScriptHost(){
   const seq=useRef(0);
-  const request=useCallback((action:ScriptAction|MediaAction,payload:Record<string,unknown>):Promise<unknown>=>{
+  const request=useCallback((action:ScriptAction|MediaAction|GroupAction,payload:Record<string,unknown>):Promise<unknown>=>{
     const host=window.chrome?.webview;
     if(!host)return Promise.reject(new Error("离线浏览器预览不能保存到 Windows 本地数据库"));
     const id="script-"+(++seq.current);
@@ -23,7 +24,8 @@ function useLocalScriptHost(){
       };
       host.addEventListener("message",listener);
       const timer=setTimeout(()=>{if(finish())reject(new Error("写入超时：先确认是否已保存，不要重复创建剧本"));},10000);
-      try{host.postMessage(JSON.stringify(action.startsWith("media.")?makeMediaRequest(action as MediaAction,id,payload):makeScriptRequest(action as ScriptAction,id,payload)));}
+      try{host.postMessage(JSON.stringify(action.startsWith("media.")?makeMediaRequest(action as MediaAction,id,payload):
+        action.startsWith("groups.")?makeGroupRequest(action as GroupAction,id,payload):makeScriptRequest(action as ScriptAction,id,payload)));}
       catch(e){if(finish())reject(e);}
     });
   },[]);
@@ -427,6 +429,8 @@ export function ScriptEditorPanel({preferences}:{preferences:UserPreferences}){
             <ActionButton disabled={busy} onClick={()=>void exportScript()}>导出 .mosentgscript</ActionButton>
           </div>
           <ScriptWorkspace key={script.scriptId} ref={workspaceRef} script={script} aliases={aliases} save={save} requestMedia={request}/>
+          <PublicationPanel key={"published-"+script.scriptId} script={script} request={request}
+            flush={async()=>workspaceRef.current?await workspaceRef.current.flush():true}/>
         </>:<div className="ui-demo-box">
           <h2>创建或选择剧本</h2><p>在左侧新建剧本，然后从本机账号备注下拉选择发言角色、添加消息和调整顺序。</p>
           <p>浏览器预览不连接真实账号。剧本始终是草稿，发布与运行在后续步骤实现。</p>
