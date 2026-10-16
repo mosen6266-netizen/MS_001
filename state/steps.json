@@ -339,9 +339,27 @@
     "step": "16",
     "title": "发布快照、预览和启动预检",
     "phase": 4,
-    "status": "not_started",
-    "acceptance_evidence": [],
-    "last_commit_sha": null
+    "status": "done_dev",
+    "acceptance_evidence": [
+      "docs/STEP_16_PREFLIGHT.md",
+      "docs/STEP_16_TEST_MATRIX.md",
+      "docs/STEP_16_ACCEPTANCE.md",
+      "src/Infrastructure/Persistence/Migrations/0006_published_snapshots.sql",
+      "src/Features/Scripts/Preview/PublishedScriptRepository.cs",
+      "src/Features/Scripts/Preview/ScriptPreview.cs",
+      "src/Core/Preflight/PreflightPlanner.cs",
+      "apps/desktop/MainWindow.Publication.cs",
+      "apps/ui/src/components/PublicationPanel.tsx",
+      "tests/Preflight/Program.cs",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/38956311705"
+    ],
+    "last_commit_sha": "b6d6296896ee6fff95331cbfb65a97b413c0adc8",
+    "deferred_release_acceptance": [
+      "PUBLISH-PREFLIGHT-REAL-WINDOWS",
+      "AUTH-REAL-ACCOUNT",
+      "GROUPS-REAL-SYNC",
+      "TDLIB-NATIVE-BINARY"
+    ]
   },
   {
     "step": "17",

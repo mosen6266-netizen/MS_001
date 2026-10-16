@@ -158,3 +158,13 @@
 - 自动化测试：独立Portable测试 **Linux 18/18，Windows 18/18**；完整 [GitHub Actions 38954528584](https://github.com/mosen6266-netizen/MS_001/actions/runs/38954528584) **25/25 SUCCESS**；UI测试与设计、所有SQLite/安全/TDLib mock、Windows x64 WPF构建发布、Chromium截图回归均通过。
 - 源码功能提交：[`2ad3feeb`](https://github.com/mosen6266-netizen/MS_001/commit/2ad3feebba6b5e08bfe412575a6269ffb4e1fd6a)，SSR bug修复提交：[`6ba635d7`](https://github.com/mosen6266-netizen/MS_001/commit/6ba635d7e5285963f9000905305689d56d940c23)；本验收/进度提交在后续git历史中。
 - 开发进度：**15/32=46.875%，剩余17步**。下一步 **Step16 发布快照、预览和启动预检**。Windows10/11原生对话框、跨电脑真实用户及群权限真实测试由用户最终统一验收。
+
+## Step16 — 发布快照、预览和启动前检查（2026-10-16）
+- **开发阶段验收 done_dev**：SQLite v6新增 `published_script_snapshots` 事务表，发布版本保留 SHA256 和源草稿修订，保存角色UUID、三段时间、媒体引用及正文；修改草稿、复制草稿不会污染已发布版本，旧版本仍可读取与校验。
+- 新增 `src/Features/Scripts/Preview`：逐条角色、内容、媒体与HTTP(S)链接实体、UTF16偏移、独立三段时间，30秒前等待+5秒正在输入=35秒最早进入发送阶段；网络耗时不虚报为0。
+- `src/Core/Preflight`：逐群/话题判断已验证群、关闭/未选话题、重复任务、图片校验、缺失所有角色备注、即时授权及群成员权限、重复备注人工指派；全部无误才生成按群冻结的绑定与步骤。任何问题阻止运行。
+- 本地桌面端发布/版本列表/预览/预检IPC与编辑器 UI 均已接入，缺失权限会逐项显示。**真实 TDLib 授权尚未接入，客户端强制 `LiveAuthorized=false`、`MembershipsFreshForStart=false`，因此不能以缓存数据开始发送，当前不提供真实“启动任务”指令**。
+- 初次 CI 发现历史数据库 schema v5 固定断言导致6个旧模块作业失败，已升级3套旧回归测试到v6；前端TypeScript `unknown` 列表类型问题也已修复。新C#模拟预检30断言 Linux/Windows 各通过，旧模块全量回归通过。
+- [CI 38956311705](https://github.com/mosen6266-netizen/MS_001/actions/runs/38956311705) **27/27 SUCCESS**，包含前端lint/test/Vite、Chromium截图、Linux/Windows全部安全/数据库/角色/群模拟测试、Windows WPF编译及win-x64自包含发布；源码最后修复提交 [`b6d6296`](https://github.com/mosen6266-netizen/MS_001/commit/b6d6296896ee6fff95331cbfb65a97b413c0adc8)；验收文档见 `docs/STEP_16_ACCEPTANCE.md`。
+- **仍DEFERRED**：Windows10/11真正可交互界面、合法Telegram账号的TDLib原生实时登录/群权限刷新、多群真实任务启动、资源压测。MS002与生产Cloudflare授权无任何修改。
+- 当前进度 **16/32=50%，剩余16步，下一步17“任务状态机与50群调度”**。
