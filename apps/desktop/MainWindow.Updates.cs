@@ -8,6 +8,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 using Mosen.GroupScheduler.Updater;
 
 namespace Mosen.GroupScheduler.Desktop;
@@ -37,6 +39,30 @@ public partial class MainWindow
             throw new CryptographicException("发行者公钥格式无效。");
         return (spki,thumbprint);
     }
+    private bool ConfirmSignedUpdate(string version, long bytes)
+    {
+        var dialog=new Window { Owner=this, Width=495, Height=230, MinWidth=420,
+            Title="检查更新", WindowStartupLocation=WindowStartupLocation.CenterOwner,
+            ResizeMode=ResizeMode.NoResize, Background=new SolidColorBrush(Color.FromRgb(23,27,33)) };
+        var root=new StackPanel { Margin=new Thickness(24) };
+        root.Children.Add(new TextBlock { Text=$"发现已验证签名的新版本 {version}",
+            FontSize=17, FontWeight=FontWeights.SemiBold, Foreground=Brushes.White });
+        root.Children.Add(new TextBlock { Text=$"安装包约 {bytes/1024/1024} MB。安装前程序会关闭并保留旧程序文件。账号、备注、剧本不会被删除。",
+            TextWrapping=TextWrapping.Wrap, Margin=new Thickness(0,17,0,17),
+            FontSize=13, Foreground=new SolidColorBrush(Color.FromRgb(195,205,215)) });
+        var buttons=new StackPanel { Orientation=Orientation.Horizontal, HorizontalAlignment=HorizontalAlignment.Left };
+        var confirm=new Button { Content="确认下载并安装", MinWidth=135, Padding=new Thickness(12,8,12,8),
+            Foreground=Brushes.White, Background=new SolidColorBrush(Color.FromRgb(28,132,88)) };
+        var cancel=new Button { Content="取消", MinWidth=88, Padding=new Thickness(12,8,12,8),
+            Foreground=Brushes.White, Background=new SolidColorBrush(Color.FromRgb(171,58,58)),
+            Margin=new Thickness(12,0,0,0), IsCancel=true };
+        confirm.Click+=(_,_)=>dialog.DialogResult=true;
+        cancel.Click+=(_,_)=>dialog.DialogResult=false;
+        buttons.Children.Add(confirm);buttons.Children.Add(cancel);
+        root.Children.Add(buttons); dialog.Content=root;
+        return dialog.ShowDialog()==true;
+    }
+
     private async void OnCheckUpdates(object sender, RoutedEventArgs evt)
     {
         if(_closing)return;
@@ -60,10 +86,7 @@ public partial class MainWindow
             var checkedManifest=SignedUpdateManifest.Verify(new string(buf,0,count),
                 new System.Collections.Generic.Dictionary<string,byte[]> { [KeyId]=pub },current);
             if(_closing)return;
-            var answer=MessageBox.Show(
-                $"发现已签名版本 {checkedManifest.Payload.Version}。需要下载约 {checkedManifest.Payload.Size/1024/1024} MB 离线安装包。\n\n更新前必须关闭程序。旧程序文件将备份，账号、备注及剧本保留。是否下载并安装？",
-                "检查更新",MessageBoxButton.YesNo,MessageBoxImage.Question,MessageBoxResult.No);
-            if(answer!=MessageBoxResult.Yes)return;
+            if(!ConfirmSignedUpdate(checkedManifest.Payload.Version,checkedManifest.Payload.Size))return;
             string stage=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"MOSEN","TelegramSchedulerUpdates");
             string installer=await ResumablePackageDownloader.StageAsync(client,checkedManifest,stage);
             if(_closing)return;
@@ -85,7 +108,7 @@ public partial class MainWindow
             Application.Current.Shutdown();
         }catch(InvalidOperationException ex){
             if(!_closing)MessageBox.Show(ex.Message,"检查更新",MessageBoxButton.OK,MessageBoxImage.Information);
-        }catch(Exception ex) when (ex is HttpRequestException or IOException or CryptographicException or FormatException or UnauthorizedAccessException or System.Text.Json.JsonException or System.ArgumentException){
+        }catch(Exception){
             if(!_closing)MessageBox.Show("更新检查或下载失败：签名不可信、网络故障或文件无效。原版本没有改变。请检查网络或使用正式签名安装包。","更新未完成",MessageBoxButton.OK,MessageBoxImage.Warning);
         }finally{if(!_closing)CheckUpdateButton.IsEnabled=true;}
     }
