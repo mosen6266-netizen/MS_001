@@ -112,6 +112,10 @@ await using(var strict=new TdlibDispatcher(strictFake,TimeSpan.FromMilliseconds(
     Check(rejected && strictFake.Sent.Length==0 && strict.PendingRequestCount==0,
         "unknown native command is rejected before any network send");
 }
+using(var loaded=JsonDocument.Parse(TdlibManualOperations.LoadChats("load-1",100)))
+  Check(loaded.RootElement.GetProperty("@type").GetString()=="loadChats"&&
+        loaded.RootElement.GetProperty("limit").GetInt32()==100,
+        "official TDLib chat loading is bounded before getChats");
 using(var list=JsonDocument.Parse(TdlibManualOperations.Chats("req-1",50)))
   Check(list.RootElement.GetProperty("@type").GetString()=="getChats"&&
         list.RootElement.GetProperty("limit").GetInt32()==50,
