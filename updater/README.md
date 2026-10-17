@@ -1,0 +1,18 @@
+# Step28 — signed releases and safe update staging
+
+**Development implementation; no production release has been signed.** The repository contains only PUBLIC trust-pin placeholders. Until the publisher configures independent credentials, the native "检查更新" button fails closed and explains why updates are disabled.
+
+Security contract:
+1. Only manually dispatched GitHub Release builds can sign anything. The GitHub Actions job requires Windows Authenticode signing PFX and password secrets, a separate P-256 manifest signing private key, and corresponding pinned **public** identifiers embedded at compile time. Secrets are never committed. Release creation is DRAFT only.
+2. The update.json envelope contains schema=1, keyId=release-v1, payload=Base64(original UTF-8 JSON bytes), signature=Base64(P-256/SHA256 IEEE P1363 signature of payload bytes). The JSON payload fields: product, version, minimumVersion, fileName, downloadUrl, size, sha256. Verification requires an exact product, monotonically increasing numeric version, exactly pinned GitHub Releases URL, fixed file name, plausible offline package size, verified 64-byte ECDSA signature and whole-file SHA256 digest. It never trusts a public key supplied by the server.
+3. The desktop checks HTTPS only, asks user consent, downloads to the isolated LocalAppData/MOSEN/TelegramSchedulerUpdates directory using a .part file and HTTP Range resume. It does not execute partial or digest-mismatched content.
+4. A separate PowerShell process runs after the GUI closes; it re-verifies SHA256 and Windows Authenticode chain and exact publisher certificate thumbprint, snapshots only program files in previous-program, then starts the signed Inno offline setup. On install failure it tries to restore program files. It leaves all private data untouched. A retained backup helps manual recovery even if restoration fails.
+5. It is not an atomic database downgrade: if a future version migrates the database schema incompatibly, rollback needs a migration-aware recovery runbook. For production, verify backward-readable schema or block downgrades, and take consistent SQLite backups. Hard crashes/power loss may leave the program directory partially replaced; a manual fallback remains necessary.
+
+To enroll signing **without publishing secrets**:
+- Generate a new P-256 signing key offline. Store only its Base64 DER SPKI PUBLIC key in updater/trust/release-v1.spki.base64. Put PKCS8 PRIVATE key only in GitHub environment Secret UPDATE_SIGNING_PKCS8_BASE64.
+- Obtain a separate trusted Windows code signing certificate. Store only its 40-hex SHA1 certificate thumbprint in updater/trust/publisher-thumbprint.txt. Store certificate PFX bytes/password only as Windows Actions environment secrets WINDOWS_SIGNING_PFX_BASE64 and WINDOWS_SIGNING_PFX_PASSWORD.
+- Restrict GitHub environment telegram-signed-release to authorized reviewers. Run release.yml manually, validate the draft, then publish only after the final Windows 10/11 and data recovery acceptance. Code signing credentials are currently absent.
+- No Signal MS002 licensing worker, Cloudflare, Telegram sessions or accounts are involved.
+
+CI tests for signed-manifest verification, product/URL/size/downgrade rejection, broken signature, corrupt/partial HTTP resume and offline staging are *synthetic*. Do not treat them as a signed EXE having been installed on a real Windows machine.
