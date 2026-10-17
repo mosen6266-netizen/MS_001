@@ -10,6 +10,7 @@ using Mosen.GroupScheduler.AccountAuth;
 using Mosen.GroupScheduler.Core.Security;
 using Mosen.GroupScheduler.Installation;
 using Mosen.GroupScheduler.Telegram;
+using QRCoder;
 
 namespace Mosen.GroupScheduler.Desktop;
 
@@ -30,6 +31,14 @@ public partial class MainWindow
     private string? _nativeIssue;
 
     private sealed record LiveGroup(string ChatId,string Title,bool CanSend);
+    private static string? RenderEphemeralQr(string? link)
+    {
+        if(string.IsNullOrWhiteSpace(link)||!link.StartsWith("tg://",StringComparison.Ordinal)||link.Length>2048)
+            return null;
+        using var data=QRCodeGenerator.GenerateQrCode(link,QRCodeGenerator.ECCLevel.Q);
+        using var render=new PngByteQRCode(data);
+        return "data:image/png;base64,"+Convert.ToBase64String(render.GetGraphic(5));
+    }
     private object LiveStatus()
     {
         var auth=_liveAuth?.Snapshot;
@@ -39,7 +48,7 @@ public partial class MainWindow
             phase=(auth?.Phase??AuthPhase.Initializing).ToString(),
             title=auth?.Title??"尚未连接",
             instruction=auth?.Instruction??"请先在设置中保存应用API参数，然后连接Telegram。",
-            qrLink=auth?.QrLink,
+            qrPng=RenderEphemeralQr(auth?.QrLink),
             canStartQr=auth?.CanStartQr??false,
             canSubmit=auth?.CanSubmit??false,
             canCancel=auth?.CanCancel??false,
