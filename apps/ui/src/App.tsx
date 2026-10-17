@@ -8,6 +8,7 @@ import { GroupCatalogPanel } from "./components/GroupCatalogPanel";
 import { ScriptEditorPanel } from "./components/ScriptEditorPanel";
 import { AuthStatusPreview } from "./components/AuthStatusPreview";
 import { TelegramLivePanel } from "./components/TelegramLivePanel";
+import { PanelErrorBoundary } from "./components/PanelErrorBoundary";
 import { DiagnosticsPanel } from "./components/DiagnosticsPanel";
 import { TelegramApiConfigurationPanel } from "./components/TelegramApiConfigurationPanel";
 import { RuntimeDashboardPanel } from "./components/RuntimeDashboardPanel";
@@ -93,8 +94,8 @@ export function App() {
           </div> :
           shell.active === "running" ? <RuntimeDashboardPanel /> :
           shell.active === "settings" ? <><PreferencesPanel {...preferences} /><TelegramApiConfigurationPanel /><DiagnosticsPanel /><DesignShowcase /></> :
-          shell.active === "groups" ? <><TelegramLivePanel view="groups"/><GroupCatalogPanel preferences={preferences.snapshot.preferences}/></> :
-          shell.active === "accounts" ? <>{window.chrome?.webview?<TelegramLivePanel/>:<AuthStatusPreview/>}{window.chrome?.webview ? <AccountRegistryPanel preferences={preferences.snapshot.preferences}/> : <MockAccountIndex preferences={preferences.snapshot.preferences} />}</> :
+          shell.active === "groups" ? <><PanelErrorBoundary label="Telegram群组连接"><TelegramLivePanel view="groups"/></PanelErrorBoundary><PanelErrorBoundary label="群组目录"><GroupCatalogPanel preferences={preferences.snapshot.preferences}/></PanelErrorBoundary></> :
+          shell.active === "accounts" ? <><PanelErrorBoundary label="Telegram登录">{window.chrome?.webview?<TelegramLivePanel/>:<AuthStatusPreview/>}</PanelErrorBoundary><PanelErrorBoundary label="账号资料">{window.chrome?.webview ? <AccountRegistryPanel preferences={preferences.snapshot.preferences}/> : <MockAccountIndex preferences={preferences.snapshot.preferences} />}</PanelErrorBoundary></> :
           <div className="blank-panel">
             <h2 id="panel-title">{active.label}</h2>
             <p>{active.description}</p>
