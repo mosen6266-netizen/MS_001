@@ -2,7 +2,7 @@ using System.Text.Json;
 
 namespace Mosen.GroupScheduler.Core.Security;
 
-public enum AllowedIpcOperation { SystemPing, AppInfo, SettingsGet, SettingsSave, DiagnosticsGet, AccountsList, AccountsCreate, AccountsEdit, AccountsArchive, AccountsRestore, GroupsList, GroupsTopics, GroupsMembers, ScriptsList, ScriptsGet, ScriptsCreate, ScriptsSave, ScriptsDuplicate, ScriptsArchive, ScriptsRestore, ScriptsExport, ScriptsImport, ScriptsPublish, ScriptsVersions, ScriptsPreview, ScriptsPreflight, MediaImport, MediaPreview, RuntimeSnapshot }
+public enum AllowedIpcOperation { SystemPing, AppInfo, SettingsGet, SettingsSave, DiagnosticsGet, AccountsList, AccountsCreate, AccountsEdit, AccountsArchive, AccountsRestore, GroupsList, GroupsTopics, GroupsMembers, ScriptsList, ScriptsGet, ScriptsCreate, ScriptsSave, ScriptsDuplicate, ScriptsArchive, ScriptsRestore, ScriptsExport, ScriptsImport, ScriptsPublish, ScriptsVersions, ScriptsPreview, ScriptsPreflight, MediaImport, MediaPreview, RuntimeSnapshot, ApiConfigStatus, ApiConfigSave, ApiConfigClear }
 
 /// <summary>Fail-closed JSON input gate: exact origin is checked separately by WebView2 host.</summary>
 public static class IpcRequestGuard
@@ -34,6 +34,9 @@ public static class IpcRequestGuard
             switch (type.GetString())
             {
                 case "system.ping": operation=AllowedIpcOperation.SystemPing; break;
+                case "telegram.api.status": operation=AllowedIpcOperation.ApiConfigStatus; break;
+                case "telegram.api.save": operation=AllowedIpcOperation.ApiConfigSave; break;
+                case "telegram.api.clear": operation=AllowedIpcOperation.ApiConfigClear; break;
                 case "app.info": operation=AllowedIpcOperation.AppInfo; break;
                 case "settings.get": operation=AllowedIpcOperation.SettingsGet; break;
                 case "settings.save": operation=AllowedIpcOperation.SettingsSave; break;
@@ -64,6 +67,19 @@ public static class IpcRequestGuard
                 case "media.preview": operation=AllowedIpcOperation.MediaPreview; break;
                 default: return false;
             }
+            if(operation==AllowedIpcOperation.ApiConfigSave)
+            {
+                if(!ExactFields(root,RootWriteFields) || !root.TryGetProperty("payload",out JsonElement config) ||
+                   !ExactFields(config,new HashSet<string>{"apiId","apiHash"}))return false;
+                var idValue=config.GetProperty("apiId");
+                var hashValue=config.GetProperty("apiHash");
+                return idValue.ValueKind==JsonValueKind.Number && idValue.TryGetInt32(out int apiId) &&
+                    apiId>0 && hashValue.ValueKind==JsonValueKind.String &&
+                    hashValue.GetString() is string hash && hash.Length==32 &&
+                    hash.All(Uri.IsHexDigit) && raw.Length<=512;
+            }
+            if(operation is AllowedIpcOperation.ApiConfigStatus or AllowedIpcOperation.ApiConfigClear)
+                return ExactFields(root,RootReadFields);
             if(operation==AllowedIpcOperation.ScriptsSave && raw.Length>DraftMessageLimit)return false;
             if(operation is not (AllowedIpcOperation.ScriptsSave or AllowedIpcOperation.MediaImport)
                 && raw.Length>StandardMessageLimit)return false;
