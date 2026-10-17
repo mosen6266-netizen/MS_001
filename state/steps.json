@@ -682,9 +682,28 @@
     "step": "29",
     "title": "全功能自动化回归",
     "phase": 8,
-    "status": "in_progress",
-    "acceptance_evidence": [],
-    "last_commit_sha": null
+    "status": "done_dev",
+    "acceptance_evidence": [
+      "tests/Unit/p0-regression-catalog.json",
+      "tests/Unit/p0-coverage.test.mjs",
+      "tests/Integration/ci-contract.test.mjs",
+      "tests/Integration/verify-ci-needs.mjs",
+      "tests/E2E/Mosen.GroupScheduler.E2E.Tests.csproj",
+      "tests/E2E/Program.cs",
+      ".github/workflows/ci.yml",
+      "docs/TEST_MATRIX.md",
+      "docs/STEP_29_TEST_MATRIX.md",
+      "docs/STEP_29_ACCEPTANCE.md",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/39032907487 (completed success 55/55; tested sha 0567b58ab0d1d54f3ed03f9f18630a640218c584)"
+    ],
+    "last_commit_sha": "0567b58ab0d1d54f3ed03f9f18630a640218c584",
+    "deferred_release_acceptance": [
+      "STEP29-REAL-E2E",
+      "TDLIB-NATIVE-BINARY",
+      "AUTH-REAL-ACCOUNT",
+      "SCHEDULER-REAL-50GROUP",
+      "LONG-SOAK"
+    ]
   },
   {
     "step": "30",
