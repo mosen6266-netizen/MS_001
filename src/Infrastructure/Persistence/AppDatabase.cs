@@ -113,6 +113,9 @@ public sealed class AppDatabase
         VerifyIntegrity(source);
         int version = ReadVersion(source, null);
         if (version is < 1 or > LatestSchemaVersion) throw new InvalidDataException("Unsupported backup schema.");
+        // Integrity_check alone will not detect a forged schema ledger.
+        // A restore candidate must match this application's embedded migration hashes.
+        ValidateAppliedHistory(source, null, version);
 
         // The restored candidate is a separate file; caller must explicitly complete
         // promotion only after the app has stopped all database connections.
@@ -130,6 +133,7 @@ public sealed class AppDatabase
                 VerifyIntegrity(verified);
                 if (ReadVersion(verified, null) != version)
                     throw new InvalidDataException("Restored candidate does not match source schema.");
+                ValidateAppliedHistory(verified, null, version);
             }
             return destination;
         }
@@ -221,7 +225,7 @@ public sealed class AppDatabase
         c.ExecuteNonQuery();
     }
 
-    private static void ValidateAppliedHistory(SqliteConnection connection, SqliteTransaction tx, int version)
+    private static void ValidateAppliedHistory(SqliteConnection connection, SqliteTransaction? tx, int version)
     {
         if (version > LatestSchemaVersion)
             throw new InvalidDataException("A newer database schema cannot be downgraded.");
