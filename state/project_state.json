@@ -6,7 +6,7 @@
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
   "current_step": "31",
-  "current_step_status": "not_started",
+  "current_step_status": "in_progress",
   "phase": 8,
   "total_steps": 32,
   "completed_steps": [
@@ -54,7 +54,7 @@
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step30 DONE_DEV (synthetic only). CI 39033877609 completed/success 57/57 jobs; tested sha cc2043fa1460c5a6206036fb964149f17b857dfa; Windows/Linux each 20/20 capacity assertions and 1/1 artifact contract; 30 CI upstream jobs all success. Actual short-run wall 4.190s Linux and 20.561s Windows, working set peak samples 90/63 MiB, Windows last handle sample 267, 300 SQLite account metadata (0 real online), 50 groups with 6 roles each, accelerated 72 logical hours/4320 ticks, no Telegram traffic. 72 REAL hours, authentic TDLib 300 concurrent sessions/50 real chats, Win10/11 native and actual CPU/reconnect performance DEFERRED; do not claim actual capacity. Progress 30/32 = 93.75%. Next Step31.",
+  "notes": "Step31 in_progress: audit repository secret leakage, strengthen SQLite backup migration-ledger verification, add fail-closed production release readiness manifest and authorization gate in manual release workflow, test recovery/unknown-delivery/secret boundaries. Retain real Win10/11 and Cloudflare production deferrals. Progress remains 30/32 until verified CI.",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
