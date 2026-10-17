@@ -6,6 +6,25 @@ export type ApiConfigSaveRequest={protocol:typeof IPC_PROTOCOL;requestId:string;
 export type TelegramAuthRequest={protocol:typeof IPC_PROTOCOL;requestId:string;type:"telegram.auth.submit";payload:{action:"qr"|"phone"|"code"|"email"|"emailCode"|"password";input:string}};
 export type TelegramMessageRequest={protocol:typeof IPC_PROTOCOL;requestId:string;type:"telegram.message.send";payload:{chatId:string;text:string}};
 export type TelegramLiveStatus={nativeReady:boolean;connected:boolean;phase:string;title:string;instruction:string;qrPng:string|null;canStartQr:boolean;canSubmit:boolean;canCancel:boolean;groups:Array<{chatId:string;title:string;canSend:boolean}>;delivery:string;issue:string|null;outboundPending:boolean};
+/** WebView IPC is an untrusted boundary: never cast a transport payload to renderable UI state. */
+export function isTelegramLiveStatus(value:unknown):value is TelegramLiveStatus{
+  if(!isRecord(value))return false;
+  for(const key of ["nativeReady","connected","canStartQr","canSubmit","canCancel","outboundPending"]){
+    if(typeof value[key]!=="boolean")return false;
+  }
+  for(const key of ["phase","title","instruction","delivery"]){
+    if(typeof value[key]!=="string"||value[key].length>1024)return false;
+  }
+  if(value.issue!==null&&(typeof value.issue!=="string"||value.issue.length>256))return false;
+  if(value.qrPng!==null&&
+     (typeof value.qrPng!=="string"||value.qrPng.length>180000||
+      !/^data:image\/png;base64,[a-zA-Z0-9+/]+=*$/.test(value.qrPng)))return false;
+  if(!Array.isArray(value.groups)||value.groups.length>100)return false;
+  return value.groups.every(group=>
+    isRecord(group)&&typeof group.chatId==="string"&&/^-?[1-9][0-9]{0,18}$/.test(group.chatId)&&
+    typeof group.title==="string"&&group.title.length<=100&&
+    typeof group.canSend==="boolean");
+}
 export type AccountAction="accounts.list"|"accounts.create"|"accounts.edit"|"accounts.archive"|"accounts.restore";
 export type AccountItem={id:string;alias:string;groupTag:string;displayName:string;revision:number;verifiedUserId:string|null;removed:boolean;canAttachSession:boolean};
 export type AccountPage={items:AccountItem[];total:number;page:number;pageSize:number};
