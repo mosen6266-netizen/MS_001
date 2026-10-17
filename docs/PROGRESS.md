@@ -284,3 +284,10 @@
 - **IN_PROGRESS / 不计完成**：已经实现独立P-256验签与固定产品/GitHub Release路径验证、签名大小/SHA256全文件校验、HTTP Range断点下载并拒绝哈希错误；Windows原生检查更新按钮使用编译期信任根，用户确认后下载再退出程序并启动二阶段安装脚本。旧程序文件备份和失败恢复不触碰LocalAppData私有数据库、TDLib会话、剧本、备注。
 - **安全门禁**：正式证书Thumbprint和P-256公钥目前均为UNCONFIGURED；默认明确禁止更新。独立GitHub Actions release.yml仅接受手动启动、验证两个签名密钥与信任根、签名程序及离线Setup、生成签名update.json，且仅创建待人工审批的草稿Release。**没有配置Secret、没有发布正式签名EXE/Release、也没有修改Signal MS002。**
 - **待核验**：本步Windows/Linux新测试和旧50项CI全量通过、Windows WPF/Inno构建、测试源码错误修正；记录真实Actions Run URL后才能标记done_dev。真实签名、Win10/11安装、断电、重装和SQLite迁移回滚仍列DEFERRED。**总进度仍然27/32（84.375%）。**
+
+### Step28 续做检查（2026-10-17）
+
+- 更新安装后复核：`updater/Apply-Update.ps1`在Inno退出零码后校验已安装EXE的Authenticode发布者和签名清单给定的准确版本；错误、文件缺失、版本不一致均恢复程序备份，独立保存可读故障日志；原私有用户数据不在清理范围内。
+- `release.yml`拆成仅 `contents: read` 的build-and-sign作业与最小权限 `contents: write` 的publish-draft作业，必须先经GitHub Actions保存并恢复签名工件，再用独立ReleaseVerifier验证P-256清单、SHA256、文件大小、Windows Authenticode证书，再仅创建草稿Release；无自动公开发布。
+- 新增 `updater/ReleaseVerifier`，增强 `tests/Updater/release-contract.test.mjs` 的权限拆分、安装签名和版本门禁核对。通过连接仓库源码直接执行的17项**静态**约束核对：17/17通过，**不能代替编译/CI**。
+- [最新 CI Run 39030669456](https://github.com/mosen6266-netizen/MS_001/actions/runs/39030669456) 检查时49个作业全部排队，暂未执行；本步保持 **in_progress**，开发完成度 **27/32（84.375%）**，下一待办是获取真实CI结果并处理编译/单测失败。签名发行证书仍UNCONFIGURED，正式Release/Windows实机自动更新与回滚未执行，Signal MS002无修改。
