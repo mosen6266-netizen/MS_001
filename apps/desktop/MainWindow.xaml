@@ -9,7 +9,7 @@
   <Border Grid.Row="0" Background="#171B21" BorderBrush="#303640" BorderThickness="0,0,0,1" Padding="14,8">
    <Grid>
     <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-    <TextBlock x:Name="SafetyNotice" Grid.Column="0" Text="离线工程模式 · 无真实 Telegram 消息发送"
+    <TextBlock x:Name="SafetyNotice" Grid.Column="0" Text="Telegram 实时连接 · 仅限授权账号手动操作"
       Foreground="#BAC6D2" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" FontSize="12"/>
     <Button Grid.Column="1" x:Name="CheckUpdateButton" Content="检查更新" Click="OnCheckUpdates" Background="#2D333E" Foreground="#F0F2F4" BorderBrush="#414A56" Padding="13,8" Margin="7,0,0,0" Cursor="Hand"/>
     <Button Grid.Column="2" x:Name="AuditHistoryButton" Content="任务历史" Click="OnOpenTaskHistory" Background="#2D333E" Foreground="#F0F2F4" BorderBrush="#414A56" Padding="13,8" Margin="7,0,0,0" Cursor="Hand"/>
