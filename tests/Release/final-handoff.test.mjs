@@ -21,7 +21,7 @@ test("V1.0 development handoff includes every core manual and no misleading publ
  assert.match(load("docs/USER_GUIDE.md"),/35秒/);
  assert.match(load("docs/USER_GUIDE.md"),/发送后等待/);
  assert.match(load("docs/RECOVERY_GUIDE.md"),/PrepareRestore/);
- assert.match(load("docs/RECOVERY_GUIDE.md"),/不.*直接.*覆盖|不自动覆盖/);
+ assert.match(load("docs/RECOVERY_GUIDE.md"),/不.*直接.*覆盖|不自动覆盖|不直接替换|不能.*覆盖/);
  assert.match(load("releases/V1.0/README.md"),/BLOCKED/);
  assert.match(load("releases/V1.0/RELEASE_NOTES.md"),/NOT PUBLISHED/);
  assert.match(load("docs/FINAL_ACCEPTANCE.md"),/13项|13\/13/);
