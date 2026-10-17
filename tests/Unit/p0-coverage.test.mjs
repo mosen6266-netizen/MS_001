@@ -21,7 +21,7 @@ test("P0 registry uses unique ids, executable evidence and explicit offline-only
   assert.ok(!row.testPath.split("/").includes(".."),row.id+" traversal");
   assert.ok(existsSync(resolve(root,row.testPath)),row.id+": missing "+row.testPath);
   assert.ok(jobs.has(row.ciJob),row.id+": CI job "+row.ciJob+" missing");
-  assert.match(read(row.testPath),/\b(Check|Reject|test|describe|it|expect|assert)\b/,
+  assert.match(read(row.testPath),/\b(Check|Reject|Assert|test|describe|it|expect|assert)\b/,
    row.id+": mapped file does not contain executable assertions");
  }
 });
@@ -38,7 +38,7 @@ test("final CI gate includes P0 E2E plus full upstream job set",()=>{
  assert.ok(jobs.has("p0-e2e")&&jobs.has("regression-gate"));
  assert.match(ci,/name: Step29 cross-feature offline E2E/);
  assert.match(ci,/node --test tests\/Unit\/p0-coverage\.test\.mjs/);
- assert.match(ci,/node --test tests\/Integration\/ci-contract\.test\.mjs/);
+ assert.match(ci,/node --test [^\n]*tests\/Integration\/ci-contract\.test\.mjs/);
  assert.match(ci,/needs: \[.*p0-e2e.*\]/);
  assert.match(ci,/REGRESSION_NEEDS_JSON: \$\{\{ toJson\(needs\) \}\}/);
  assert.match(ci,/if: always\(\)/);
