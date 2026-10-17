@@ -41,20 +41,20 @@ public partial class MainWindow
     }
     private bool ConfirmSignedUpdate(string version, long bytes)
     {
-        var dialog=new Window { Owner=this, Width=495, Height=230, MinWidth=420,
+        var dialog=new System.Windows.Window { Owner=this, Width=495, Height=230, MinWidth=420,
             Title="检查更新", WindowStartupLocation=WindowStartupLocation.CenterOwner,
-            ResizeMode=ResizeMode.NoResize, Background=new SolidColorBrush(Color.FromRgb(23,27,33)) };
-        var root=new StackPanel { Margin=new Thickness(24) };
-        root.Children.Add(new TextBlock { Text=$"发现已验证签名的新版本 {version}",
-            FontSize=17, FontWeight=FontWeights.SemiBold, Foreground=Brushes.White });
-        root.Children.Add(new TextBlock { Text=$"安装包约 {bytes/1024/1024} MB。安装前程序会关闭并保留旧程序文件。账号、备注、剧本不会被删除。",
+            ResizeMode=ResizeMode.NoResize, Background=new SolidColorBrush(System.Windows.Media.Color.FromRgb(23,27,33)) };
+        var root=new System.Windows.Controls.StackPanel { Margin=new Thickness(24) };
+        root.Children.Add(new System.Windows.Controls.TextBlock { Text=$"发现已验证签名的新版本 {version}",
+            FontSize=17, FontWeight=FontWeights.SemiBold, Foreground=System.Windows.Media.Brushes.White });
+        root.Children.Add(new System.Windows.Controls.TextBlock { Text=$"安装包约 {bytes/1024/1024} MB。安装前程序会关闭并保留旧程序文件。账号、备注、剧本不会被删除。",
             TextWrapping=TextWrapping.Wrap, Margin=new Thickness(0,17,0,17),
-            FontSize=13, Foreground=new SolidColorBrush(Color.FromRgb(195,205,215)) });
-        var buttons=new StackPanel { Orientation=Orientation.Horizontal, HorizontalAlignment=HorizontalAlignment.Left };
-        var confirm=new Button { Content="确认下载并安装", MinWidth=135, Padding=new Thickness(12,8,12,8),
-            Foreground=Brushes.White, Background=new SolidColorBrush(Color.FromRgb(28,132,88)) };
-        var cancel=new Button { Content="取消", MinWidth=88, Padding=new Thickness(12,8,12,8),
-            Foreground=Brushes.White, Background=new SolidColorBrush(Color.FromRgb(171,58,58)),
+            FontSize=13, Foreground=new SolidColorBrush(System.Windows.Media.Color.FromRgb(195,205,215)) });
+        var buttons=new System.Windows.Controls.StackPanel { Orientation=System.Windows.Controls.Orientation.Horizontal, HorizontalAlignment=System.Windows.HorizontalAlignment.Left };
+        var confirm=new System.Windows.Controls.Button { Content="确认下载并安装", MinWidth=135, Padding=new Thickness(12,8,12,8),
+            Foreground=System.Windows.Media.Brushes.White, Background=new SolidColorBrush(System.Windows.Media.Color.FromRgb(28,132,88)) };
+        var cancel=new System.Windows.Controls.Button { Content="取消", MinWidth=88, Padding=new Thickness(12,8,12,8),
+            Foreground=System.Windows.Media.Brushes.White, Background=new SolidColorBrush(System.Windows.Media.Color.FromRgb(171,58,58)),
             Margin=new Thickness(12,0,0,0), IsCancel=true };
         confirm.Click+=(_,_)=>dialog.DialogResult=true;
         cancel.Click+=(_,_)=>dialog.DialogResult=false;
@@ -106,12 +106,12 @@ public partial class MainWindow
             launch.ArgumentList.Add("-PublisherThumbprint");launch.ArgumentList.Add(thumbprint);
             launch.ArgumentList.Add("-ExpectedVersion");launch.ArgumentList.Add(checkedManifest.Payload.Version);
             launch.ArgumentList.Add("-ParentProcessId");launch.ArgumentList.Add(Environment.ProcessId.ToString());
-            Process.Start(launch) ?? throw new IOException("无法启动更新辅助程序。");
-            Application.Current.Shutdown();
+            if (Process.Start(launch) is null) throw new IOException("无法启动更新辅助程序。");
+            System.Windows.Application.Current.Shutdown();
         }catch(InvalidOperationException ex){
-            if(!_closing)MessageBox.Show(ex.Message,"检查更新",MessageBoxButton.OK,MessageBoxImage.Information);
+            if(!_closing)System.Windows.MessageBox.Show(ex.Message,"检查更新",MessageBoxButton.OK,MessageBoxImage.Information);
         }catch(Exception){
-            if(!_closing)MessageBox.Show("更新检查或下载失败：签名不可信、网络故障或文件无效。原版本没有改变。请检查网络或使用正式签名安装包。","更新未完成",MessageBoxButton.OK,MessageBoxImage.Warning);
+            if(!_closing)System.Windows.MessageBox.Show("更新检查或下载失败：签名不可信、网络故障或文件无效。原版本没有改变。请检查网络或使用正式签名安装包。","更新未完成",MessageBoxButton.OK,MessageBoxImage.Warning);
         }finally{if(!_closing)CheckUpdateButton.IsEnabled=true;}
     }
 }
