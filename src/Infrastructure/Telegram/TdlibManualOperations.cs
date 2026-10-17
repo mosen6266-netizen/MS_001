@@ -14,6 +14,15 @@ public static class TdlibManualOperations
             ["limit"]=limit
         });
     }
+    public static string LoadChats(string correlation,int limit=100)
+    {
+        if(limit is <1 or >100)throw new ArgumentOutOfRangeException(nameof(limit));
+        return JsonSerializer.Serialize(new Dictionary<string,object>{
+            ["@type"]="loadChats",["@extra"]=correlation,
+            ["chat_list"]=new Dictionary<string,object>{{"@type","chatListMain"}},
+            ["limit"]=limit
+        });
+    }
     public static string Chat(string correlation,long id)
     {
         if(id==0)throw new ArgumentOutOfRangeException(nameof(id));
