@@ -9,3 +9,10 @@
 - 当前默认签名信任pin均为UNCONFIGURED，完整正式签名CI没有执行。不能将development Artifact链接当作GitHub Release链接，也不能声明“已经上架”。
 
 每个Actions运行有其自己的测试源码SHA、可下载工件、过期日期和独立校验数据；正式发布前重新构建和记录准确结果。真实Win10/11实体测试与13项release/readiness签收仍然必需。
+
+## 2026-10-17已核实的交付工件
+
+- [开发文档交接包 v1-development-handoff](https://github.com/mosen6266-netizen/MS_001/actions/runs/39036960159/artifacts/12102174301)（19份文件，内层v1-development-handoff.zip SHA256 3FF4BF94C4BB9AC2DB843A61A2EC647884EF0D23E8BE721001285E828BBA844F，预计过期2026-11-16）。
+- [未签名的 Windows dev安装包](https://github.com/mosen6266-netizen/MS_001/actions/runs/39036960159/artifacts/12103105698)（MOSEN-Telegram-Scheduler-Setup-0.27.0-dev.exe，269,075,217字节，EXE SHA256 85D04E5CC52FC33D81D062518603D38E1ADB7EC0A19CA6A5EE607236C8589C9A，预计过期2026-10-24）。
+- CI [39036960159](https://github.com/mosen6266-netizen/MS_001/actions/runs/39036960159) completed/success 59/59，受测代码 SHA 1b17ba0c8e6170e5b64023fbe0fae5ad7a3d30e3。GitHub artifact外层zip文件sha与原始内部文件的SHA不是相同对象。
+- 不存在正式V1.0的签名EXE/正式更新签名清单/公开GitHub Releases v1.0.0；不得把开发工件当作正式下载链接。
