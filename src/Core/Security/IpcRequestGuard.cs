@@ -2,7 +2,7 @@ using System.Text.Json;
 
 namespace Mosen.GroupScheduler.Core.Security;
 
-public enum AllowedIpcOperation { SystemPing, AppInfo, SettingsGet, SettingsSave, DiagnosticsGet, AccountsList, AccountsCreate, AccountsEdit, AccountsArchive, AccountsRestore, GroupsList, GroupsTopics, GroupsMembers, ScriptsList, ScriptsGet, ScriptsCreate, ScriptsSave, ScriptsDuplicate, ScriptsArchive, ScriptsRestore, ScriptsExport, ScriptsImport, ScriptsPublish, ScriptsVersions, ScriptsPreview, ScriptsPreflight, MediaImport, MediaPreview, RuntimeSnapshot, ApiConfigStatus, ApiConfigSave, ApiConfigClear }
+public enum AllowedIpcOperation { SystemPing, AppInfo, SettingsGet, SettingsSave, DiagnosticsGet, AccountsList, AccountsCreate, AccountsEdit, AccountsArchive, AccountsRestore, GroupsList, GroupsTopics, GroupsMembers, ScriptsList, ScriptsGet, ScriptsCreate, ScriptsSave, ScriptsDuplicate, ScriptsArchive, ScriptsRestore, ScriptsExport, ScriptsImport, ScriptsPublish, ScriptsVersions, ScriptsPreview, ScriptsPreflight, MediaImport, MediaPreview, RuntimeSnapshot, ApiConfigStatus, ApiConfigSave, ApiConfigClear, TelegramAuthStatus, TelegramAuthStart, TelegramAuthSubmit, TelegramAuthStop, TelegramChatsRefresh, TelegramManualMessage }
 
 /// <summary>Fail-closed JSON input gate: exact origin is checked separately by WebView2 host.</summary>
 public static class IpcRequestGuard
@@ -37,6 +37,12 @@ public static class IpcRequestGuard
                 case "telegram.api.status": operation=AllowedIpcOperation.ApiConfigStatus; break;
                 case "telegram.api.save": operation=AllowedIpcOperation.ApiConfigSave; break;
                 case "telegram.api.clear": operation=AllowedIpcOperation.ApiConfigClear; break;
+                case "telegram.auth.status": operation=AllowedIpcOperation.TelegramAuthStatus; break;
+                case "telegram.auth.start": operation=AllowedIpcOperation.TelegramAuthStart; break;
+                case "telegram.auth.submit": operation=AllowedIpcOperation.TelegramAuthSubmit; break;
+                case "telegram.auth.stop": operation=AllowedIpcOperation.TelegramAuthStop; break;
+                case "telegram.chats.refresh": operation=AllowedIpcOperation.TelegramChatsRefresh; break;
+                case "telegram.message.send": operation=AllowedIpcOperation.TelegramManualMessage; break;
                 case "app.info": operation=AllowedIpcOperation.AppInfo; break;
                 case "settings.get": operation=AllowedIpcOperation.SettingsGet; break;
                 case "settings.save": operation=AllowedIpcOperation.SettingsSave; break;
@@ -67,6 +73,40 @@ public static class IpcRequestGuard
                 case "media.preview": operation=AllowedIpcOperation.MediaPreview; break;
                 default: return false;
             }
+            if(operation==AllowedIpcOperation.TelegramAuthSubmit)
+            {
+                if(!ExactFields(root,RootWriteFields)||!root.TryGetProperty("payload",out var data)||
+                   !ExactFields(data,new HashSet<string>{"action","input"}))return false;
+                var action=data.GetProperty("action");
+                var input=data.GetProperty("input");
+                if(action.ValueKind!=JsonValueKind.String||input.ValueKind!=JsonValueKind.String)return false;
+                string? task=action.GetString(),value=input.GetString();
+                if(value is null||value.Length>512)return false;
+                return task switch {
+                    "qr"=>value.Length==0,
+                    "phone"=>value.Length>=7&&value.Length<=20&&value[0]=='+'&&value.Skip(1).All(char.IsAsciiDigit),
+                    "code" or "emailCode"=>value.Length is >=2 and <=32&&value.All(char.IsLetterOrDigit),
+                    "email"=>value.Length is >=3 and <=254&&value.Contains('@')&&!value.Any(char.IsWhiteSpace),
+                    "password"=>value.Length is >=1 and <=512,
+                    _=>false
+                };
+            }
+            if(operation==AllowedIpcOperation.TelegramManualMessage)
+            {
+                if(!ExactFields(root,RootWriteFields)||!root.TryGetProperty("payload",out var msg)||
+                   !ExactFields(msg,new HashSet<string>{"chatId","text"}))return false;
+                if(msg.GetProperty("chatId").ValueKind!=JsonValueKind.String||
+                   msg.GetProperty("text").ValueKind!=JsonValueKind.String)return false;
+                var id=msg.GetProperty("chatId").GetString();
+                var body=msg.GetProperty("text").GetString();
+                return id is {Length:>=2 and <=20}&&id.StartsWith("-",StringComparison.Ordinal)&&
+                    long.TryParse(id,out long groupId)&&groupId<0 &&
+                    body is {Length:>=1 and <=2000}&& !string.IsNullOrWhiteSpace(body)&&
+                    !body.Any(x=>char.IsControl(x)&&x is not '\n' and not '\r' and not '\t');
+            }
+            if(operation is AllowedIpcOperation.TelegramAuthStatus or AllowedIpcOperation.TelegramAuthStart
+                or AllowedIpcOperation.TelegramAuthStop or AllowedIpcOperation.TelegramChatsRefresh)
+                return ExactFields(root,RootReadFields);
             if(operation==AllowedIpcOperation.ApiConfigSave)
             {
                 if(!ExactFields(root,RootWriteFields) || !root.TryGetProperty("payload",out JsonElement config) ||
