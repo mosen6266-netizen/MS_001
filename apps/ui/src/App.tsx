@@ -25,7 +25,7 @@ declare global {
   }
 }
 export function App({initialRoute}:{initialRoute?:ShellRoute}={}) {
-  const [shell, setShell] = useState(()=>initialRoute ? transitionShellRoute(initialShellState,initialRoute,0) : initialShellState);
+  const [shell, setShell] = useState(()=>initialRoute ? transitionShellRoute(initialShellState(),initialRoute,0) : initialShellState());
   const [bridgeStatus, setBridgeStatus] = useState("等待本地界面连接");
   const viewportRef = useRef<HTMLElement | null>(null);
   const preferences = usePreferences();
