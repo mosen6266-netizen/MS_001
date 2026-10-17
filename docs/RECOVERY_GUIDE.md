@@ -16,7 +16,7 @@
 ## 二、SQLite可靠恢复的实际边界
 
 1. AppDatabase.CreateBackup使用SQLite Backup API生成数据库完整副本，执行PRAGMA integrity_check。
-2. AppDatabase.PrepareRestore先验证备份的完整性、受支持schema版本及每一条schema_migrations SHA256是否匹配程序内嵌迁移记录；只创建独立的restore-candidate-*.db并再次核查。
+2. AppDatabase.PrepareRestore先验证备份的完整性、受支持schema版本及每一条schema_migrations SHA256是否匹配程序内嵌迁移记录；只创建独立的restore-candidate-*.db并再次核查，**不会直接覆盖正在使用的app.db**。
 3. **准备候选≠完成恢复。** 只能在关闭所有数据库连接、先保存现有数据库完整回退副本、人工核对旧/新schema兼容性后，另行执行受控的候选切换。项目当前未提供已实机验证的“一键恢复”功能。
 4. 不能只拷贝app.db而在进程仍运行时删除WAL/SHM，不能将高版本数据库直接降到低版本或删迁移日志。
 5. 若备份的SQLite页完整但迁移SHA被篡改，候选生成会拒绝。这是安全阻断，不得通过修改签名或关闭检查绕开。
