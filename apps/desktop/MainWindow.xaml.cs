@@ -41,6 +41,7 @@ public partial class MainWindow : Window
             _appHealth = "closing";
             _safeTelemetry.Record(DiagnosticEvent.Closed);
             // WebView2 runs only while the window is open; never keep background sessions.
+            _ = LiveStopAsync(); // close official TDLib clients when the window exits
             _webSubscriptions.Dispose();
             StopResourceHealth();
             StopAlertNotifications();
@@ -157,6 +158,13 @@ public partial class MainWindow : Window
                 return;
             }
             var request = JsonSerializer.Deserialize<BridgeRequest>(jsonMessage)!;
+            if (operation is AllowedIpcOperation.TelegramAuthStatus or AllowedIpcOperation.TelegramAuthStart or
+                AllowedIpcOperation.TelegramAuthSubmit or AllowedIpcOperation.TelegramAuthStop or
+                AllowedIpcOperation.TelegramChatsRefresh or AllowedIpcOperation.TelegramManualMessage)
+            {
+                await HandleLiveTelegramAsync(jsonMessage,request.RequestId,request.Type);
+                return;
+            }
             if (operation is AllowedIpcOperation.ApiConfigStatus or AllowedIpcOperation.ApiConfigSave or AllowedIpcOperation.ApiConfigClear)
             {
                 await HandleTelegramApiConfigurationAsync(jsonMessage,request.RequestId,request.Type);
