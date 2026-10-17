@@ -112,6 +112,29 @@ try
     restored.Initialize();
     using (var c = Open(candidate)) Check(Count(c, "accounts") == 1, "restored and re-upgraded metadata retained");
 
+    // Step31 security: a structurally valid SQLite file with a forged migration ledger
+    // must never be materialized as a restore candidate.
+    string forgedBackup=Path.Combine(root,"backup-forged-ledger.db");
+    File.Copy(snapshotV1,forgedBackup);
+    using (var forged=Open(forgedBackup))
+    {
+        using var cmd=forged.CreateCommand();
+        cmd.CommandText="UPDATE schema_migrations SET sha256=$hash WHERE version=1;";
+        cmd.Parameters.AddWithValue("$hash",new string('f',64));
+        Check(cmd.ExecuteNonQuery()==1,"synthetic SQLite backup migration digest was altered");
+        cmd.Parameters.Clear();
+        cmd.CommandText="PRAGMA integrity_check;";
+        Check((string?)cmd.ExecuteScalar()=="ok","forged migration ledger does not invalidate SQLite page integrity");
+    }
+    var candidatesBefore=Directory.GetFiles(root,"restore-candidate-*.db").Length;
+    bool forgedRejected=false;
+    try { db.PrepareRestore(forgedBackup); }catch(InvalidDataException){forgedRejected=true;}
+    Check(forgedRejected,"restore refuses structurally valid backup with altered migration ledger");
+    Check(Directory.GetFiles(root,"restore-candidate-*.db").Length==candidatesBefore,
+        "rejected forged backup does not leave a new restoration candidate");
+    Check(db.GetSchemaVersion()==10 && new AppDatabase(candidate).GetSchemaVersion()==10,
+        "refused forged backup leaves live database and legitimate candidate untouched");
+
     // Strict timing is serial, not overlapping.
     var timing = new ScriptStepTiming(30000, 5000, 0);
     Check(timing.EarliestDispatchAfterMs == 35000, "data contract encodes exact sequential wait+typing");
