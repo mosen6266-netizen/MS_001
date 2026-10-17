@@ -37,6 +37,7 @@ test("client only trusts compiled issuer, has no user-origin public key input",(
  assert.match(ui,/SignedReleaseFeed = "https:\/\/github.com\/mosen6266-netizen\/MS_001\/releases\/latest\/download\/update.json"/);
  assert.match(ui,/Process.Start\(launch\)/);
  assert.match(ui,/Application.Current.Shutdown\(\)/);
+ assert.match(ui,/Content="确认下载并安装"|Content="检查更新"|Content="取消"/);
 });
 test("stage-two verifies signer and backups only the program directory",()=>{
  assert.match(rollback,/ExpectedSHA256/);
@@ -44,7 +45,8 @@ test("stage-two verifies signer and backups only the program directory",()=>{
  assert.match(rollback,/PublisherThumbprint/);
  assert.match(rollback,/Wait-Process/);
  assert.match(rollback,/previous-program\.pending/);
- assert.match(rollback,/Copy-Item -LiteralPath \$backup -Destination \$program/);
+ assert.match(rollback,/robocopy \$backup \$program/);
+ assert.match(rollback,/last-update-error\.txt/);
  assert.doesNotMatch(rollback,/Remove-Item -LiteralPath \$privateData/);
  assert.match(installer,/Source: "\.\.\\updater\\Apply-Update\.ps1"; DestDir: "\{app\}\\tools"/);
 });
