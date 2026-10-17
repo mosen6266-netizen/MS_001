@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "product": "MOSEN_TELEGRAM_SCHEDULER",
+  "releaseAuthorized": false,
+  "releaseCandidate": "1.0.0",
+  "approval": {
+    "reviewer": "",
+    "approvedAtUtc": "",
+    "approvalEvidence": ""
+  },
+  "requirements": [
+    {
+      "id": "win10_clean_install_upgrade_uninstall",
+      "status": "DEFERRED",
+      "evidenceRef": "",
+      "reviewedBy": "",
+      "reviewedAtUtc": ""
+    },
+    {
+      "id": "win11_clean_install_upgrade_uninstall",
+      "status": "DEFERRED",
+      "evidenceRef": "",
+      "reviewedBy": "",
+      "reviewedAtUtc": ""
+    },
+    {
+      "id": "native_tdlib_verified_binary",
+      "status": "DEFERRED",
+      "evidenceRef": "",
+      "reviewedBy": "",
+      "reviewedAtUtc": ""
+    },
+    {
+      "id": "real_owned_account_auth_and_restart",
+      "status": "DEFERRED",
+      "evidenceRef": "",
+      "reviewedBy": "",
+      "reviewedAtUtc": ""
+    },
+    {
+      "id": "authorized_group_preflight_and_outbound_protection",
+      "status": "DEFERRED",
+      "evidenceRef": "",
+      "reviewedBy": "",
+      "reviewedAtUtc": ""
+    },
+    {
+      "id": "real_50_group_stability",
+      "status": "DEFERRED",
+      "evidenceRef": "",
+      "reviewedBy": "",
+      "reviewedAtUtc": ""
+    },
+    {
+      "id": "real_300_account_resource_capacity",
+      "status": "DEFERRED",
+      "evidenceRef": "",
+      "reviewedBy": "",
+      "reviewedAtUtc": ""
+    },
+    {
+      "id": "real_72h_wall_clock_soak",
+      "status": "DEFERRED",
+      "evidenceRef": "",
+      "reviewedBy": "",
+      "reviewedAtUtc": ""
+    },
+    {
+      "id": "power_loss_sqlite_restore",
+      "status": "DEFERRED",
+      "evidenceRef": "",
+      "reviewedBy": "",
+      "reviewedAtUtc": ""
+    },
+    {
+      "id": "windows_signed_setup_update_and_rollback",
+      "status": "DEFERRED",
+      "evidenceRef": "",
+      "reviewedBy": "",
+      "reviewedAtUtc": ""
+    },
+    {
+      "id": "cloudflare_independent_license_prod",
+      "status": "DEFERRED",
+      "evidenceRef": "",
+      "reviewedBy": "",
+      "reviewedAtUtc": ""
+    },
+    {
+      "id": "third_party_license_trademark_review",
+      "status": "DEFERRED",
+      "evidenceRef": "",
+      "reviewedBy": "",
+      "reviewedAtUtc": ""
+    },
+    {
+      "id": "human_final_acceptance",
+      "status": "DEFERRED",
+      "evidenceRef": "",
+      "reviewedBy": "",
+      "reviewedAtUtc": ""
+    }
+  ]
+}
