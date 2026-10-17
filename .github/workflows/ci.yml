@@ -649,9 +649,21 @@ jobs:
           retention-days: 30
           if-no-files-found: error
 
+  tdlib-native-smoke:
+    name: Win-x64 real TDLib native load and version (no login)
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: Load actual native tdjson.dll and request TDLib version
+        run: dotnet run --project tests/NativeSmoke/Mosen.GroupScheduler.NativeSmoke.csproj --configuration Release --runtime win-x64
+
   regression-gate:
     name: Step29 aggregate P0 gate - require every upstream CI job success
-    needs: [ui, windows, migrations, shell, visual-screenshots, settings, security, tdlib-adapter, authorization, session-lifecycle, group-catalog, script-editor, script-timing-media, script-portable, script-preflight, virtual-scheduler, outbound-policy, delivery-dedup, recovery-safety, runtime-dashboard, notifications-stop, history-security, performance-budget, telegram-license-worker, telegram-license-client, installer-data, windows-installer, updater-security, p0-e2e, capacity-synthetic, security-audit, handoff-docs]
+    needs: [ui, windows, migrations, shell, visual-screenshots, settings, security, tdlib-adapter, authorization, session-lifecycle, group-catalog, script-editor, script-timing-media, script-portable, script-preflight, virtual-scheduler, outbound-policy, delivery-dedup, recovery-safety, runtime-dashboard, notifications-stop, history-security, performance-budget, telegram-license-worker, telegram-license-client, installer-data, windows-installer, updater-security, p0-e2e, capacity-synthetic, security-audit, handoff-docs, tdlib-native-smoke]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -662,5 +674,5 @@ jobs:
       - name: Reject cancelled, skipped, failed or missing upstream checks
         env:
           REGRESSION_NEEDS_JSON: ${{ toJson(needs) }}
-          REGRESSION_REQUIRED_JOB_IDS: "ui,windows,migrations,shell,visual-screenshots,settings,security,tdlib-adapter,authorization,session-lifecycle,group-catalog,script-editor,script-timing-media,script-portable,script-preflight,virtual-scheduler,outbound-policy,delivery-dedup,recovery-safety,runtime-dashboard,notifications-stop,history-security,performance-budget,telegram-license-worker,telegram-license-client,installer-data,windows-installer,updater-security,p0-e2e,capacity-synthetic,security-audit,handoff-docs"
+          REGRESSION_REQUIRED_JOB_IDS: "ui,windows,migrations,shell,visual-screenshots,settings,security,tdlib-adapter,authorization,session-lifecycle,group-catalog,script-editor,script-timing-media,script-portable,script-preflight,virtual-scheduler,outbound-policy,delivery-dedup,recovery-safety,runtime-dashboard,notifications-stop,history-security,performance-budget,telegram-license-worker,telegram-license-client,installer-data,windows-installer,updater-security,p0-e2e,capacity-synthetic,security-audit,handoff-docs,tdlib-native-smoke"
         run: node tests/Integration/verify-ci-needs.mjs
