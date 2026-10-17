@@ -656,8 +656,18 @@
     "step": "28",
     "title": "签名更新与安全回滚",
     "phase": 7,
-    "status": "not_started",
-    "acceptance_evidence": [],
+    "status": "in_progress",
+    "acceptance_evidence": [
+      "src/Core/Updater/SignedUpdateManifest.cs",
+      "src/Core/Updater/ResumablePackageDownloader.cs",
+      "apps/desktop/MainWindow.Updates.cs",
+      "updater/Apply-Update.ps1",
+      "build/New-SignedUpdateManifest.ps1",
+      ".github/workflows/release.yml",
+      "tests/Updater/Program.cs",
+      "tests/Updater/release-contract.test.mjs",
+      "docs/STEP_28_TEST_MATRIX.md"
+    ],
     "last_commit_sha": null
   },
   {
