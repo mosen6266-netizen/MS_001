@@ -5,8 +5,8 @@
   "default_branch": "main",
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
-  "current_step": "30",
-  "current_step_status": "in_progress",
+  "current_step": "31",
+  "current_step_status": "not_started",
   "phase": 8,
   "total_steps": 32,
   "completed_steps": [
@@ -38,7 +38,8 @@
     "26",
     "27",
     "28",
-    "29"
+    "29",
+    "30"
   ],
   "development_started": true,
   "functional_code_started": true,
@@ -47,13 +48,13 @@
   "icon_source_received": true,
   "icon_asset_upload_verified": true,
   "exact_timing_contract": "wait preSendDelayMs -> typing typingDurationMs -> send; 30s+5s=35s; no overlap",
-  "last_verified_commit_sha": "0567b58ab0d1d54f3ed03f9f18630a640218c584",
+  "last_verified_commit_sha": "cc2043fa1460c5a6206036fb964149f17b857dfa",
   "last_updated": "2026-10-17",
   "blocking_issues": [
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step30 in_progress: build reproducible 300 account *metadata only*, 50 local simulated group scheduler stress + accelerated 72h logical model clock, actual GitHub runner process CPU/RAM/threads/handles/disk and duration reports; Windows/Linux CI required. Do not claim 300 native online, real 72h soak or native TDLib test. Progress stays 29/32 until new CI evidence.",
+  "notes": "Step30 DONE_DEV (synthetic only). CI 39033877609 completed/success 57/57 jobs; tested sha cc2043fa1460c5a6206036fb964149f17b857dfa; Windows/Linux each 20/20 capacity assertions and 1/1 artifact contract; 30 CI upstream jobs all success. Actual short-run wall 4.190s Linux and 20.561s Windows, working set peak samples 90/63 MiB, Windows last handle sample 267, 300 SQLite account metadata (0 real online), 50 groups with 6 roles each, accelerated 72 logical hours/4320 ticks, no Telegram traffic. 72 REAL hours, authentic TDLib 300 concurrent sessions/50 real chats, Win10/11 native and actual CPU/reconnect performance DEFERRED; do not claim actual capacity. Progress 30/32 = 93.75%. Next Step31.",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
@@ -240,6 +241,16 @@
       "id": "STEP29-REAL-E2E",
       "status": "DEFERRED",
       "detail": "开发阶段30项跨模块E2E均为真实SQLite的合成离线模拟；仍未完成Win10/11原生TDLib真实账号/合法群消息、操作交互及Windows更新回滚的实机端到端验收。"
+    },
+    {
+      "id": "STEP30-NATIVE-CAPACITY",
+      "status": "DEFERRED",
+      "detail": "300 online tdjson sessions, legitimate real account/group permissions, 50 genuine chat groups, native resource/RAM/CPU and reconnection measurements NOT performed; synthetic metadata is not equivalent."
+    },
+    {
+      "id": "STEP30-72H-REAL-SOAK",
+      "status": "DEFERRED",
+      "detail": "Physical 72h continuous wall-clock soak with actual Windows10/11 CPU/RAM/handle/disk/network/reconnect metrics NOT performed. 72h in CI was accelerated logical time only."
     }
   ],
   "step03_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38921641970",
@@ -335,5 +346,6 @@
   "step27_unit_checks_per_os": 22,
   "step27_static_contract_scenarios_per_os": 4,
   "step28_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/39031497799",
-  "step29_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/39032907487"
+  "step29_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/39032907487",
+  "step30_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/39033877609"
 }
