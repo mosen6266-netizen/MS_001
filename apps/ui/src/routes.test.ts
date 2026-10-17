@@ -35,6 +35,6 @@ describe("single-document navigation", () => {
     expect((html.match(/<aside /g) ?? []).length).toBe(1);
     expect((html.match(/class="nav-action/g) ?? []).length).toBe(6);
     expect(html).not.toMatch(/<a\s+href=/);
-    expect(html).toContain("无消息发送");
+    expect(html).toContain("未授权不发送");
   });
 });
