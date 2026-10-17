@@ -1,6 +1,6 @@
 import {useCallback,useEffect,useRef,useState} from "react";
 import {ActionButton,ConfirmDialog,StatusPill} from "./DesignSystem";
-import {IPC_PROTOCOL,isBridgeRequest,isBridgeResponse,type TelegramLiveStatus} from "../../../../src/contracts/ipc";
+import {IPC_PROTOCOL,isBridgeRequest,isBridgeResponse,isTelegramLiveStatus,type TelegramLiveStatus} from "../../../../src/contracts/ipc";
 
 type LiveType="telegram.auth.status"|"telegram.auth.start"|"telegram.auth.submit"|
   "telegram.auth.stop"|"telegram.chats.refresh"|"telegram.message.send";
@@ -20,6 +20,7 @@ export function TelegramLivePanel({view="accounts"}:{view?:"accounts"|"groups"})
  const [draft,setDraft]=useState("");
  const [confirm,setConfirm]=useState(false);
  const pending=useRef(new Set<()=>void>());
+ const checking=useRef(false);
  const invoke=useCallback((type:LiveType,payload?:Record<string,unknown>):Promise<Record<string,unknown>>=>{
   const host=window.chrome?.webview;
   if(!host)return Promise.reject(new Error("需要 Windows 客户端"));
@@ -45,10 +46,18 @@ export function TelegramLivePanel({view="accounts"}:{view?:"accounts"|"groups"})
   });
  },[]);
  const reload=useCallback(async()=>{
+   // A sluggish local host must not accumulate new polling requests every 2.5 seconds.
+   if(checking.current)return;
+   checking.current=true;
    try{
-    const r=await invoke("telegram.auth.status");
-    setStatus(r as unknown as TelegramLiveStatus);
-   }catch{/* Keep previous displayed state; never imply Ready on an error. */}
+    const reply=await invoke("telegram.auth.status");
+    if(isTelegramLiveStatus(reply)){
+      setStatus(reply);
+    }else{
+      setMessage("Telegram 状态数据不完整，请重新打开页面；已保留原有界面。");
+    }
+   }catch{/* Keep last known safe status; never turn an error into a false login. */}
+   finally{checking.current=false;}
  },[invoke]);
  useEffect(()=>{
   if(!window.chrome?.webview)return;
@@ -61,9 +70,11 @@ export function TelegramLivePanel({view="accounts"}:{view?:"accounts"|"groups"})
   setBusy(true);setMessage("");
   try{
    const result=await invoke(type,payload);
-   if("status" in result&&typeof result.status==="object"&&result.status!==null)
-     setStatus(result.status as TelegramLiveStatus);
-   else if("phase" in result)setStatus(result as unknown as TelegramLiveStatus);
+   const next=("status" in result)?result.status:("phase" in result?result:null);
+   if(next!==null){
+     if(isTelegramLiveStatus(next))setStatus(next);
+     else setMessage("Telegram 返回了不完整的状态，已忽略异常数据。");
+   }
    if(typeof result.message==="string")setMessage(result.message);
    else if(type==="telegram.chats.refresh")setMessage("群组信息已从Telegram刷新。");
    else if(type==="telegram.auth.start")setMessage("已启动官方授权流程，请查看当前状态。");
@@ -75,7 +86,7 @@ export function TelegramLivePanel({view="accounts"}:{view?:"accounts"|"groups"})
  const authAction=status.phase==="WaitPhoneOrQr"?"phone":
   status.phase==="WaitCode"?"code":status.phase==="WaitEmailAddress"?"email":
   status.phase==="WaitEmailCode"?"emailCode":status.phase==="WaitPassword"?"password":null;
- const authorizedGroups=status.groups.filter(g=>g.canSend);
+ const authorizedGroups=Array.isArray(status.groups)?status.groups.filter(g=>g&&g.canSend):[];
  const choice=authorizedGroups.find(g=>g.chatId===chatId);
  const canSend=status.connected&&!status.outboundPending&&!busy&&!!choice&&draft.trim().length>0&&draft.length<=2000;
  const doSend=()=>{void action("telegram.message.send",{chatId,text:draft}).then(()=>setDraft(""));};
