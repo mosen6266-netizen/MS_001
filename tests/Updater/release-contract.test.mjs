@@ -1,0 +1,48 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
+const read = x=>readFileSync(new URL(x,import.meta.url),"utf8");
+const signer=read("../../build/New-SignedUpdateManifest.ps1");
+const rollback=read("../../updater/Apply-Update.ps1");
+const workflow=read("../../.github/workflows/release.yml");
+const trust=read("../../updater/trust/release-v1.spki.base64").trim();
+const publisher=read("../../updater/trust/publisher-thumbprint.txt").trim();
+const ui=read("../../apps/desktop/MainWindow.Updates.cs");
+const installer=read("../../installer/Setup.iss");
+test("release trust pins are public and production signing keys are absent",()=>{
+ assert.match(trust,/^(?:UNCONFIGURED|[a-zA-Z0-9+/=]{80,})$/);
+ assert.match(publisher,/^(?:UNCONFIGURED|[a-fA-F0-9]{40})$/);
+ assert.match(signer,/UPDATE_SIGNING_PKCS8_BASE64/);
+ assert.match(signer,/FixedTimeEquals/);
+ assert.match(signer,/SignData/);
+ assert.doesNotMatch(trust,/PRIVATE KEY|BEGIN.*PRIVATE/);
+});
+test("manual release pipeline refuses missing keys and creates drafts only",()=>{
+ assert.match(workflow,/workflow_dispatch:/);
+ assert.doesNotMatch(workflow,/\n  push:/);
+ assert.match(workflow,/WINDOWS_SIGNING_PFX_BASE64/);
+ assert.match(workflow,/WINDOWS_SIGNING_PFX_PASSWORD/);
+ assert.match(workflow,/Get-AuthenticodeSignature/);
+ assert.match(workflow,/UPDATE_SIGNING_PKCS8_BASE64/);
+ assert.match(workflow,/--draft/);
+ assert.match(workflow,/gh release create/);
+ assert.doesNotMatch(workflow,/--latest\b/);
+});
+test("client only trusts compiled issuer, has no user-origin public key input",()=>{
+ assert.match(ui,/GetManifestResourceStream/);
+ assert.match(ui,/SignedUpdateManifest.Verify/);
+ assert.match(ui,/ResumablePackageDownloader.StageAsync/);
+ assert.match(ui,/SignedReleaseFeed = "https:\/\/github.com\/mosen6266-netizen\/MS_001\/releases\/latest\/download\/update.json"/);
+ assert.match(ui,/Process.Start\(launch\)/);
+ assert.match(ui,/Application.Current.Shutdown\(\)/);
+});
+test("stage-two verifies signer and backups only the program directory",()=>{
+ assert.match(rollback,/ExpectedSHA256/);
+ assert.match(rollback,/Get-AuthenticodeSignature/);
+ assert.match(rollback,/PublisherThumbprint/);
+ assert.match(rollback,/Wait-Process/);
+ assert.match(rollback,/previous-program\.pending/);
+ assert.match(rollback,/Copy-Item -LiteralPath \$backup -Destination \$program/);
+ assert.doesNotMatch(rollback,/Remove-Item -LiteralPath \$privateData/);
+ assert.match(installer,/Source: "\.\.\\updater\\Apply-Update\.ps1"; DestDir: "\{app\}\\tools"/);
+});
