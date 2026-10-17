@@ -1,4 +1,4 @@
-import {Component,type ErrorInfo,type ReactNode} from "react";
+import {Component,type ReactNode} from "react";
 
 /** An individual panel cannot take down the window, navigation or other panels.
  * Do not copy error messages, stack traces, credentials or TDLib payloads to UI/logs.
@@ -8,7 +8,7 @@ type State={failed:boolean};
 export class PanelErrorBoundary extends Component<Props,State>{
  state:State={failed:false};
  static getDerivedStateFromError():State{return {failed:true};}
- componentDidCatch(_error:Error,_details:ErrorInfo):void{
+ componentDidCatch():void{
    // Intentional: diagnostic text could contain a phone, QR token or Telegram secret.
    // A fixed category is sufficient; never send React component stacks externally.
  }
