@@ -2,10 +2,10 @@
 #define ProductName "MOSEN Telegram Scheduler"
 #define ProductExe "Mosen.GroupScheduler.Desktop.exe"
 #ifndef ProductVersion
-  #define ProductVersion "0.29.0"
+  #define ProductVersion "0.29.1"
 #endif
 #ifndef OutputTag
-  #define OutputTag "0.29.0-dev"
+  #define OutputTag "0.29.1-dev"
 #endif
 #ifndef PublishDir
   #define PublishDir "..\artifacts\desktop"
