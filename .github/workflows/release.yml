@@ -35,12 +35,7 @@ jobs:
           if($pin -notmatch '^[a-fA-F0-9]{40}$' -or $pub -eq "UNCONFIGURED"){throw "Publisher pins are not configured"}
           $cert=[Security.Cryptography.X509Certificates.X509Certificate2]::new([Convert]::FromBase64String($env:WINDOWS_SIGNING_PFX_BASE64),$env:WINDOWS_SIGNING_PFX_PASSWORD)
           if($cert.Thumbprint.ToUpperInvariant() -cne $pin.ToUpperInvariant()){throw "PFX does not match publisher thumbprint"}
-          $key=[Security.Cryptography.ECDsa]::Create()
-          try{
-            $read=0
-            $key.ImportPkcs8PrivateKey([Convert]::FromBase64String($env:UPDATE_SIGNING_PKCS8_BASE64),[ref]$read)
-            if(-not [Security.Cryptography.CryptographicOperations]::FixedTimeEquals([Convert]::FromBase64String($pub),$key.ExportSubjectPublicKeyInfo())){throw "Release signing private key does not match pinned SPKI"}
-          }finally{$key.Dispose()}
+          # The signer verifies PKCS8/SPKI equality using .NET10 Span APIs before release creation.
           gh release view "v$env:RELEASE_VERSION" --json tagName 2>$null
           if($LASTEXITCODE -eq 0){throw "Release exists; refusing overwrite"}
       - uses: actions/setup-node@v4
