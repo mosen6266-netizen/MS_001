@@ -709,9 +709,26 @@
     "step": "30",
     "title": "300 账号/50 群容量和长稳测试",
     "phase": 8,
-    "status": "in_progress",
-    "acceptance_evidence": [],
-    "last_commit_sha": null
+    "status": "done_dev",
+    "acceptance_evidence": [
+      "tests/Capacity/Mosen.GroupScheduler.Capacity.Tests.csproj",
+      "tests/Capacity/Program.cs",
+      "tests/Capacity/report-contract.test.mjs",
+      "docs/BENCHMARKS.md",
+      "docs/CAPACITY_LIMITS.md",
+      "reports/performance/README.md",
+      "docs/STEP_30_TEST_MATRIX.md",
+      "docs/STEP_30_ACCEPTANCE.md",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/39033877609 (completed success, 57/57; capacity reports Artifacts 12101840842,12101726732)"
+    ],
+    "last_commit_sha": "cc2043fa1460c5a6206036fb964149f17b857dfa",
+    "deferred_release_acceptance": [
+      "STEP30-NATIVE-CAPACITY",
+      "STEP30-72H-REAL-SOAK",
+      "NATIVE-RESOURCE",
+      "FULL-CAPACITY",
+      "LONG-SOAK"
+    ]
   },
   {
     "step": "31",
