@@ -30,18 +30,14 @@ public static class TdlibManualOperations
             throw new ArgumentException("Invalid message characters.",nameof(content));
         return JsonSerializer.Serialize(new Dictionary<string,object?>{
             ["@type"]="sendMessage",["@extra"]=correlation,["chat_id"]=id,
-            ["message_thread_id"]=0L,["reply_to"]=null,
-            ["options"]=new Dictionary<string,object?>{
-                ["disable_notification"]=false,["from_background"]=false,
-                ["protect_content"]=false
-            },
+            ["topic_id"]=null,["reply_to"]=null,["options"]=null,["reply_markup"]=null,
             ["input_message_content"]=new Dictionary<string,object?>{
                 ["@type"]="inputMessageText",
                 ["text"]=new Dictionary<string,object?>{
                     ["@type"]="formattedText",["text"]=content,
                     ["entities"]=Array.Empty<object>()
                 },
-                ["link_preview_options"]=new Dictionary<string,object?>{{"is_disabled",true}},
+                ["link_preview_options"]=null,
                 ["clear_draft"]=false
             }
         });
