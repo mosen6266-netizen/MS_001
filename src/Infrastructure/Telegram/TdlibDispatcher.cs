@@ -5,6 +5,7 @@ using System.Threading.Channels;
 namespace Mosen.GroupScheduler.Telegram;
 
 public enum TdlibControlCommand { GetVersion, GetAuthorizationState }
+public enum TdlibManualOperation { ListChats, GetChat, SendOneText }
 
 public sealed record TdlibEnvelope(int ClientId, string Type, JsonElement Body)
 {
@@ -142,6 +143,19 @@ public sealed class TdlibDispatcher : IAsyncDisposable
             return await completion.Task.WaitAsync(timeout,cancellationToken);
         }
         finally{_pending.TryRemove(id,out _);}
+    }
+
+    /// <summary>One manual operation, correlated to a single TDLib client; no automatic retry.</summary>
+    public Task<TdlibEnvelope> SendManualAsync(int clientId,TdlibManualOperation command,long chatId,
+        string? text,TimeSpan timeout,CancellationToken cancellationToken=default)
+    {
+        return SendCorrelatedAsync(clientId,id=>command switch
+        {
+            TdlibManualOperation.ListChats => TdlibManualOperations.Chats(id),
+            TdlibManualOperation.GetChat => TdlibManualOperations.Chat(id,chatId),
+            TdlibManualOperation.SendOneText => TdlibManualOperations.SendOneText(id,chatId,text!),
+            _ => throw new ArgumentOutOfRangeException(nameof(command))
+        },timeout,cancellationToken);
     }
 
     /// <summary>Explicit one-client close used to cancel authorization, not logOut.</summary>
