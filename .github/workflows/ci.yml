@@ -619,9 +619,39 @@ jobs:
       - name: Test release approval gate, tracked source and injected secrets
         run: node --test tests/SecurityAudit/release-readiness.test.mjs tests/SecurityAudit/source-audit.test.mjs
 
+  handoff-docs:
+    name: Step32 docs, checksum manifest and blocked release candidate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Validate V1.0 delivery documents and blocked release status
+        run: node --test tests/Release/final-handoff.test.mjs
+      - name: Create deterministic documentation-only handoff
+        run: python build/package-development-handoff.py --output artifacts/handoff
+      - name: Independently recheck archive and per-file SHA256
+        run: python build/package-development-handoff.py --output artifacts/handoff --verify
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v1-development-handoff
+          path: |
+            artifacts/handoff/v1-development-handoff.zip
+            artifacts/handoff/v1-development-handoff.zip.sha256
+            artifacts/handoff/handoff-manifest.json
+          retention-days: 30
+          if-no-files-found: error
+
   regression-gate:
     name: Step29 aggregate P0 gate - require every upstream CI job success
-    needs: [ui, windows, migrations, shell, visual-screenshots, settings, security, tdlib-adapter, authorization, session-lifecycle, group-catalog, script-editor, script-timing-media, script-portable, script-preflight, virtual-scheduler, outbound-policy, delivery-dedup, recovery-safety, runtime-dashboard, notifications-stop, history-security, performance-budget, telegram-license-worker, telegram-license-client, installer-data, windows-installer, updater-security, p0-e2e, capacity-synthetic, security-audit]
+    needs: [ui, windows, migrations, shell, visual-screenshots, settings, security, tdlib-adapter, authorization, session-lifecycle, group-catalog, script-editor, script-timing-media, script-portable, script-preflight, virtual-scheduler, outbound-policy, delivery-dedup, recovery-safety, runtime-dashboard, notifications-stop, history-security, performance-budget, telegram-license-worker, telegram-license-client, installer-data, windows-installer, updater-security, p0-e2e, capacity-synthetic, security-audit, handoff-docs]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -632,5 +662,5 @@ jobs:
       - name: Reject cancelled, skipped, failed or missing upstream checks
         env:
           REGRESSION_NEEDS_JSON: ${{ toJson(needs) }}
-          REGRESSION_REQUIRED_JOB_IDS: "ui,windows,migrations,shell,visual-screenshots,settings,security,tdlib-adapter,authorization,session-lifecycle,group-catalog,script-editor,script-timing-media,script-portable,script-preflight,virtual-scheduler,outbound-policy,delivery-dedup,recovery-safety,runtime-dashboard,notifications-stop,history-security,performance-budget,telegram-license-worker,telegram-license-client,installer-data,windows-installer,updater-security,p0-e2e,capacity-synthetic,security-audit"
+          REGRESSION_REQUIRED_JOB_IDS: "ui,windows,migrations,shell,visual-screenshots,settings,security,tdlib-adapter,authorization,session-lifecycle,group-catalog,script-editor,script-timing-media,script-portable,script-preflight,virtual-scheduler,outbound-policy,delivery-dedup,recovery-safety,runtime-dashboard,notifications-stop,history-security,performance-budget,telegram-license-worker,telegram-license-client,installer-data,windows-installer,updater-security,p0-e2e,capacity-synthetic,security-audit,handoff-docs"
         run: node tests/Integration/verify-ci-needs.mjs
