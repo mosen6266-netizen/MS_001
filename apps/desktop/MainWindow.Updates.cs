@@ -88,7 +88,8 @@ public partial class MainWindow
             if(_closing)return;
             if(!ConfirmSignedUpdate(checkedManifest.Payload.Version,checkedManifest.Payload.Size))return;
             string stage=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"MOSEN","TelegramSchedulerUpdates");
-            string installer=await ResumablePackageDownloader.StageAsync(client,checkedManifest,stage);
+            using var packageClient=new HttpClient { Timeout=TimeSpan.FromMinutes(30) };
+            string installer=await ResumablePackageDownloader.StageAsync(packageClient,checkedManifest,stage);
             if(_closing)return;
             string script=Path.Combine(AppContext.BaseDirectory,"tools","Apply-Update.ps1");
             if(!File.Exists(script))throw new FileNotFoundException("更新辅助程序不存在。");
