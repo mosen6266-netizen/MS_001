@@ -21,7 +21,7 @@ test("P0 registry uses unique ids, executable evidence and explicit offline-only
   assert.ok(!row.testPath.split("/").includes(".."),row.id+" traversal");
   assert.ok(existsSync(resolve(root,row.testPath)),row.id+": missing "+row.testPath);
   assert.ok(jobs.has(row.ciJob),row.id+": CI job "+row.ciJob+" missing");
-  assert.match(read(row.testPath),/\b(Check|Reject|Assert|test|describe|it|expect|assert)\b/,
+  assert.match(read(row.testPath),/\b(Check|Reject|Assert|Verify|test|describe|it|expect|assert)\b/,
    row.id+": mapped file does not contain executable assertions");
  }
 });
