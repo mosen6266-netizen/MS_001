@@ -662,13 +662,20 @@
       "src/Core/Updater/ResumablePackageDownloader.cs",
       "apps/desktop/MainWindow.Updates.cs",
       "updater/Apply-Update.ps1",
+      "updater/ReleaseSigner/Program.cs",
+      "updater/ReleaseVerifier/Program.cs",
       "build/New-SignedUpdateManifest.ps1",
       ".github/workflows/release.yml",
       "tests/Updater/Program.cs",
       "tests/Updater/release-contract.test.mjs",
-      "docs/STEP_28_TEST_MATRIX.md"
+      "docs/STEP_28_TEST_MATRIX.md",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/39030669456 (queued, not successful)"
     ],
-    "last_commit_sha": null
+    "last_commit_sha": null,
+    "deferred_release_acceptance": [
+      "STEP28-LIVE-CODE-SIGNING",
+      "STEP28-REAL-ROLLBACK"
+    ]
   },
   {
     "step": "29",
