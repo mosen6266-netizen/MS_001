@@ -7,12 +7,14 @@ on:
         required: true
         type: string
 permissions:
-  contents: write
+  contents: read
 concurrency:
   group: ms001-signed-release
   cancel-in-progress: false
 jobs:
-  release:
+  build-and-sign:
+    permissions:
+      contents: read
     runs-on: windows-latest
     timeout-minutes: 90
     environment: telegram-signed-release
@@ -103,6 +105,51 @@ jobs:
         run: |
           $file="artifacts/installer/MOSEN-Telegram-Scheduler-Setup-$env:RELEASE_VERSION.exe"
           ./build/New-SignedUpdateManifest.ps1 -Version $env:RELEASE_VERSION -PackagePath $file -Destination "artifacts/installer/update.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ms001-signed-draft-candidate
+          path: |
+            artifacts/installer/MOSEN-Telegram-Scheduler-Setup-${{ inputs.version }}.exe
+            artifacts/installer/MOSEN-Telegram-Scheduler-Setup-${{ inputs.version }}.exe.sha256
+            artifacts/installer/update.json
+          retention-days: 2
+          if-no-files-found: error
+
+  publish-draft:
+    needs: build-and-sign
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - uses: actions/download-artifact@v4
+        with:
+          name: ms001-signed-draft-candidate
+          path: artifacts/installer/
+      - name: Independently verify signature, digest, cert and exact version
+        shell: pwsh
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: |
+          $ErrorActionPreference="Stop"
+          $v=$env:RELEASE_VERSION
+          $package="artifacts/installer/MOSEN-Telegram-Scheduler-Setup-$v.exe"
+          dotnet run --project updater/ReleaseVerifier/Mosen.GroupScheduler.ReleaseVerifier.csproj -c Release -- $v $package "artifacts/installer/update.json"
+          if($LASTEXITCODE -ne 0){throw "Signed manifest or package digest verification failed"}
+          $certPin=(Get-Content -Raw "updater/trust/publisher-thumbprint.txt").Trim()
+          $cert=Get-AuthenticodeSignature $package
+          if($cert.Status -ne "Valid" -or $null -eq $cert.SignerCertificate -or
+             $cert.SignerCertificate.Thumbprint.ToUpperInvariant() -cne $certPin.ToUpperInvariant()){
+            throw "Installer's trusted Authenticode publisher signature failed independent recheck"
+          }
+          $actual=(Get-FileHash $package -Algorithm SHA256).Hash
+          $sum=(Get-Content "artifacts/installer/MOSEN-Telegram-Scheduler-Setup-$v.exe.sha256" -Raw)
+          if(-not $sum.StartsWith($actual,[StringComparison]::OrdinalIgnoreCase)){throw "SHA256 checksum file mismatch"}
       - name: Create GitHub Release DRAFT for separate human approval
         shell: pwsh
         env:
@@ -111,4 +158,6 @@ jobs:
         run: |
           $v=$env:RELEASE_VERSION
           $file="MOSEN-Telegram-Scheduler-Setup-$v.exe"
+          gh release view "v$v" --json tagName 2>$null
+          if($LASTEXITCODE -eq 0){throw "Release already exists; refusing overwrite"}
           gh release create "v$v" "artifacts/installer/$file" "artifacts/installer/$file.sha256" "artifacts/installer/update.json" --draft --title "MOSEN Telegram Scheduler v$v" --notes "Signed draft awaiting final Win10/11, data migration, TDLib, and human release verification."
