@@ -43,7 +43,7 @@ test("development package never includes EXE, secrets or changes real approval",
 test("document package CI must upload evidence and final aggregate require it",()=>{
  const workflow=load(".github/workflows/ci.yml");
  assert.match(workflow,/\n  handoff-docs:/);
- assert.match(workflow,/python build\/package-development-handoff\.py --verify/);
+ assert.match(workflow,/python build\/package-development-handoff\.py[^\n]* --verify/);
  assert.match(workflow,/v1-development-handoff/);
  assert.match(workflow,/node --test tests\/Release\/final-handoff\.test\.mjs/);
  assert.match(workflow,/needs: \[[^\]]*handoff-docs\]/);
