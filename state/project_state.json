@@ -5,9 +5,9 @@
   "default_branch": "main",
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
-  "current_step": "28",
-  "current_step_status": "in_progress",
-  "phase": 7,
+  "current_step": "29",
+  "current_step_status": "not_started",
+  "phase": 8,
   "total_steps": 32,
   "completed_steps": [
     "01",
@@ -36,7 +36,8 @@
     "24",
     "25",
     "26",
-    "27"
+    "27",
+    "28"
   ],
   "development_started": true,
   "functional_code_started": true,
@@ -45,13 +46,13 @@
   "icon_source_received": true,
   "icon_asset_upload_verified": true,
   "exact_timing_contract": "wait preSendDelayMs -> typing typingDurationMs -> send; 30s+5s=35s; no overlap",
-  "last_verified_commit_sha": "cbb9d9c26a4186a0ad348184e77e9aa739d4c884",
+  "last_verified_commit_sha": "716f22ad3a4c707b5b4574cad34b738f2d1c70ff",
   "last_updated": "2026-10-17",
   "blocking_issues": [
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step28 in_progress: signed feed, strict GitHub source, SHA256/resume, WPF opt-in installer, after-exit signature+version verification, robust restore with two rolling program backups (previous-program/prior), protects pending backup from overwrite, separate read-only signer and write-scoped draft publisher. Signed publisher trust still UNCONFIGURED and no signed public release; latest GH Actions 39030893090 pending, 0 jobs. No CI pass/real Windows acceptance. Completed 27/32, remaining 5.",
+  "notes": "Step28 DONE_DEV on verified source 716f22ad3a4c707b5b4574cad34b738f2d1c70ff. CI 39031497799 completed/success 52/52 jobs, Windows/Linux each 22 update assertions+4 release contract tests, .NET release signer/verifier builds, Windows PowerShell parsing, WPF Win-x64 build/publish, unsigned offline Inno EXE generated 269072288 bytes sha256 E81CA3181840A67603677EBBBD83090B94F85D2269290FD3FEDA747CFE76FFBF. Production code-signing keys remain UNCONFIGURED: never released a signed EXE or publicly published GitHub Release. Win10/11 physical update, rollback, TDLib, Cloudflare production, 72h tests remain DEFERRED. Progress 28/32 (87.5%), next Step29.",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
@@ -326,5 +327,6 @@
   "step27_installer_bytes": 269048726,
   "step27_installer_sha256": "B89BA706946CC4EE13F100B6917090A487132464EA556DEF67F2D42A09EC1153",
   "step27_unit_checks_per_os": 22,
-  "step27_static_contract_scenarios_per_os": 4
+  "step27_static_contract_scenarios_per_os": 4,
+  "step28_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/39031497799"
 }
