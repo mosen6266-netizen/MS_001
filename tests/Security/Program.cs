@@ -16,6 +16,20 @@ Check(IpcRequestGuard.TryValidate(valid,out var operation)&&operation==AllowedIp
 Check(IpcRequestGuard.TryValidate(save,out operation)&&operation==AllowedIpcOperation.SettingsSave,"valid settings save passes exact payload check");
 Check(IpcRequestGuard.TryValidate("""{"protocol":"mosen.desktop.v1","requestId":"diag-1","type":"diagnostics.get"}""",out operation)&&operation==AllowedIpcOperation.DiagnosticsGet,"read-only diagnostics command allowed");
 Check(!IpcRequestGuard.TryValidate("""{"protocol":"mosen.desktop.v1","requestId":"x","type":"telegram.send"}""",out _),"Telegram network command denied");
+string tgApiSave=System.Text.Json.JsonSerializer.Serialize(new{
+    protocol="mosen.desktop.v1",requestId="tg-api-1",type="telegram.api.save",
+    payload=new {apiId=123456,apiHash=new string('a',32)}
+});
+Check(IpcRequestGuard.TryValidate(tgApiSave,out operation)&&operation==AllowedIpcOperation.ApiConfigSave,
+    "valid local app API parameters accepted by strict IPC");
+Check(!IpcRequestGuard.TryValidate(tgApiSave.Replace(new string('a',32),"BAD-SECRET"),out _),
+    "malformed app API hash rejected before touching disk");
+Check(!IpcRequestGuard.TryValidate(tgApiSave.Replace("\"apiId\":123456","\"apiId\":123456,\"session\":\"UNTRUSTED\""),out _),
+    "credential IPC forbids unrelated account session fields");
+Check(IpcRequestGuard.TryValidate("""{"protocol":"mosen.desktop.v1","requestId":"tg-api-2","type":"telegram.api.status"}""",out operation)&&operation==AllowedIpcOperation.ApiConfigStatus,
+    "app API status read-only command permitted");
+Check(IpcRequestGuard.TryValidate("""{"protocol":"mosen.desktop.v1","requestId":"tg-api-3","type":"telegram.api.clear"}""",out operation)&&operation==AllowedIpcOperation.ApiConfigClear,
+    "explicit local app API config removal permitted");
 Check(!IpcRequestGuard.TryValidate(valid.Replace("system.ping","system.ping\",\"type\":\"settings.get"),out _),"duplicate root type denied");
 Check(!IpcRequestGuard.TryValidate(save.Replace("\"pageSize\":20", "\"pageSize\":20,\"pageSize\":50"),out _),"duplicate nested preference denied");
 Check(!IpcRequestGuard.TryValidate(save.Replace("\"density\":\"comfortable\"", "\"density\":\"compact\",\"token\":\"BAD-SECRET\""),out _),"credential keys denied");
@@ -97,6 +111,16 @@ try
         try{DpapiProtector.Unprotect(protectedEnvelope+"broken");}
         catch(CryptographicException){broken=true;}
         Check(broken,"tampered DPAPI envelope rejected");
+        var apiStore=new TelegramAppCredentialStore(Path.Combine(tmp,"app-telegram-api.json"));
+        apiStore.Save(123456,new string('a',32));
+        Check(apiStore.Configured,"Windows API credential configuration stored");
+        Check(!File.ReadAllText(Path.Combine(tmp,"app-telegram-api.json")).Contains(new string('a',32)),
+            "DPAPI file does not leak plaintext hash");
+        var stored=apiStore.Read();
+        Check(stored.ApiId==123456 && stored.ApiHash==new string('a',32),
+            "locally protected application credentials round-trip");
+        apiStore.Clear();
+        Check(!apiStore.Configured,"user can erase protected app API configuration");
     }
     else
     {
