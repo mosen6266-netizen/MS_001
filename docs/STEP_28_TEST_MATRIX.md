@@ -10,3 +10,5 @@
 
 - [x] 17/17 项仓库源码静态合同核对通过（**不等于** Windows/Linux 单测、WPF 构建或真实 Inno 安装）。
 - [ ] 最新 CI [39030669456](https://github.com/mosen6266-netizen/MS_001/actions/runs/39030669456) 初次检查全部49个作业为queued，尚无PASS结果，禁止标记done_dev。
+- [x] 静态检查：安装成功后仍强制检查新EXE Authenticode证书指纹及清单准确版本，不一致则恢复旧程序；连续升级时轮换`previous-program`/`previous-program.prior`两代备份，未完成`.pending`阻止自动覆盖。
+- [ ] 最新 [CI 39030893090](https://github.com/mosen6266-netizen/MS_001/actions/runs/39030893090) 初查pending、0个已分配作业，不存在通过结论。
