@@ -6,7 +6,7 @@
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
   "current_step": "28",
-  "current_step_status": "not_started",
+  "current_step_status": "in_progress",
   "phase": 5,
   "total_steps": 32,
   "completed_steps": [
@@ -51,7 +51,7 @@
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step27 done_dev: Actual unsigned Inno Setup 6.7.1 standalone win-x64 installer built by GitHub CI 39026535003 success 50/50; 269048726-byte EXE SHA256 B89BA706946CC4EE13F100B6917090A487132464EA556DEF67F2D42A09EC1153 uploaded as ms001-step27-offline-installer-unsigned artifact. Microsoft Authenticode-verified x64 offline Evergreen WebView2 installer bundled. End users need neither Python/Java nor .NET SDK. Per-user stable AppId install and shortcuts, verified icon, historical LocalAppData MOSEN/TelegramScheduler app.db and WebView2 profile separated; default uninstall keeps data. Windows/Linux each 22 upgrade/install state assertions and 4 script contract suites. Real clean Windows10/11 VM install/uninstall and production code signing, updates and live TDLib remain DEFERRED. Progress 27/32=84.375%, 5 steps remaining, next Step28 signer/updater.",
+  "notes": "Step28 in progress: pinned P-256 signed manifest, SHA256 and HTTP resume downloader, WPF check-update gate, separate post-exit Authenticode verification and best-effort program-folder backup/rollback, draft-only signed release workflow. Signing trust pins remain UNCONFIGURED; no actual production code signing or GitHub release. Cross-platform CI pending. Progress remains 27/32; no claim of done_dev until all tests pass.",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
