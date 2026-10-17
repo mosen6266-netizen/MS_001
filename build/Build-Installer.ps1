@@ -5,8 +5,8 @@ param(
  [Parameter(Mandatory=$false)][string]$Published = "artifacts/desktop",
  [Parameter(Mandatory=$false)][string]$Output = "artifacts/installer",
  [Parameter(Mandatory=$false)][string]$InnoCompiler = "",
- [Parameter(Mandatory=$false)][string]$PackageVersion = "0.29.1",
- [Parameter(Mandatory=$false)][string]$PackageFileTag = "0.29.1-dev"
+ [Parameter(Mandatory=$false)][string]$PackageVersion = "0.29.2",
+ [Parameter(Mandatory=$false)][string]$PackageFileTag = "0.29.2-dev"
 )
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
