@@ -2,7 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
 const read = x=>readFileSync(new URL(x,import.meta.url),"utf8");
-const signer=read("../../build/New-SignedUpdateManifest.ps1");
+const signer=read("../../updater/ReleaseSigner/Program.cs");
+const signerWrapper=read("../../build/New-SignedUpdateManifest.ps1");
 const rollback=read("../../updater/Apply-Update.ps1");
 const workflow=read("../../.github/workflows/release.yml");
 const trust=read("../../updater/trust/release-v1.spki.base64").trim();
@@ -13,6 +14,7 @@ test("release trust pins are public and production signing keys are absent",()=>
  assert.match(trust,/^(?:UNCONFIGURED|[a-zA-Z0-9+/=]{80,})$/);
  assert.match(publisher,/^(?:UNCONFIGURED|[a-fA-F0-9]{40})$/);
  assert.match(signer,/UPDATE_SIGNING_PKCS8_BASE64/);
+ assert.match(signerWrapper,/dotnet run --project/);
  assert.match(signer,/FixedTimeEquals/);
  assert.match(signer,/SignData/);
  assert.doesNotMatch(trust,/PRIVATE KEY|BEGIN.*PRIVATE/);
