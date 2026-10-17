@@ -7,7 +7,9 @@ on:
       - "tests/**"
       - "license/**"
       - "installer/**"
+      - "updater/**"
       - "build/**"
+      - ".github/workflows/release.yml"
       - "assets/branding/**"
       - ".github/workflows/ci.yml"
       - "Directory.Build.props"
@@ -509,3 +511,23 @@ jobs:
             artifacts/installer/MOSEN-Telegram-Scheduler-Setup-0.27.0-dev.exe.sha256
           retention-days: 7
           if-no-files-found: error
+
+  updater-security:
+    name: Signed update and resume contract - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: Test manifest P-256 trust, strict origin, digest and HTTP resume
+        run: dotnet run --project tests/Updater/Mosen.GroupScheduler.Updater.Tests.csproj --configuration Release
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Ensure unsigned release cannot escape guarded workflow
+        run: node --test tests/Updater/release-contract.test.mjs
