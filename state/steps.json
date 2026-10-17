@@ -734,9 +734,31 @@
     "step": "31",
     "title": "安全审计、数据恢复和发布阻断",
     "phase": 8,
-    "status": "in_progress",
-    "acceptance_evidence": [],
-    "last_commit_sha": null
+    "status": "done_dev",
+    "acceptance_evidence": [
+      "src/Infrastructure/Persistence/AppDatabase.cs",
+      "tests/Migrations/Program.cs",
+      "build/audit-repository-secrets.mjs",
+      "build/check-release-readiness.mjs",
+      "release/readiness.json",
+      "tests/SecurityAudit/release-readiness.test.mjs",
+      "tests/SecurityAudit/source-audit.test.mjs",
+      ".github/workflows/release.yml",
+      ".github/workflows/ci.yml",
+      "docs/SECURITY_AUDIT.md",
+      "docs/THIRD_PARTY_REVIEW.md",
+      "docs/STEP_31_TEST_MATRIX.md",
+      "docs/STEP_31_ACCEPTANCE.md",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/39035133383 (completed success 58/58; source a40ec24b721b27c605205cc7ae268c6d22ebb71c)"
+    ],
+    "last_commit_sha": "a40ec24b721b27c605205cc7ae268c6d22ebb71c",
+    "deferred_release_acceptance": [
+      "STEP31-RELEASE-READINESS",
+      "STEP31-THIRD-PARTY-LEGAL",
+      "STEP31-LOCAL-UPDATER-INTEGRITY",
+      "STEP30-NATIVE-CAPACITY",
+      "STEP30-72H-REAL-SOAK"
+    ]
   },
   {
     "step": "32",
