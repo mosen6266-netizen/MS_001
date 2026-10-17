@@ -669,7 +669,7 @@
       "tests/Updater/Program.cs",
       "tests/Updater/release-contract.test.mjs",
       "docs/STEP_28_TEST_MATRIX.md",
-      "https://github.com/mosen6266-netizen/MS_001/actions/runs/39030669456 (queued, not successful)"
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/39030893090 (pending, not passed)"
     ],
     "last_commit_sha": null,
     "deferred_release_acceptance": [
