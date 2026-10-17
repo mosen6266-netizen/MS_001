@@ -573,9 +573,40 @@ jobs:
       - name: Validate P0 mapped coverage, test ownership and risk boundaries
         run: node --test tests/Unit/p0-coverage.test.mjs tests/Integration/ci-contract.test.mjs
 
+  capacity-synthetic:
+    name: Step30 300 metadata and 50 offline groups and 72h logical - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Exercise metadata/group capacity and record real process counters
+        env:
+          MS001_PERF_REPORT: reports/performance/step30-${{ matrix.os }}.json
+        run: dotnet run --project tests/Capacity/Mosen.GroupScheduler.Capacity.Tests.csproj -c Release
+      - name: Validate truthful resource and capacity report
+        env:
+          MS001_PERF_REPORT: reports/performance/step30-${{ matrix.os }}.json
+        run: node --test tests/Capacity/report-contract.test.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: step30-synthetic-capacity-${{ matrix.os }}
+          path: reports/performance/step30-${{ matrix.os }}.json
+          retention-days: 30
+          if-no-files-found: error
+
   regression-gate:
     name: Step29 aggregate P0 gate - require every upstream CI job success
-    needs: [ui, windows, migrations, shell, visual-screenshots, settings, security, tdlib-adapter, authorization, session-lifecycle, group-catalog, script-editor, script-timing-media, script-portable, script-preflight, virtual-scheduler, outbound-policy, delivery-dedup, recovery-safety, runtime-dashboard, notifications-stop, history-security, performance-budget, telegram-license-worker, telegram-license-client, installer-data, windows-installer, updater-security, p0-e2e]
+    needs: [ui, windows, migrations, shell, visual-screenshots, settings, security, tdlib-adapter, authorization, session-lifecycle, group-catalog, script-editor, script-timing-media, script-portable, script-preflight, virtual-scheduler, outbound-policy, delivery-dedup, recovery-safety, runtime-dashboard, notifications-stop, history-security, performance-budget, telegram-license-worker, telegram-license-client, installer-data, windows-installer, updater-security, p0-e2e, capacity-synthetic]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -586,5 +617,5 @@ jobs:
       - name: Reject cancelled, skipped, failed or missing upstream checks
         env:
           REGRESSION_NEEDS_JSON: ${{ toJson(needs) }}
-          REGRESSION_REQUIRED_JOB_IDS: "ui,windows,migrations,shell,visual-screenshots,settings,security,tdlib-adapter,authorization,session-lifecycle,group-catalog,script-editor,script-timing-media,script-portable,script-preflight,virtual-scheduler,outbound-policy,delivery-dedup,recovery-safety,runtime-dashboard,notifications-stop,history-security,performance-budget,telegram-license-worker,telegram-license-client,installer-data,windows-installer,updater-security,p0-e2e"
+          REGRESSION_REQUIRED_JOB_IDS: "ui,windows,migrations,shell,visual-screenshots,settings,security,tdlib-adapter,authorization,session-lifecycle,group-catalog,script-editor,script-timing-media,script-portable,script-preflight,virtual-scheduler,outbound-policy,delivery-dedup,recovery-safety,runtime-dashboard,notifications-stop,history-security,performance-budget,telegram-license-worker,telegram-license-client,installer-data,windows-installer,updater-security,p0-e2e,capacity-synthetic"
         run: node tests/Integration/verify-ci-needs.mjs
