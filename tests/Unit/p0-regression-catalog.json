@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 1,
+  "mode": "offline-simulation-only",
+  "statement": "P0 automated coverage means synthetic tests and build gates, not real Telegram/TDLib/Windows installation acceptance.",
+  "cases": [
+    {
+      "id": "P0-01",
+      "description": "SQLite迁移与备份恢复",
+      "testPath": "tests/Migrations/Program.cs",
+      "ciJob": "migrations"
+    },
+    {
+      "id": "P0-02",
+      "description": "用户设置与并发修订",
+      "testPath": "tests/Settings/Program.cs",
+      "ciJob": "settings"
+    },
+    {
+      "id": "P0-03",
+      "description": "IPC协议和敏感信息过滤",
+      "testPath": "tests/Security/Program.cs",
+      "ciJob": "security"
+    },
+    {
+      "id": "P0-04",
+      "description": "TDLib异步响应与退出契约",
+      "testPath": "tests/TelegramAdapter/Program.cs",
+      "ciJob": "tdlib-adapter"
+    },
+    {
+      "id": "P0-05",
+      "description": "账号二维码及二步认证状态",
+      "testPath": "tests/AccountAuth/Program.cs",
+      "ciJob": "authorization"
+    },
+    {
+      "id": "P0-06",
+      "description": "300会话目录及私有密钥隔离",
+      "testPath": "tests/SessionLifecycle/Program.cs",
+      "ciJob": "session-lifecycle"
+    },
+    {
+      "id": "P0-07",
+      "description": "群/话题权限与改名",
+      "testPath": "tests/GroupCatalog/Program.cs",
+      "ciJob": "group-catalog"
+    },
+    {
+      "id": "P0-08",
+      "description": "角色剧本编辑与撤销保存",
+      "testPath": "tests/Scripts/Editor/Program.cs",
+      "ciJob": "script-editor"
+    },
+    {
+      "id": "P0-09",
+      "description": "三个时间段顺序及媒体文件",
+      "testPath": "tests/Scripts/Timing/Program.cs",
+      "ciJob": "script-timing-media"
+    },
+    {
+      "id": "P0-10",
+      "description": "跨设备剧本压缩包与防目录穿越",
+      "testPath": "tests/Scripts/Portable/Program.cs",
+      "ciJob": "script-portable"
+    },
+    {
+      "id": "P0-11",
+      "description": "不可变发布与群授权预检",
+      "testPath": "tests/Preflight/Program.cs",
+      "ciJob": "script-preflight"
+    },
+    {
+      "id": "P0-12",
+      "description": "50群公平调度与重启禁发",
+      "testPath": "tests/Scheduler/Program.cs",
+      "ciJob": "virtual-scheduler"
+    },
+    {
+      "id": "P0-13",
+      "description": "官方限流及出站权限",
+      "testPath": "tests/Policy/Program.cs",
+      "ciJob": "outbound-policy"
+    },
+    {
+      "id": "P0-14",
+      "description": "投递回执去重及不明结果",
+      "testPath": "tests/Delivery/Program.cs",
+      "ciJob": "delivery-dedup"
+    },
+    {
+      "id": "P0-15",
+      "description": "断网、休眠与恢复隔离",
+      "testPath": "tests/Recovery/Program.cs",
+      "ciJob": "recovery-safety"
+    },
+    {
+      "id": "P0-16",
+      "description": "50群运行看板与状态计数",
+      "testPath": "tests/UI/Dashboard/Program.cs",
+      "ciJob": "runtime-dashboard"
+    },
+    {
+      "id": "P0-17",
+      "description": "全局紧急停止及异常提醒",
+      "testPath": "tests/Notifications/Program.cs",
+      "ciJob": "notifications-stop"
+    },
+    {
+      "id": "P0-18",
+      "description": "历史审计、十万条及清理",
+      "testPath": "tests/History/Program.cs",
+      "ciJob": "history-security"
+    },
+    {
+      "id": "P0-19",
+      "description": "模拟运行资源预算与泄漏检测",
+      "testPath": "tests/Performance/Program.cs",
+      "ciJob": "performance-budget"
+    },
+    {
+      "id": "P0-20",
+      "description": "独立Telegram卡密Worker和D1",
+      "testPath": "license/tests/license.test.mjs",
+      "ciJob": "telegram-license-worker"
+    },
+    {
+      "id": "P0-21",
+      "description": "云端授权管理员安全约束",
+      "testPath": "license/tests/security-scan.test.mjs",
+      "ciJob": "telegram-license-worker"
+    },
+    {
+      "id": "P0-22",
+      "description": "本地许可证签名和撤销",
+      "testPath": "tests/Licensing/Program.cs",
+      "ciJob": "telegram-license-client"
+    },
+    {
+      "id": "P0-23",
+      "description": "安装器保留数据且独立WebView2",
+      "testPath": "tests/Installer/Program.cs",
+      "ciJob": "installer-data"
+    },
+    {
+      "id": "P0-24",
+      "description": "安全更新签名与SHA校验",
+      "testPath": "tests/Updater/Program.cs",
+      "ciJob": "updater-security"
+    },
+    {
+      "id": "P0-25",
+      "description": "正式签名发行的最小权限",
+      "testPath": "tests/Updater/release-contract.test.mjs",
+      "ciJob": "updater-security"
+    },
+    {
+      "id": "P0-26",
+      "description": "UI访问路径及导航不刷新",
+      "testPath": "apps/ui/src/routes.test.ts",
+      "ciJob": "ui"
+    },
+    {
+      "id": "P0-27",
+      "description": "UI操作锁和事件处理",
+      "testPath": "apps/ui/src/exclusive.test.ts",
+      "ciJob": "ui"
+    },
+    {
+      "id": "P0-28",
+      "description": "UI设置可访问和状态保存",
+      "testPath": "apps/ui/src/settings.test.ts",
+      "ciJob": "ui"
+    },
+    {
+      "id": "P0-29",
+      "description": "UI剧本编辑和三个时间段",
+      "testPath": "apps/ui/src/script-editor/script-editor.test.tsx",
+      "ciJob": "ui"
+    },
+    {
+      "id": "P0-30",
+      "description": "跨模块离线端到端关键流程",
+      "testPath": "tests/E2E/Program.cs",
+      "ciJob": "p0-e2e"
+    },
+    {
+      "id": "P0-31",
+      "description": "跨设备备注筛选+跨群调度安全复位",
+      "testPath": "tests/E2E/Program.cs",
+      "ciJob": "p0-e2e"
+    },
+    {
+      "id": "P0-32",
+      "description": "WPF窗口尺寸/安全关闭",
+      "testPath": "tests/UI/Shell/Program.cs",
+      "ciJob": "shell"
+    }
+  ]
+}
