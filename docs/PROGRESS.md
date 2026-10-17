@@ -308,3 +308,11 @@
 - [GitHub Actions CI 39032907487](https://github.com/mosen6266-netizen/MS_001/actions/runs/39032907487) **completed/success，55/55作业通过**；源码commit [0567b58ab0](https://github.com/mosen6266-netizen/MS_001/commit/0567b58ab0d1d54f3ed03f9f18630a640218c584)。P0工作流汇总实际验证29个上游作业全success，2套E2E各30个断言及2套Node各5个测试成功。WPF、Chromium快照、Inno开发unsigned安装器均构建成功。
 - [Step29详细验收](STEP_29_ACCEPTANCE.md)，开发阶段done_dev。**DEFERRED**：真实Windows10/11、TDLib自有账号、真实群消息、72小时实体长稳、正式签名发行与Cloudflare生产授权仍待最终验收；没有触碰Signal MS002。
 - **进度29/32（90.625%），剩余3步；下一步30——300账号/50群容量与长稳测试。**
+
+## Step30 — 300账号元数据/50模拟群容量与加速长稳（2026-10-17，开发验收）
+
+- 新增tests/Capacity本地真实SQLite数据与FairScheduler整体容量回归，300个元数据槽位/50群各6模拟角色（300角色映射）、超限拒绝、未知提交不自动重发、任务故障隔离、断电重启Review与停止后持久禁发；72小时虚拟逻辑时钟4320预算Tick，非真实72小时。
+- GitHub Actions [Run 39033877609](https://github.com/mosen6266-netizen/MS_001/actions/runs/39033877609) **completed/success，57/57 Jobs通过**；受测源码[cc2043fa](https://github.com/mosen6266-netizen/MS_001/commit/cc2043fa1460c5a6206036fb964149f17b857dfa)。Linux/Windows各20条容量断言及1份资源JSON合同通过，聚合30上游Job全部成功。
+- 真实**短时**CI耗时 Linux 4.190秒/Windows 20.561秒；工作集最高取样Linux 90MiB、Windows 63MiB；Windows最后句柄267。每平台原始完整JSON在本Run Artifacts，详细实测和局限见[BENCHMARKS](BENCHMARKS.md)、[CAPACITY_LIMITS](CAPACITY_LIMITS.md)、[STEP_30_ACCEPTANCE](STEP_30_ACCEPTANCE.md)。
+- 开发阶段done_dev；**DEFERRED**：300真实原生TDLib账号同时在线、50真实群、真正72小时连续Windows墙钟稳定和网络重连、杀软/磁盘风险/真实资源及生产卡密，均未执行，保留最终实机验收。未改变Signal MS002。
+- **开发进度30/32（93.75%），剩余2步；下一步31安全审计/数据恢复/发布阻断。**
