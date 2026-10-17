@@ -112,7 +112,25 @@ await using(var strict=new TdlibDispatcher(strictFake,TimeSpan.FromMilliseconds(
     Check(rejected && strictFake.Sent.Length==0 && strict.PendingRequestCount==0,
         "unknown native command is rejected before any network send");
 }
-Console.WriteLine($"SUMMARY: {checks} TDLib adapter assertions passed, with fake transport only (no TDLib DLL, login or message send).");
+using(var list=JsonDocument.Parse(TdlibManualOperations.Chats("req-1",50)))
+  Check(list.RootElement.GetProperty("@type").GetString()=="getChats"&&
+        list.RootElement.GetProperty("limit").GetInt32()==50,
+        "official TDLib chat list request is bounded");
+using(var lookup=JsonDocument.Parse(TdlibManualOperations.Chat("req-2",-100123456)))
+  Check(lookup.RootElement.GetProperty("chat_id").GetInt64()==-100123456,
+        "official TDLib getChat uses exact selected group id");
+using(var one=JsonDocument.Parse(TdlibManualOperations.SendOneText("req-3",-100123456,"手动发送测试")))
+  Check(one.RootElement.GetProperty("@type").GetString()=="sendMessage"&&
+        one.RootElement.GetProperty("input_message_content").GetProperty("@type").GetString()=="inputMessageText"&&
+        one.RootElement.GetProperty("input_message_content").GetProperty("text").GetProperty("text").GetString()=="手动发送测试",
+        "manual text request contains actual formatted text and chat ID");
+bool badManual=false;
+try{TdlibManualOperations.SendOneText("x",0,"test");}catch(ArgumentOutOfRangeException){badManual=true;}
+Check(badManual,"zero chat ID rejected before transport");
+badManual=false;
+try{TdlibManualOperations.SendOneText("x",-100,new string('a',2001));}catch(ArgumentException){badManual=true;}
+Check(badManual,"message content bounded before transport");
+Console.WriteLine($"SUMMARY: {checks} TDLib adapter assertions passed, against factory and fake transport only (native smoke is separate).");
 
 internal sealed class FakeTransport : ITdlibTransport
 {
