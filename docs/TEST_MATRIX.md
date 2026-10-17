@@ -20,3 +20,16 @@
 | PERF-01 | 72小时长稳与资源统计 | 在实际硬件上形成可重复的CPU/内存/句柄/磁盘/错误率报告 |
 | RELEASE-01 | Win10/Win11 x64 干净安装 | 完整安装、一键启动、合法依赖、更新可回滚 |
 未执行的项目必须标记 not_run；不能写 pass。压测结果决定实际硬件门槛，不凭设计推测。
+
+
+## Step29 P0 自动化覆盖追踪（2026-10-17）
+
+既有 TIME/ROLE/GROUP/SEND/UI/SYS/DATA/SECURITY/PERF/RELEASE 验收项继续保留。本步新增机器可解析覆盖台账 tests/Unit/p0-regression-catalog.json，追踪**32个开发阶段P0条目**至实际测试文件与 GitHub CI Job，不能据此将真实设备 PERF-01/RELEASE-01 标记为通过。
+
+- **Unit**：tests/Unit/p0-coverage.test.mjs 校验ID、路径、源码断言和必测领域；现有Windows/Linux单位矩阵保留。
+- **Integration**：tests/Integration/ci-contract.test.mjs 约束模块串接和不使用真实网络；verify-ci-needs.mjs 只有全部29个依赖 Job 都 success 才放行，任何跳过、取消或失败均拒绝。
+- **E2E**：tests/E2E/Program.cs 在本地SQLite贯穿跨设备剧本打包、备注映射、不可变发布、群权限预检、调度状态机、确认后等待、备份与重启隔离（30项断言；Windows/Linux）。
+- **UI/视觉**：保留 React Vitest、Chromium 1440/700px 快照与 WPF 编译作业；真实Win10/11和WebView2体验只列 DEFERRED。
+- **报告**：docs/STEP_29_TEST_MATRIX.md 跟踪本次CI完成度；仅在最新 Run completed/success 且全部Jobs success时签发开发阶段验收。
+
+**边界声明**：模拟预检使用用户合成的已授权账户与群信息，没有真实Telegram身份授权、TDLib原生通信、真实发送、Cloudflare签发或操作Signal MS002。所有相关真实发布验证仍在最终验收阶段。
