@@ -4,7 +4,9 @@
 param(
  [Parameter(Mandatory=$false)][string]$Published = "artifacts/desktop",
  [Parameter(Mandatory=$false)][string]$Output = "artifacts/installer",
- [Parameter(Mandatory=$false)][string]$InnoCompiler = ""
+ [Parameter(Mandatory=$false)][string]$InnoCompiler = "",
+ [Parameter(Mandatory=$false)][string]$PackageVersion = "0.27.0",
+ [Parameter(Mandatory=$false)][string]$PackageFileTag = "0.27.0-dev"
 )
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
@@ -39,9 +41,9 @@ if([string]::IsNullOrWhiteSpace($compiler) -or !(Test-Path -LiteralPath $compile
 }
 New-Item -ItemType Directory -Force -Path $outputDir|Out-Null
 $script=Join-Path $repo "installer/Setup.iss"
-& $compiler "/DPublishDir=$publishDir" "/DRuntimeFile=$runtime" "/DBrandingFile=$icon" "/DInstallerOutput=$outputDir" $script
+& $compiler "/DPublishDir=$publishDir" "/DRuntimeFile=$runtime" "/DBrandingFile=$icon" "/DInstallerOutput=$outputDir" "/DProductVersion=$PackageVersion" "/DOutputTag=$PackageFileTag" $script
 if($LASTEXITCODE -ne 0){throw "Inno Setup compiler failed: $LASTEXITCODE"}
-$package=Join-Path $outputDir "MOSEN-Telegram-Scheduler-Setup-0.27.0-dev.exe"
+$package=Join-Path $outputDir "MOSEN-Telegram-Scheduler-Setup-$PackageFileTag.exe"
 if(!(Test-Path -LiteralPath $package -PathType Leaf)){throw "Expected installer was not created."}
 $bytes=(Get-Item -LiteralPath $package).Length
 if($bytes -lt 100MB){throw "Installer too small for bundled offline WebView2 Runtime: $bytes bytes."}
