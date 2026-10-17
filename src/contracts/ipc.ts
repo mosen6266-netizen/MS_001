@@ -1,7 +1,8 @@
 /** Allowlisted offline host commands; no Telegram sends, login, sessions or secrets. */
 export const IPC_PROTOCOL = "mosen.desktop.v1" as const;
-export type ReadRequest = { protocol: typeof IPC_PROTOCOL; requestId: string; type: "system.ping"|"app.info"|"settings.get"|"diagnostics.get"|"runtime.snapshot" };
+export type ReadRequest = { protocol: typeof IPC_PROTOCOL; requestId: string; type: "system.ping"|"app.info"|"settings.get"|"diagnostics.get"|"runtime.snapshot"|"telegram.api.status"|"telegram.api.clear" };
 export type SettingsSaveRequest = { protocol: typeof IPC_PROTOCOL; requestId: string; type: "settings.save"; payload: {expectedRevision:number;preferences:UserPreferences} };
+export type ApiConfigSaveRequest={protocol:typeof IPC_PROTOCOL;requestId:string;type:"telegram.api.save";payload:{apiId:number;apiHash:string}};
 export type AccountAction="accounts.list"|"accounts.create"|"accounts.edit"|"accounts.archive"|"accounts.restore";
 export type AccountItem={id:string;alias:string;groupTag:string;displayName:string;revision:number;verifiedUserId:string|null;removed:boolean;canAttachSession:boolean};
 export type AccountPage={items:AccountItem[];total:number;page:number;pageSize:number};
@@ -26,7 +27,7 @@ export type ScriptSummary={scriptId:string;title:string;revision:number;stepCoun
 export type ScriptRequest={protocol:typeof IPC_PROTOCOL;requestId:string;type:ScriptAction;payload:Record<string,unknown>};
 export type RuntimeDashboardRow={runId:string;chatId:string;topicId:string|null;state:string;phase:string;completedSteps:number;totalSteps:number;completionPercent:number;nextStepNumber:number;remainingMs:number;lastClockUtc:string;isClockActive:boolean;issueCode:string;revision:number};
 export type RuntimeDashboardSnapshot={checkedUtc:string;mode:"offline-simulation-readonly";summary:{total:number;running:number;paused:number;review:number;failed:number;completed:number;stopped:number;ready:number;uncertainMessages:number;corruptRecords:number};items:RuntimeDashboardRow[];pollHintSeconds?:5|15|30};
-export type BridgeRequest = ReadRequest | SettingsSaveRequest | AccountRequest | GroupRequest | ScriptRequest | MediaRequest;
+export type BridgeRequest = ReadRequest | SettingsSaveRequest | ApiConfigSaveRequest | AccountRequest | GroupRequest | ScriptRequest | MediaRequest;
 export type BridgeResponse = { protocol: typeof IPC_PROTOCOL; requestId:string; ok:boolean; type:string; payload:Record<string,unknown> };
 export type Density = "compact" | "comfortable";
 export type UserPreferences = {density:Density;searchDebounceMs:number;pageSize:10|20|50;desktopNotifications:boolean};
@@ -46,6 +47,12 @@ export function isPreferencesSnapshot(v:unknown):v is PreferencesSnapshot {
 }
 export function isBridgeRequest(v:unknown):v is BridgeRequest {
   if(!isRecord(v)||v.protocol!==IPC_PROTOCOL||typeof v.requestId!=="string"||v.requestId.length===0||v.requestId.length>64)return false;
+  if(v.type==="telegram.api.save"){
+    return Object.keys(v).length===4 && isRecord(v.payload) &&
+      Object.keys(v.payload).sort().join(",")==="apiHash,apiId" &&
+      Number.isInteger(v.payload.apiId) && Number(v.payload.apiId)>0 &&
+      typeof v.payload.apiHash==="string" && /^[0-9a-fA-F]{32}$/.test(v.payload.apiHash);
+  }
   if(v.type==="settings.save"){
     if(Object.keys(v).length!==4||!isRecord(v.payload)||Object.keys(v.payload).length!==2)return false;
     return Number.isSafeInteger(v.payload.expectedRevision) && (v.payload.expectedRevision as number)>=0 && isPreferences(v.payload.preferences);
@@ -144,7 +151,7 @@ export function isBridgeRequest(v:unknown):v is BridgeRequest {
     return Number.isInteger(p.page)&&Number(p.page)>=1&&Number(p.page)<=1000000 &&
       [10,20,50].includes(Number(p.pageSize));
   }
-  return (v.type==="system.ping"||v.type==="app.info"||v.type==="settings.get"||v.type==="diagnostics.get"||v.type==="runtime.snapshot") && Object.keys(v).length===3;
+  return (v.type==="system.ping"||v.type==="app.info"||v.type==="settings.get"||v.type==="diagnostics.get"||v.type==="runtime.snapshot"||v.type==="telegram.api.status"||v.type==="telegram.api.clear") && Object.keys(v).length===3;
 }
 export function isRuntimeDashboardSnapshot(v:unknown):v is RuntimeDashboardSnapshot {
   if(!isRecord(v)||v.mode!=="offline-simulation-readonly"||typeof v.checkedUtc!=="string"||
