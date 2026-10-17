@@ -6,7 +6,7 @@
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
   "current_step": "32",
-  "current_step_status": "not_started",
+  "current_step_status": "in_progress",
   "phase": 8,
   "total_steps": 32,
   "completed_steps": [
@@ -55,7 +55,7 @@
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step31 DONE_DEV on tested source a40ec24b721b27c605205cc7ae268c6d22ebb71c, CI 39035133383 completed/success 58/58 jobs, audit 339 tracked files and 8/8 Node checks, SQLite Windows/Linux each 32 tests including tampered schema hash restore denial, 31 upstream aggregate green. Production RELEASE BLOCKED by release/readiness.json 13 DEFERRED real-device+signature+licensing gates, protected environment reviewer, publisher trust UNCONFIGURED, native tdjson/72h/Windows/Cloudflare live untested; installed PowerShell helper integrity remains a risk. Progress 31/32 (96.875%). Step32 documentation/final signed release subject to real acceptance; no Signal MS002 changes.",
+  "notes": "Step32 underway: author user guide, recovery, formal release notes and final acceptance, deliver unsigned build/documentation bundle with hashes through CI and immutable evidence manifest. Real Windows/TDLib/Cloudflare/72h/signing constraints remain BLOCKED and 13 readiness requirements DEFERRED. Step31 complete count 31/32 pending Step32 dev CI and delivery checks.",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
