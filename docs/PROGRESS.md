@@ -324,3 +324,10 @@
 - [Actions Run 39035133383](https://github.com/mosen6266-netizen/MS_001/actions/runs/39035133383) **completed/success，58/58作业全绿**（受测代码[a40ec24b](https://github.com/mosen6266-netizen/MS_001/commit/a40ec24b721b27c605205cc7ae268c6d22ebb71c)）。339个git文本文件扫描无匹配，8/8安全Node用例PASS，31上游Job最终总验收通过。
 - [审计问题清单](SECURITY_AUDIT.md) · [第三方审核](THIRD_PARTY_REVIEW.md) · [Step31开发验收](STEP_31_ACCEPTANCE.md)。**DEFERRED**：原生TDLib/Win10/11、72h真实长稳、真实Cloudflare授权、正式签名证书、版权/商标、PowerShell更新helper安全审核。发行状态仍是 **BLOCKED**；未动Signal MS002。
 - **开发进度31/32（96.875%），剩余1步；下一步32——最终文档、安装包和V1.0发布签收；任何真实阻断条件未满足时不发行。**
+
+## Step32 — 最终开发交接与V1.0签收准备（2026-10-17，开发验收完成）
+
+- 真实CI [Run 39036960159](https://github.com/mosen6266-netizen/MS_001/actions/runs/39036960159) **completed/success、59/59 Jobs通过**，包含32个上游作业均成功的P0汇总门禁；受测代码[1b17ba0](https://github.com/mosen6266-netizen/MS_001/commit/1b17ba0c8e6170e5b64023fbe0fae5ad7a3d30e3)。
+- 交付用户手册、问题排查/恢复指南、V1.0准备说明与未签字签收表、最终验收/正式发行阻断清单；[19文档开发交接ZIP](https://github.com/mosen6266-netizen/MS_001/actions/runs/39036960159/artifacts/12102174301)真实生成并通过SHA256复核（内层ZIP SHA256 3FF4BF94C4BB9AC2DB843A61A2EC647884EF0D23E8BE721001285E828BBA844F，约2026-11-16过期）。
+- [未签名Windows开发Setup](https://github.com/mosen6266-netizen/MS_001/actions/runs/39036960159/artifacts/12103105698)实际编译：MOSEN-Telegram-Scheduler-Setup-0.27.0-dev.exe，269075217字节，SHA256 85D04E5CC52FC33D81D062518603D38E1ADB7EC0A19CA6A5EE607236C8589C9A（约2026-10-24过期）。**不是正式V1.0安装包**。
+- [第32步开发验收](STEP_32_ACCEPTANCE.md)：**32/32开发步骤已完成（100% done_dev）**，但release/readiness.json仍13/13 DEFERRED且releaseAuthorized=false，Win10/11、官方tdjson、真实50群/300在线、72小时实机、Cloudflare生产许可证、正式签名PFX、合规审核和人工签收均未通过；正式发布状态 **BLOCKED / NOT PUBLISHED**。Signal MS002未修改。
