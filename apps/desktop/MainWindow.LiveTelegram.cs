@@ -237,7 +237,7 @@ public partial class MainWindow
             "password"=>AuthCommandKind.EnterPassword,
             _=>throw new ArgumentException("Unknown auth action.")
         };
-        string? input=payload.TryGetProperty("input",out var p)?p.GetString():null;
+        string? input=action=="qr"?null:(payload.TryGetProperty("input",out var p)?p.GetString():null);
         AuthResult result=await session.SubmitAsync(new AuthCommand(kind,input));
         return new{accepted=result.Accepted,code=result.Code,message=result.Message,status=LiveStatus()};
     }
