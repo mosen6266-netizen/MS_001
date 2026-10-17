@@ -1,8 +1,11 @@
-/** Allowlisted offline host commands; no Telegram sends, login, sessions or secrets. */
+/** Exact-shape desktop commands; native TDLib actions are gated by local user interaction. */
 export const IPC_PROTOCOL = "mosen.desktop.v1" as const;
-export type ReadRequest = { protocol: typeof IPC_PROTOCOL; requestId: string; type: "system.ping"|"app.info"|"settings.get"|"diagnostics.get"|"runtime.snapshot"|"telegram.api.status"|"telegram.api.clear" };
+export type ReadRequest = { protocol: typeof IPC_PROTOCOL; requestId: string; type: "system.ping"|"app.info"|"settings.get"|"diagnostics.get"|"runtime.snapshot"|"telegram.api.status"|"telegram.api.clear"|"telegram.auth.status"|"telegram.auth.start"|"telegram.auth.stop"|"telegram.chats.refresh" };
 export type SettingsSaveRequest = { protocol: typeof IPC_PROTOCOL; requestId: string; type: "settings.save"; payload: {expectedRevision:number;preferences:UserPreferences} };
 export type ApiConfigSaveRequest={protocol:typeof IPC_PROTOCOL;requestId:string;type:"telegram.api.save";payload:{apiId:number;apiHash:string}};
+export type TelegramAuthRequest={protocol:typeof IPC_PROTOCOL;requestId:string;type:"telegram.auth.submit";payload:{action:"qr"|"phone"|"code"|"email"|"emailCode"|"password";input:string}};
+export type TelegramMessageRequest={protocol:typeof IPC_PROTOCOL;requestId:string;type:"telegram.message.send";payload:{chatId:string;text:string}};
+export type TelegramLiveStatus={nativeReady:boolean;connected:boolean;phase:string;title:string;instruction:string;qrLink:string|null;canStartQr:boolean;canSubmit:boolean;canCancel:boolean;groups:Array<{chatId:string;title:string;canSend:boolean}>;delivery:string;issue:string|null;outboundPending:boolean};
 export type AccountAction="accounts.list"|"accounts.create"|"accounts.edit"|"accounts.archive"|"accounts.restore";
 export type AccountItem={id:string;alias:string;groupTag:string;displayName:string;revision:number;verifiedUserId:string|null;removed:boolean;canAttachSession:boolean};
 export type AccountPage={items:AccountItem[];total:number;page:number;pageSize:number};
@@ -27,7 +30,7 @@ export type ScriptSummary={scriptId:string;title:string;revision:number;stepCoun
 export type ScriptRequest={protocol:typeof IPC_PROTOCOL;requestId:string;type:ScriptAction;payload:Record<string,unknown>};
 export type RuntimeDashboardRow={runId:string;chatId:string;topicId:string|null;state:string;phase:string;completedSteps:number;totalSteps:number;completionPercent:number;nextStepNumber:number;remainingMs:number;lastClockUtc:string;isClockActive:boolean;issueCode:string;revision:number};
 export type RuntimeDashboardSnapshot={checkedUtc:string;mode:"offline-simulation-readonly";summary:{total:number;running:number;paused:number;review:number;failed:number;completed:number;stopped:number;ready:number;uncertainMessages:number;corruptRecords:number};items:RuntimeDashboardRow[];pollHintSeconds?:5|15|30};
-export type BridgeRequest = ReadRequest | SettingsSaveRequest | ApiConfigSaveRequest | AccountRequest | GroupRequest | ScriptRequest | MediaRequest;
+export type BridgeRequest = ReadRequest | SettingsSaveRequest | ApiConfigSaveRequest | TelegramAuthRequest | TelegramMessageRequest | AccountRequest | GroupRequest | ScriptRequest | MediaRequest;
 export type BridgeResponse = { protocol: typeof IPC_PROTOCOL; requestId:string; ok:boolean; type:string; payload:Record<string,unknown> };
 export type Density = "compact" | "comfortable";
 export type UserPreferences = {density:Density;searchDebounceMs:number;pageSize:10|20|50;desktopNotifications:boolean};
@@ -47,6 +50,25 @@ export function isPreferencesSnapshot(v:unknown):v is PreferencesSnapshot {
 }
 export function isBridgeRequest(v:unknown):v is BridgeRequest {
   if(!isRecord(v)||v.protocol!==IPC_PROTOCOL||typeof v.requestId!=="string"||v.requestId.length===0||v.requestId.length>64)return false;
+  if(v.type==="telegram.auth.submit"){
+    if(Object.keys(v).length!==4||!isRecord(v.payload)||
+       Object.keys(v.payload).sort().join(",")!=="action,input")return false;
+    const {action,input}=v.payload;
+    if(typeof input!=="string"||input.length>512)return false;
+    return action==="qr"?input.length===0:
+      action==="phone"?/^\+[0-9]{6,19}$/.test(input):
+      action==="email"?input.length<=254&&input.includes("@")&&!/\s/.test(input):
+      action==="code"||action==="emailCode"?/^[a-zA-Z0-9]{2,32}$/.test(input):
+      action==="password"?input.length>=1:false;
+  }
+  if(v.type==="telegram.message.send"){
+    if(Object.keys(v).length!==4||!isRecord(v.payload)||
+       Object.keys(v.payload).sort().join(",")!=="chatId,text")return false;
+    const {chatId,text}=v.payload;
+    return typeof chatId==="string"&&/^-\d{1,19}$/.test(chatId)&&
+      typeof text==="string"&&text.length>=1&&text.length<=2000&&
+      text.trim().length>0&&!/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/.test(text);
+  }
   if(v.type==="telegram.api.save"){
     return Object.keys(v).length===4 && isRecord(v.payload) &&
       Object.keys(v.payload).sort().join(",")==="apiHash,apiId" &&
@@ -151,7 +173,7 @@ export function isBridgeRequest(v:unknown):v is BridgeRequest {
     return Number.isInteger(p.page)&&Number(p.page)>=1&&Number(p.page)<=1000000 &&
       [10,20,50].includes(Number(p.pageSize));
   }
-  return (v.type==="system.ping"||v.type==="app.info"||v.type==="settings.get"||v.type==="diagnostics.get"||v.type==="runtime.snapshot"||v.type==="telegram.api.status"||v.type==="telegram.api.clear") && Object.keys(v).length===3;
+  return (v.type==="system.ping"||v.type==="app.info"||v.type==="settings.get"||v.type==="diagnostics.get"||v.type==="runtime.snapshot"||v.type==="telegram.api.status"||v.type==="telegram.api.clear"||v.type==="telegram.auth.status"||v.type==="telegram.auth.start"||v.type==="telegram.auth.stop"||v.type==="telegram.chats.refresh") && Object.keys(v).length===3;
 }
 export function isRuntimeDashboardSnapshot(v:unknown):v is RuntimeDashboardSnapshot {
   if(!isRecord(v)||v.mode!=="offline-simulation-readonly"||typeof v.checkedUtc!=="string"||
