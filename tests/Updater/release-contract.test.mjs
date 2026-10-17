@@ -58,6 +58,9 @@ test("stage-two verifies signer and backups only the program directory",()=>{
  assert.match(ui,/launch.ArgumentList.Add\("-ExpectedVersion"\)/);
  assert.match(rollback,/Wait-Process/);
  assert.match(rollback,/previous-program\.pending/);
+ assert.match(rollback,/previous-program\.prior/);
+ assert.match(rollback,/if\(Test-Path -LiteralPath \$tempBackup\)\{throw/);
+ assert.match(rollback,/Move-Item -LiteralPath \$backup -Destination \$priorBackup/);
  assert.match(rollback,/robocopy \$backup \$program/);
  assert.match(rollback,/last-update-error\.txt/);
  assert.match(rollback,/previous-program/);
