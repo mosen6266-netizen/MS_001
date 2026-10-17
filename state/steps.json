@@ -764,8 +764,33 @@
     "step": "32",
     "title": "文档、安装包与 V1.0 发布签收",
     "phase": 8,
-    "status": "in_progress",
-    "acceptance_evidence": [],
-    "last_commit_sha": null
+    "status": "done_dev",
+    "acceptance_evidence": [
+      "docs/USER_GUIDE.md",
+      "docs/TROUBLESHOOTING.md",
+      "docs/RECOVERY_GUIDE.md",
+      "docs/FINAL_ACCEPTANCE.md",
+      "docs/STEP_32_TEST_MATRIX.md",
+      "docs/STEP_32_ACCEPTANCE.md",
+      "releases/V1.0/README.md",
+      "releases/V1.0/RELEASE_NOTES.md",
+      "releases/V1.0/RELEASE_SIGNOFF.md",
+      "releases/V1.0/ARTIFACTS.md",
+      "build/package-development-handoff.py",
+      "tests/Release/final-handoff.test.mjs",
+      ".github/workflows/ci.yml",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/39036960159 (completed success 59/59; tested code 1b17ba0c8e6170e5b64023fbe0fae5ad7a3d30e3)",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/39036960159/artifacts/12102174301 (19 files documentation, SHA256 3FF4BF94C4BB9AC2DB843A61A2EC647884EF0D23E8BE721001285E828BBA844F)",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/39036960159/artifacts/12103105698 (unsigned 0.27.0-dev setup, SHA256 85D04E5CC52FC33D81D062518603D38E1ADB7EC0A19CA6A5EE607236C8589C9A)"
+    ],
+    "last_commit_sha": "1b17ba0c8e6170e5b64023fbe0fae5ad7a3d30e3",
+    "deferred_release_acceptance": [
+      "STEP32-FORMAL-V1-RELEASE",
+      "STEP31-RELEASE-READINESS",
+      "STEP31-THIRD-PARTY-LEGAL",
+      "STEP31-LOCAL-UPDATER-INTEGRITY",
+      "STEP30-NATIVE-CAPACITY",
+      "STEP30-72H-REAL-SOAK"
+    ]
   }
 ]
