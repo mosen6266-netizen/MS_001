@@ -552,3 +552,39 @@ jobs:
           node-version: "24"
       - name: Ensure unsigned release cannot escape guarded workflow
         run: node --test tests/Updater/release-contract.test.mjs
+
+  p0-e2e:
+    name: Step29 cross-feature offline E2E - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Full P0 export-import-publish-preflight-scheduler-recovery E2E
+        run: dotnet run --project tests/E2E/Mosen.GroupScheduler.E2E.Tests.csproj --configuration Release
+      - name: Validate P0 mapped coverage, test ownership and risk boundaries
+        run: node --test tests/Unit/p0-coverage.test.mjs tests/Integration/ci-contract.test.mjs
+
+  regression-gate:
+    name: Step29 aggregate P0 gate - require every upstream CI job success
+    needs: [ui, windows, migrations, shell, visual-screenshots, settings, security, tdlib-adapter, authorization, session-lifecycle, group-catalog, script-editor, script-timing-media, script-portable, script-preflight, virtual-scheduler, outbound-policy, delivery-dedup, recovery-safety, runtime-dashboard, notifications-stop, history-security, performance-budget, telegram-license-worker, telegram-license-client, installer-data, windows-installer, updater-security, p0-e2e]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Reject cancelled, skipped, failed or missing upstream checks
+        env:
+          REGRESSION_NEEDS_JSON: ${{ toJson(needs) }}
+          REGRESSION_REQUIRED_JOB_IDS: "ui,windows,migrations,shell,visual-screenshots,settings,security,tdlib-adapter,authorization,session-lifecycle,group-catalog,script-editor,script-timing-media,script-portable,script-preflight,virtual-scheduler,outbound-policy,delivery-dedup,recovery-safety,runtime-dashboard,notifications-stop,history-security,performance-budget,telegram-license-worker,telegram-license-client,installer-data,windows-installer,updater-security,p0-e2e"
+        run: node tests/Integration/verify-ci-needs.mjs
