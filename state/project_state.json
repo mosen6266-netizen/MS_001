@@ -5,8 +5,8 @@
   "default_branch": "main",
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
-  "current_step": "31",
-  "current_step_status": "in_progress",
+  "current_step": "32",
+  "current_step_status": "not_started",
   "phase": 8,
   "total_steps": 32,
   "completed_steps": [
@@ -39,7 +39,8 @@
     "27",
     "28",
     "29",
-    "30"
+    "30",
+    "31"
   ],
   "development_started": true,
   "functional_code_started": true,
@@ -48,13 +49,13 @@
   "icon_source_received": true,
   "icon_asset_upload_verified": true,
   "exact_timing_contract": "wait preSendDelayMs -> typing typingDurationMs -> send; 30s+5s=35s; no overlap",
-  "last_verified_commit_sha": "cc2043fa1460c5a6206036fb964149f17b857dfa",
+  "last_verified_commit_sha": "a40ec24b721b27c605205cc7ae268c6d22ebb71c",
   "last_updated": "2026-10-17",
   "blocking_issues": [
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step31 in_progress: audit repository secret leakage, strengthen SQLite backup migration-ledger verification, add fail-closed production release readiness manifest and authorization gate in manual release workflow, test recovery/unknown-delivery/secret boundaries. Retain real Win10/11 and Cloudflare production deferrals. Progress remains 30/32 until verified CI.",
+  "notes": "Step31 DONE_DEV on tested source a40ec24b721b27c605205cc7ae268c6d22ebb71c, CI 39035133383 completed/success 58/58 jobs, audit 339 tracked files and 8/8 Node checks, SQLite Windows/Linux each 32 tests including tampered schema hash restore denial, 31 upstream aggregate green. Production RELEASE BLOCKED by release/readiness.json 13 DEFERRED real-device+signature+licensing gates, protected environment reviewer, publisher trust UNCONFIGURED, native tdjson/72h/Windows/Cloudflare live untested; installed PowerShell helper integrity remains a risk. Progress 31/32 (96.875%). Step32 documentation/final signed release subject to real acceptance; no Signal MS002 changes.",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
@@ -251,6 +252,21 @@
       "id": "STEP30-72H-REAL-SOAK",
       "status": "DEFERRED",
       "detail": "Physical 72h continuous wall-clock soak with actual Windows10/11 CPU/RAM/handle/disk/network/reconnect metrics NOT performed. 72h in CI was accelerated logical time only."
+    },
+    {
+      "id": "STEP31-RELEASE-READINESS",
+      "status": "DEFERRED",
+      "detail": "Mandatory release/readiness.json contains 13 DEFERRED real-world evidence gates and releaseAuthorized false; production release cannot proceed, protected GitHub environment must have reviewers."
+    },
+    {
+      "id": "STEP31-THIRD-PARTY-LEGAL",
+      "status": "DEFERRED",
+      "detail": "Exact binary redistribution licenses, NuGet/NPM transitive component notices and trademarks require human review; no current legal approval."
+    },
+    {
+      "id": "STEP31-LOCAL-UPDATER-INTEGRITY",
+      "status": "DEFERRED",
+      "detail": "Locally installed PowerShell updater helper is in a user-writable program directory; integrity and ACL/TOCTOU threat model must be hardened and physically reviewed before release."
     }
   ],
   "step03_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38921641970",
@@ -347,5 +363,6 @@
   "step27_static_contract_scenarios_per_os": 4,
   "step28_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/39031497799",
   "step29_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/39032907487",
-  "step30_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/39033877609"
+  "step30_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/39033877609",
+  "step31_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/39035133383"
 }
