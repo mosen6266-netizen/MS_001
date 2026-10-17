@@ -6,7 +6,7 @@
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
   "current_step": "29",
-  "current_step_status": "not_started",
+  "current_step_status": "in_progress",
   "phase": 8,
   "total_steps": 32,
   "completed_steps": [
@@ -52,7 +52,7 @@
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step28 DONE_DEV on verified source 716f22ad3a4c707b5b4574cad34b738f2d1c70ff. CI 39031497799 completed/success 52/52 jobs, Windows/Linux each 22 update assertions+4 release contract tests, .NET release signer/verifier builds, Windows PowerShell parsing, WPF Win-x64 build/publish, unsigned offline Inno EXE generated 269072288 bytes sha256 E81CA3181840A67603677EBBBD83090B94F85D2269290FD3FEDA747CFE76FFBF. Production code-signing keys remain UNCONFIGURED: never released a signed EXE or publicly published GitHub Release. Win10/11 physical update, rollback, TDLib, Cloudflare production, 72h tests remain DEFERRED. Progress 28/32 (87.5%), next Step29.",
+  "notes": "Step29 in_progress: implement offline cross-feature P0 e2e workflow (portable import -> immutable publish -> group preflight -> durable scheduler -> failure/restart), P0 coverage manifest, unit/integration guard and CI aggregate gate. No real Telegram login/send or production deployment; all deferred real device checks remain deferred. Progress 28/32 until full new CI green.",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
