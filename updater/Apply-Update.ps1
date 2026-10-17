@@ -35,9 +35,25 @@ if($ParentProcessId -gt 0) {
 }
 if(Get-Process -Name "Mosen.GroupScheduler.Desktop" -ErrorAction SilentlyContinue) {throw "Running app blocks update"}
 $backup=Join-Path $staging "previous-program"
+$priorBackup=Join-Path $staging "previous-program.prior"
 $tempBackup=Join-Path $staging "previous-program.pending"
-if(Test-Path -LiteralPath $backup){throw "Existing recovery backup: resolve first"}
 if(Test-Path -LiteralPath $tempBackup){throw "Interrupted backup: manual recovery required"}
+# The last successful upgrade retained an old version. Rotate, never silently
+# replace an incomplete backup. One additional generation is kept for recovery.
+if(Test-Path -LiteralPath $backup){
+ foreach($old in @($backup,$priorBackup)){
+  if(Test-Path -LiteralPath $old){
+   if(((Get-Item -LiteralPath $old -Force).Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0){
+     throw "Existing program backup is a reparse point"
+   }
+   Get-ChildItem -LiteralPath $old -Force -Recurse | ForEach-Object {
+     if(($_.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0){throw "Linked backup contents cannot be rotated"}
+   }
+  }
+ }
+ if(Test-Path -LiteralPath $priorBackup){Remove-Item -LiteralPath $priorBackup -Recurse -Force}
+ Move-Item -LiteralPath $backup -Destination $priorBackup
+}
 if(!(Test-Path -LiteralPath (Join-Path $program "Mosen.GroupScheduler.Desktop.exe"))){throw "Installed exe missing"}
 # Reject links inside installation: do not follow external targets while cloning.
 Get-ChildItem -LiteralPath $program -Force -Recurse | ForEach-Object {
