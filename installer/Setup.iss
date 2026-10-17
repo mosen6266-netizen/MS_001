@@ -63,6 +63,7 @@ Name: "desktopicon"; Description: "在桌面创建快捷方式"; GroupDescriptio
 Source: "{#PublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#RuntimeFile}"; DestDir: "{tmp}"; Flags: deleteafterinstall
 Source: "..\build\Remove-LocalUserData.ps1"; DestDir: "{app}\tools"; Flags: ignoreversion
+Source: "..\updater\Apply-Update.ps1"; DestDir: "{app}\tools"; Flags: ignoreversion
 
 [Icons]
 Name: "{autoprograms}\{#ProductName}"; Filename: "{app}\{#ProductExe}"; WorkingDir: "{app}"
