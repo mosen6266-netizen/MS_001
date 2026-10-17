@@ -157,6 +157,11 @@ public partial class MainWindow : Window
                 return;
             }
             var request = JsonSerializer.Deserialize<BridgeRequest>(jsonMessage)!;
+            if (operation is AllowedIpcOperation.ApiConfigStatus or AllowedIpcOperation.ApiConfigSave or AllowedIpcOperation.ApiConfigClear)
+            {
+                await HandleTelegramApiConfigurationAsync(jsonMessage,request.RequestId,request.Type);
+                return;
+            }
             if (operation is AllowedIpcOperation.SettingsGet or AllowedIpcOperation.SettingsSave)
             {
                 await HandleSettingsRequestAsync(jsonMessage, request.RequestId, request.Type);
