@@ -682,7 +682,7 @@
     "step": "29",
     "title": "全功能自动化回归",
     "phase": 8,
-    "status": "not_started",
+    "status": "in_progress",
     "acceptance_evidence": [],
     "last_commit_sha": null
   },
