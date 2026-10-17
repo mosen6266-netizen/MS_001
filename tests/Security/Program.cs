@@ -35,7 +35,11 @@ Check(IpcRequestGuard.TryValidate(singleMessage,out operation)&&operation==Allow
   "one selected group plain-text send shape is accepted");
 Check(!IpcRequestGuard.TryValidate(singleMessage.Replace("-1001234567890","1234567890"),out _),
   "private chats cannot be targeted using the group sender");
-Check(!IpcRequestGuard.TryValidate(singleMessage.Replace("仅向已授权群组手动发送一次",new string('a',2001)),out _),
+string tooLongTelegramText=System.Text.Json.JsonSerializer.Serialize(new{
+  protocol="mosen.desktop.v1",requestId="tg-too-long",type="telegram.message.send",
+  payload=new {chatId="-1001234567890",text=new string('a',2001)}
+});
+Check(!IpcRequestGuard.TryValidate(tooLongTelegramText,out _),
   "bulk message content over 2000 characters is denied");
 Check(!IpcRequestGuard.TryValidate(singleMessage.Replace("\"chatId\":","\"accountIds\":[\"other\"],\"chatId\":"),out _),
   "multi-account recipient injection is denied");
