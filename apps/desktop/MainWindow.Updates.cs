@@ -104,6 +104,7 @@ public partial class MainWindow
             launch.ArgumentList.Add("-Installer");launch.ArgumentList.Add(installer);
             launch.ArgumentList.Add("-ExpectedSHA256");launch.ArgumentList.Add(checkedManifest.Payload.Sha256);
             launch.ArgumentList.Add("-PublisherThumbprint");launch.ArgumentList.Add(thumbprint);
+            launch.ArgumentList.Add("-ExpectedVersion");launch.ArgumentList.Add(checkedManifest.Payload.Version);
             launch.ArgumentList.Add("-ParentProcessId");launch.ArgumentList.Add(Environment.ProcessId.ToString());
             Process.Start(launch) ?? throw new IOException("无法启动更新辅助程序。");
             Application.Current.Shutdown();
