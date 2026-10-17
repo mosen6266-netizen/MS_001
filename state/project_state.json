@@ -51,7 +51,7 @@
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step28 code implemented (not CI-accepted): ECDSA P-256 signed manifest, strict GitHub release asset URL/version/product bounds, resumable SHA256 verified installer download; WPF check updates using embedded trust anchor; separate post-exit PowerShell validates SHA256 and Authenticode, backups program files, validates installed EXE version/signature and restores on failure. Release workflow splits read-only build/sign and independent permission-scoped draft publishing; default trust pins UNCONFIGURED, no real signed release. 17/17 reviewed static assertions pass, but latest 49-job GitHub Actions run 39030669456 is queued, no CI success. Progress stays 27/32 (84.375%) until tests complete.",
+  "notes": "Step28 in_progress: signed feed, strict GitHub source, SHA256/resume, WPF opt-in installer, after-exit signature+version verification, robust restore with two rolling program backups (previous-program/prior), protects pending backup from overwrite, separate read-only signer and write-scoped draft publisher. Signed publisher trust still UNCONFIGURED and no signed public release; latest GH Actions 39030893090 pending, 0 jobs. No CI pass/real Windows acceptance. Completed 27/32, remaining 5.",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
