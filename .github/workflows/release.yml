@@ -23,6 +23,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
+      - name: Detect committed secrets before any signing key is loaded
+        run: node build/audit-repository-secrets.mjs
       - name: Refuse release without independent real-device and security evidence
         run: node build/check-release-readiness.mjs --enforce
       - name: Refuse missing signing secrets or untrusted publisher pins
