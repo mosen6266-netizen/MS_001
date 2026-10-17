@@ -23,3 +23,7 @@
 - 第32步最终文档/交付验证运行及真实安装工件哈希，应由第32步实际CI证据填写，不得使用旧包的哈希冒充新包。
 
 使用和支持材料：[用户指南](../../docs/USER_GUIDE.md) · [故障](../../docs/TROUBLESHOOTING.md) · [恢复](../../docs/RECOVERY_GUIDE.md) · [正式验收](../../docs/FINAL_ACCEPTANCE.md)。
+
+## 第32步最新开发构建实证
+
+[CI Run 39036960159](https://github.com/mosen6266-netizen/MS_001/actions/runs/39036960159) 59/59成功，受测源码 1b17ba0c8e6170e5b64023fbe0fae5ad7a3d30e3。交接资料19份，内层ZIP SHA256 3FF4BF94C4BB9AC2DB843A61A2EC647884EF0D23E8BE721001285E828BBA844F；Windows unsigned 0.27.0-dev安装EXE大小269,075,217字节，SHA256 85D04E5CC52FC33D81D062518603D38E1ADB7EC0A19CA6A5EE607236C8589C9A。**正式V1.0未签名未发布**。详见[第32步验收](../../docs/STEP_32_ACCEPTANCE.md)。
