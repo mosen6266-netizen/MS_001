@@ -16,6 +16,30 @@ Check(IpcRequestGuard.TryValidate(valid,out var operation)&&operation==AllowedIp
 Check(IpcRequestGuard.TryValidate(save,out operation)&&operation==AllowedIpcOperation.SettingsSave,"valid settings save passes exact payload check");
 Check(IpcRequestGuard.TryValidate("""{"protocol":"mosen.desktop.v1","requestId":"diag-1","type":"diagnostics.get"}""",out operation)&&operation==AllowedIpcOperation.DiagnosticsGet,"read-only diagnostics command allowed");
 Check(!IpcRequestGuard.TryValidate("""{"protocol":"mosen.desktop.v1","requestId":"x","type":"telegram.send"}""",out _),"Telegram network command denied");
+
+Check(IpcRequestGuard.TryValidate("""{"protocol":"mosen.desktop.v1","requestId":"tg-status","type":"telegram.auth.status"}""",out operation)&&operation==AllowedIpcOperation.TelegramAuthStatus,
+  "official TDLib authorization state read is permitted");
+Check(IpcRequestGuard.TryValidate("""{"protocol":"mosen.desktop.v1","requestId":"tg-start","type":"telegram.auth.start"}""",out operation)&&operation==AllowedIpcOperation.TelegramAuthStart,
+  "explicit user-initiated native login is permitted");
+Check(IpcRequestGuard.TryValidate("""{"protocol":"mosen.desktop.v1","requestId":"tg-qr","type":"telegram.auth.submit","payload":{"action":"qr","input":""}}""",out operation)&&operation==AllowedIpcOperation.TelegramAuthSubmit,
+  "user QR command allowed only with empty input");
+Check(!IpcRequestGuard.TryValidate("""{"protocol":"mosen.desktop.v1","requestId":"tg-qr-bad","type":"telegram.auth.submit","payload":{"action":"qr","input":"secret"}}""",out _),
+  "QR request cannot smuggle a credential");
+Check(IpcRequestGuard.TryValidate("""{"protocol":"mosen.desktop.v1","requestId":"tg-groups","type":"telegram.chats.refresh"}""",out operation)&&operation==AllowedIpcOperation.TelegramChatsRefresh,
+  "real group read requires explicit command");
+string singleMessage=System.Text.Json.JsonSerializer.Serialize(new{
+  protocol="mosen.desktop.v1",requestId="tg-single",type="telegram.message.send",
+  payload=new {chatId="-1001234567890",text="仅向已授权群组手动发送一次"}
+});
+Check(IpcRequestGuard.TryValidate(singleMessage,out operation)&&operation==AllowedIpcOperation.TelegramManualMessage,
+  "one selected group plain-text send shape is accepted");
+Check(!IpcRequestGuard.TryValidate(singleMessage.Replace("-1001234567890","1234567890"),out _),
+  "private chats cannot be targeted using the group sender");
+Check(!IpcRequestGuard.TryValidate(singleMessage.Replace("仅向已授权群组手动发送一次",new string('a',2001)),out _),
+  "bulk message content over 2000 characters is denied");
+Check(!IpcRequestGuard.TryValidate(singleMessage.Replace("\"chatId\":","\"accountIds\":[\"other\"],\"chatId\":"),out _),
+  "multi-account recipient injection is denied");
+
 string tgApiSave=System.Text.Json.JsonSerializer.Serialize(new{
     protocol="mosen.desktop.v1",requestId="tg-api-1",type="telegram.api.save",
     payload=new {apiId=123456,apiHash=new string('a',32)}
