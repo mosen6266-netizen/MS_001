@@ -72,7 +72,7 @@ export function App() {
             <span className="nav-shortcut" aria-hidden="true">{page.shortcut}</span>
           </button>)}
       </nav>
-      <div className="shell-nav-foot"><span className="safe-indicator" aria-hidden="true" />离线工程基础 · 无消息发送</div>
+      <div className="shell-nav-foot"><span className="safe-indicator" aria-hidden="true" />Telegram 真实登录 · 未授权不发送</div>
     </aside>
     <main className="shell-main" ref={viewportRef} id="main-content" tabIndex={-1} aria-label="当前页面内容">
       <header className="shell-header">
@@ -86,10 +86,10 @@ export function App() {
         {shell.active==="scripts"?null:
         shell.active === "overview" ?
           <div className="overview-grid">
-            <article className="summary-tile"><h2>已授权账号</h2><strong>尚未接入</strong><p>真实 Telegram 登录将在后续阶段实现</p></article>
+            <article className="summary-tile"><h2>已授权账号</h2><strong>请连接</strong><p>在账号管理中使用 Telegram 官方授权登录</p></article>
             <article className="summary-tile"><h2>运行任务</h2><strong>0</strong><p>目前不执行群消息发送</p></article>
-            <article className="summary-tile"><h2>工程状态</h2><strong>STEP 21</strong><p>运行中心只读状态、模拟调度与故障恢复</p></article>
-            <article className="notice-tile"><h2 id="panel-title">当前开发范围</h2><p>已实现本地账号登记及只读群组目录；真实 TDLib 同步、账号授权和群组任务尚未接入，当前不会执行发送。</p></article>
+            <article className="summary-tile"><h2>工程状态</h2><strong>TDLib 原生接入</strong><p>真实账号登录与手动群组发送；剧本运行仍单独受控</p></article>
+            <article className="notice-tile"><h2 id="panel-title">当前开发范围</h2><p>已提供真实 TDLib 登录、群组同步和单次人工确认发送；未授权账号、未知回执或批量剧本不会自动发送。</p></article>
           </div> :
           shell.active === "running" ? <RuntimeDashboardPanel /> :
           shell.active === "settings" ? <><PreferencesPanel {...preferences} /><TelegramApiConfigurationPanel /><DiagnosticsPanel /><DesignShowcase /></> :
@@ -101,7 +101,7 @@ export function App() {
             <span className="muted-note">本页面业务功能尚未实现，目前不会连接 Telegram 或发送消息。</span>
           </div>}
       </section>
-      <footer className="shell-footer">MOSEN Group Scheduler · 工程预览版 · 导航快捷键 Alt + 1–6</footer>
+      <footer className="shell-footer">MOSEN Group Scheduler · Windows Telegram 集成测试版 · Alt + 1–6</footer>
     </main>
   </div>;
 }
