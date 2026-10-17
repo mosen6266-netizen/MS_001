@@ -18,6 +18,8 @@ public static class ResumablePackageDownloader
         var partial = target + ".part";
         if (File.Exists(target) && await IsValidAsync(target, update.Payload, ct)) return target;
         if (File.Exists(target)) File.Delete(target);
+        if (File.Exists(partial) && (new FileInfo(partial).Attributes & FileAttributes.ReparsePoint) != 0)
+            throw new InvalidOperationException("不允许通过符号链接续传更新文件。");
         long offset = File.Exists(partial) ? new FileInfo(partial).Length : 0;
         if (offset > update.Payload.Size) { File.Delete(partial); offset = 0; }
         if (offset == update.Payload.Size && await IsValidAsync(partial, update.Payload, ct))
