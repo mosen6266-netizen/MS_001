@@ -20,6 +20,11 @@ jobs:
     environment: telegram-signed-release
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Refuse release without independent real-device and security evidence
+        run: node build/check-release-readiness.mjs --enforce
       - name: Refuse missing signing secrets or untrusted publisher pins
         shell: pwsh
         env:
@@ -118,6 +123,7 @@ jobs:
   publish-draft:
     needs: build-and-sign
     runs-on: windows-latest
+    environment: telegram-signed-release
     permissions:
       contents: write
     steps:
@@ -127,6 +133,11 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "10.0.x"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Recheck signed-release readiness after protected environment approval
+        run: node build/check-release-readiness.mjs --enforce
       - uses: actions/download-artifact@v4
         with:
           name: ms001-signed-draft-candidate
