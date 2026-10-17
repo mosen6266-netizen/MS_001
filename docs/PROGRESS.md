@@ -301,3 +301,10 @@
 - [GitHub Actions CI 39031497799](https://github.com/mosen6266-netizen/MS_001/actions/runs/39031497799) **completed/success，52/52成功**，受测开发代码最终commit [716f22ad](https://github.com/mosen6266-netizen/MS_001/commit/716f22ad3a4c707b5b4574cad34b738f2d1c70ff)。源文件、故障修复与限制见[第28步验收](STEP_28_ACCEPTANCE.md)。
 - **DEFERRED**：签名PFX和独立P-256密钥未配置、没有执行发布签名/正式Release；真实Win10/11下载-覆盖-失败-断电回滚、账号/SQLite迁移、原生TDLib和独立Cloudflare许可联调/负载均未实机验收。没有修改Signal MS002。
 - **开发进度28/32（87.5%），剩余4步；下一步29全功能自动化回归。**
+
+## Step29 — P0全功能自动化回归开发验收（2026-10-17）
+
+- 32条可追溯P0映射对应实际测试文件和CI Job，新增Windows/Linux各30项真实SQLite合成E2E业务链：跨设备导入、备注角色、冻结发布、群权限预检、顺序等待/模拟发送回执、SQLite备份/重启审查与停止；负面场景不允许自动重发。
+- [GitHub Actions CI 39032907487](https://github.com/mosen6266-netizen/MS_001/actions/runs/39032907487) **completed/success，55/55作业通过**；源码commit [0567b58ab0](https://github.com/mosen6266-netizen/MS_001/commit/0567b58ab0d1d54f3ed03f9f18630a640218c584)。P0工作流汇总实际验证29个上游作业全success，2套E2E各30个断言及2套Node各5个测试成功。WPF、Chromium快照、Inno开发unsigned安装器均构建成功。
+- [Step29详细验收](STEP_29_ACCEPTANCE.md)，开发阶段done_dev。**DEFERRED**：真实Windows10/11、TDLib自有账号、真实群消息、72小时实体长稳、正式签名发行与Cloudflare生产授权仍待最终验收；没有触碰Signal MS002。
+- **进度29/32（90.625%），剩余3步；下一步30——300账号/50群容量与长稳测试。**
