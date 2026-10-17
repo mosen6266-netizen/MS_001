@@ -734,7 +734,7 @@
     "step": "31",
     "title": "安全审计、数据恢复和发布阻断",
     "phase": 8,
-    "status": "not_started",
+    "status": "in_progress",
     "acceptance_evidence": [],
     "last_commit_sha": null
   },
