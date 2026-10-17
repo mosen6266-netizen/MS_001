@@ -11,6 +11,7 @@ export function AccountRegistryPanel({preferences}:{preferences:UserPreferences}
   const [showArchived,setShowArchived]=useState(false);
   const [result,setResult]=useState<AccountPage>({items:[],total:0,page:1,pageSize:preferences.pageSize});
   const [state,setState]=useState<"loading"|"ready"|"error">("loading");
+  const [readError,setReadError]=useState("");
   const [alias,setAlias]=useState("");
   const [groupTag,setGroupTag]=useState("");
   const [editing,setEditing]=useState<AccountItem|null>(null);
@@ -54,18 +55,23 @@ export function AccountRegistryPanel({preferences}:{preferences:UserPreferences}
   },[]);
   useEffect(()=>{
     let active=true;
-    setState("loading");
+    setState("loading");setReadError("");
     request("accounts.list",{query:debounce,group,page,pageSize:preferences.pageSize,archived:showArchived})
       .then(data=>{
         if(!active)return;
         if(!isAccountPage(data))throw new Error("本地账号列表响应格式异常");
         setResult(data);setState("ready");
-      }).catch(()=>{if(active)setState("error");});
+      }).catch(error=>{if(active){setState("error");setReadError(error instanceof Error?error.message:"本机账号读取异常");}});
     return ()=>{active=false;};
   },[request,debounce,group,page,preferences.pageSize,showArchived,serial]);
   const announce=(message:string,tone:"success"|"danger"="success")=>
     setToast({id:Date.now(),message,tone});
   const refresh=()=>setSerial(x=>x+1);
+  useEffect(()=>{
+    const onAccountChange=()=>setSerial(x=>x+1);
+    window.addEventListener("mosen:account-updated",onAccountChange);
+    return ()=>window.removeEventListener("mosen:account-updated",onAccountChange);
+  },[]);
   const write=async(type:AccountAction,payload:Record<string,unknown>,message:string):Promise<boolean>=>{
     try{
       const output=await run(()=>request(type,payload));
@@ -97,19 +103,19 @@ export function AccountRegistryPanel({preferences}:{preferences:UserPreferences}
       <h2 id="panel-title">本地账号注册表</h2>
       <StatusPill tone="warning">仅登记元数据 · 不代表真实登录或在线</StatusPill>
       <p className="ui-preview-caption" style={{marginTop:10}}>
-        最多登记300个账号。登录与会话恢复需要官方 TDLib 原生库验收后才能使用；备注和分组数据已保存于本机 SQLite。
+        最多登记300条账号备注。点击某条账号的「连接此账号」可在独立 TDLib 会话目录中登录；一次仅保持一个活跃账号，切换不会清除已有会话。
       </p>
       <div className="ui-action-row" style={{marginBottom:14}}>
         <ActionButton tone={!showArchived?"success":"quiet"} onClick={()=>{setShowArchived(false);setPage(1);}}>正常账号</ActionButton>
         <ActionButton tone={showArchived?"success":"quiet"} onClick={()=>{setShowArchived(true);setPage(1);}}>已归档账号</ActionButton>
-        <StatusPill>连接池默认16槽 · 真实连接尚未启用</StatusPill>
+        <StatusPill>已登记账号≠已登录 · 一次一个活跃连接</StatusPill>
       </div>
       <div className="ui-form-row">
         <TextField label="搜索账号备注" value={query} onChange={x=>{setQuery(x);setPage(1);}} placeholder="查找账号"/>
         <TextField label="按分组筛选（留空表示全部）" value={group} onChange={x=>{setGroup(x);setPage(1);}}/>
       </div>
       <div className="ui-list-summary">本地已登记 {result.total} 条（筛选结果） · 目标上限 300 · 当前第 {result.page}/{pages} 页</div>
-      {state==="error"?<StatusPill tone="danger">账号读取失败，请检查本地数据库</StatusPill>:null}
+      {state==="error"?<div role="alert"><StatusPill tone="danger">账号读取失败：{readError}</StatusPill><p>请不要删除本地数据。可重启程序后点「刷新列表」重试。</p></div>:null}
       <ul className={"ui-bounded-list "+(preferences.density==="compact"?"ui-bounded-list--compact":"")} aria-label="本地账号目录">
         {result.items.map(item=><li key={item.id} className="ui-account-row">
           <div><strong>{item.alias}</strong><small>{item.groupTag||"未分组"} · {item.displayName||"未绑定Telegram身份"} · 未连接</small></div>
@@ -118,6 +124,8 @@ export function AccountRegistryPanel({preferences}:{preferences:UserPreferences}
               <ActionButton tone="success" disabled={busy||!item.canAttachSession}
                 onClick={()=>write("accounts.restore",{id:item.id,expectedRevision:item.revision},"账号已恢复到正常目录，仍须官方授权才能登录")}>恢复账号</ActionButton>:
               <>
+                <ActionButton tone="success" disabled={busy||!item.canAttachSession}
+                  onClick={()=>window.dispatchEvent(new CustomEvent("mosen:login-account",{detail:{accountId:item.id,alias:item.alias}}))}>连接此账号</ActionButton>
                 <ActionButton disabled={busy||!item.canAttachSession} onClick={()=>startEdit(item)}>编辑备注</ActionButton>
                 <ActionButton tone="danger" disabled={busy||!item.canAttachSession} onClick={()=>{setArchive(item);setTypedAlias("");}}>归档</ActionButton>
               </>}
@@ -144,7 +152,7 @@ export function AccountRegistryPanel({preferences}:{preferences:UserPreferences}
           onClick={save}>{editing?"保存备注":"登记账号"}</ActionButton>
         {editing?<ActionButton onClick={()=>{setEditing(null);setAlias("");setGroupTag("");}}>取消编辑</ActionButton>:null}
       </div>
-      <p className="ui-preview-caption" style={{marginTop:12}}>不收集手机号、验证码、密码或会话密钥。真实 Telegram 账号的重复身份检查必须在后续官方授权之后完成。</p>
+      <p className="ui-preview-caption" style={{marginTop:12}}>保存备注后点击上方「连接此账号」，再按 Telegram 官方提示扫码或验证。只有官方 getMe 返回的真实身份才能绑定此槽位；不会记录验证码或密码。</p>
     </section>
     <ConfirmDialog open={archive!==null} title="确认归档本地账号" description={archive?
       "将账号“"+archive.alias+"”从目录归档；须先解除任务关联。密钥及会话文件不会永久删除。":""}

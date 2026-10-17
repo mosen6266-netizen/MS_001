@@ -29,6 +29,9 @@ public partial class MainWindow
     private long _pendingMessageId;
     private long _pendingChatId;
     private string? _nativeIssue;
+    private Guid? _activeAccountId;
+    private int _identitySyncing;
+    private bool _identityConfirmed;
 
     private sealed record LiveGroup(string ChatId,string Title,bool CanSend);
     private static string? RenderEphemeralQr(string? link)
@@ -42,6 +45,7 @@ public partial class MainWindow
     private object LiveStatus()
     {
         var auth=_liveAuth?.Snapshot;
+        UpdateTrayConnectionStatus(auth?.Phase==AuthPhase.Ready && _identityConfirmed);
         return new {
             nativeReady=_liveTransport is not null,
             connected=auth?.Phase==AuthPhase.Ready,
@@ -70,7 +74,7 @@ public partial class MainWindow
             {
                 case "telegram.auth.status": result=LiveStatus();break;
                 case "telegram.auth.start":
-                    result=await LiveStartAsync();break;
+                    result=await LiveStartAsync(payload);break;
                 case "telegram.auth.submit":
                     result=await LiveAuthSubmitAsync(payload);break;
                 case "telegram.auth.stop":
@@ -92,7 +96,11 @@ public partial class MainWindow
                 code="TELEGRAM_OPERATION_NOT_CONFIRMED",
                 message=e is DllNotFoundException or BadImageFormatException or EntryPointNotFoundException
                   ? "TDLib原生组件无法加载；请安装完整Windows x64版本并检查运行库。"
-                  : "操作未确认。请查看官方Telegram状态后再决定是否重试；本程序不会自动补发。"
+                  : type=="telegram.auth.start" && !_telegramApiConfig.Configured
+                    ? "还缺少 Telegram API ID 和 API Hash。请打开左侧设置，保存本人在 my.telegram.org 申请的应用参数。"
+                    : type=="telegram.auth.start" && _liveTransport is not null
+                      ? "请先关闭当前 Telegram 连接，再连接另一账号；已有登录资料不会删除。"
+                      : "操作未确认。请查看官方Telegram状态后再决定是否重试；本程序不会自动补发。"
             });
         }
         catch(Exception)
@@ -103,9 +111,12 @@ public partial class MainWindow
         }
     }
 
+    private string ProfilePath() => _activeAccountId is Guid id
+        ? Path.Combine(UserDataPaths.ForCurrentUser(),"tdlib","accounts",id.ToString("N"))
+        : Path.Combine(UserDataPaths.ForCurrentUser(),"tdlib","primary");
     private byte[] ReadOrCreateSessionKey()
     {
-        string folder=Path.Combine(UserDataPaths.ForCurrentUser(),"tdlib","primary");
+        string folder=ProfilePath();
         Directory.CreateDirectory(folder);
         string keyPath=Path.Combine(folder,"key.dpapi");
         if(File.Exists(keyPath))
@@ -126,14 +137,29 @@ public partial class MainWindow
         finally{CryptographicOperations.ZeroMemory(generated);}
     }
 
-    private async Task<object> LiveStartAsync()
+    private async Task<object> LiveStartAsync(JsonElement payload)
     {
+        Guid? accountId=null;
+        if(payload.ValueKind==JsonValueKind.Object)
+        {
+            if(!payload.TryGetProperty("accountId",out var idProperty)||
+               !Guid.TryParseExact(idProperty.GetString(),"D",out var parsedId)||parsedId==Guid.Empty)
+                throw new ArgumentException("Invalid account slot.");
+            if(_accountRegistry.Get(parsedId) is null)
+                throw new InvalidOperationException("Account slot does not exist or is archived.");
+            accountId=parsedId;
+        }
         await _liveMutex.WaitAsync();
         try
         {
-            if(_liveTransport is not null)return LiveStatus();
+            if(_liveTransport is not null)
+            {
+                if(_activeAccountId==accountId)return LiveStatus();
+                throw new InvalidOperationException("Close the active Telegram client first.");
+            }
             if(!_telegramApiConfig.Configured)
                 throw new InvalidOperationException("Telegram API application credentials are not configured.");
+            _activeAccountId=accountId;_identityConfirmed=false;
             var native=new NativeTdlibTransport();
             var bridge=new TdlibDispatcher(native);
             try
@@ -145,7 +171,7 @@ public partial class MainWindow
                 TdlibAuthConfiguration config;
                 try
                 {
-                    string path=Path.Combine(UserDataPaths.ForCurrentUser(),"tdlib","primary");
+                    string path=ProfilePath();
                     string db=Path.Combine(path,"database");
                     string files=Path.Combine(path,"files");
                     Directory.CreateDirectory(db);Directory.CreateDirectory(files);
@@ -168,6 +194,7 @@ public partial class MainWindow
                 _liveClosing=true;
                 await bridge.DisposeAsync();
                 _liveTransport=null;_liveAuth=null;_liveClient=0;
+                _activeAccountId=null;_identityConfirmed=false;
                 throw;
             }
         }
@@ -195,7 +222,54 @@ public partial class MainWindow
             if(!result.Accepted)_nativeIssue=result.Code;
         }
         if(view.Phase==AuthPhase.Ready)
-            _nativeIssue=null;
+            await SynchronizeVerifiedIdentityAsync();
+    }
+
+    // Bind only from an authorized native getMe response, never from user-supplied UI identity.
+    private async Task SynchronizeVerifiedIdentityAsync()
+    {
+        if(_identityConfirmed||Interlocked.CompareExchange(ref _identitySyncing,1,0)!=0)return;
+        try
+        {
+            if(_liveTransport is null||_liveAuth?.Snapshot.Phase!=AuthPhase.Ready)return;
+            var reply=await _liveTransport.SendManualAsync(_liveClient,TdlibManualOperation.GetMe,
+                0,null,TimeSpan.FromSeconds(15));
+            if(reply.Type!="user"||
+               !reply.Body.TryGetProperty("id",out var value)||
+               !value.TryGetInt64(out long uid)||uid<=0)
+                throw new InvalidDataException("Telegram getMe was not confirmed.");
+            string first=reply.Body.TryGetProperty("first_name",out var fname)&&fname.ValueKind==JsonValueKind.String
+                ? fname.GetString()??"": "";
+            string last=reply.Body.TryGetProperty("last_name",out var lname)&&lname.ValueKind==JsonValueKind.String
+                ? lname.GetString()??"": "";
+            string display=new string((first+" "+last).Trim().Where(c=>!char.IsControl(c)).Take(64).ToArray());
+            if(string.IsNullOrWhiteSpace(display))display="Telegram账号";
+            var existing=_accountRegistry.FindByVerifiedUserId(uid);
+            if(_activeAccountId is Guid slot)
+            {
+                var record=_accountRegistry.Get(slot)??throw new InvalidOperationException("Account slot missing.");
+                if(existing is not null && existing.Id!=record.Id)
+                    throw new InvalidOperationException("Identity already belongs to another slot.");
+                if(record.VerifiedUserId is not null &&
+                   record.VerifiedUserId!=uid.ToString(System.Globalization.CultureInfo.InvariantCulture))
+                    throw new InvalidOperationException("Slot identity mismatch.");
+                if(record.VerifiedUserId is null || record.DisplayName!=display)
+                    _accountRegistry.BindVerifiedIdentity(slot,record.Revision,uid,display);
+            }
+            else if(existing is null)
+            {
+                var record=_accountRegistry.Register(display);
+                _accountRegistry.BindVerifiedIdentity(Guid.Parse(record.Id),record.Revision,uid,display);
+            }
+            else if(existing.Removed)throw new InvalidOperationException("Verified account is archived.");
+            _identityConfirmed=true;_nativeIssue=null;
+        }
+        catch(Exception)
+        {
+            _identityConfirmed=false;
+            _nativeIssue="ACCOUNT_IDENTITY_SYNC_FAILED";
+        }
+        finally{Volatile.Write(ref _identitySyncing,0);}
     }
 
     private async Task ConsumeLiveUpdatesAsync(TdlibDispatcher bridge)
@@ -293,8 +367,8 @@ public partial class MainWindow
 
     private async Task<object> LiveSendTextAsync(JsonElement payload)
     {
-        if(_liveAuth?.Snapshot.Phase!=AuthPhase.Ready || _liveTransport is null)
-            throw new InvalidOperationException("Unauthorized client.");
+        if(_liveAuth?.Snapshot.Phase!=AuthPhase.Ready || _liveTransport is null || !_identityConfirmed)
+            throw new InvalidOperationException("Telegram identity has not been verified and saved.");
         if(_acknowledgement is not null)throw new InvalidOperationException("Previous send is unresolved.");
         if(DateTimeOffset.UtcNow<_nextManualSend)throw new InvalidOperationException("Manual rate limit.");
         string chatId=payload.GetProperty("chatId").GetString()!;
@@ -345,6 +419,7 @@ public partial class MainWindow
         {
             _liveClosing=true;_liveGroups.Clear();
             var bridge=_liveTransport;_liveTransport=null;_liveAuth=null;_liveClient=0;
+            _activeAccountId=null;_identityConfirmed=false;
             _acknowledgement?.TrySetCanceled();
             if(bridge is not null)await bridge.DisposeAsync();
             _lastDelivery="连接已关闭";_nativeIssue=null;

@@ -21,6 +21,7 @@ export function TelegramLivePanel({view="accounts"}:{view?:"accounts"|"groups"})
  const [confirm,setConfirm]=useState(false);
  const pending=useRef(new Set<()=>void>());
  const checking=useRef(false);
+ const lastConnected=useRef(false);
  const invoke=useCallback((type:LiveType,payload?:Record<string,unknown>):Promise<Record<string,unknown>>=>{
   const host=window.chrome?.webview;
   if(!host)return Promise.reject(new Error("需要 Windows 客户端"));
@@ -53,6 +54,9 @@ export function TelegramLivePanel({view="accounts"}:{view?:"accounts"|"groups"})
     const reply=await invoke("telegram.auth.status");
     if(isTelegramLiveStatus(reply)){
       setStatus(reply);
+      if(reply.connected&&!lastConnected.current)
+        window.dispatchEvent(new Event("mosen:account-updated"));
+      lastConnected.current=reply.connected;
     }else{
       setMessage("Telegram 状态数据不完整，请重新打开页面；已保留原有界面。");
     }
@@ -65,6 +69,26 @@ export function TelegramLivePanel({view="accounts"}:{view?:"accounts"|"groups"})
   const tick=window.setInterval(()=>{if(active)void reload();},2500);
   return()=>{active=false;clearInterval(tick);for(const cancel of pending.current)cancel();};
  },[reload]);
+ useEffect(()=>{
+  const connectSlot=(event:Event)=>{
+    const detail=(event as CustomEvent<{accountId?:string;alias?:string}>).detail;
+    if(!detail||typeof detail.accountId!=="string"||busy)return;
+    void (async()=>{
+      setBusy(true);setMessage("");
+      try{
+        if(status.nativeReady)await invoke("telegram.auth.stop");
+        const reply=await invoke("telegram.auth.start",{accountId:detail.accountId});
+        if(!isTelegramLiveStatus(reply))throw new Error("Telegram 连接状态异常");
+        setStatus(reply);
+        setMessage("账号「"+(detail.alias||"当前账号")+"」已开始连接。请按上方提示完成官方登录。");
+        await reload();
+      }catch(e){setMessage(e instanceof Error?e.message:"账号连接失败");}
+      finally{setBusy(false);}
+    })();
+  };
+  window.addEventListener("mosen:login-account",connectSlot);
+  return()=>window.removeEventListener("mosen:login-account",connectSlot);
+ },[busy,status.nativeReady,invoke,reload]);
  const action=async(type:LiveType,payload?:Record<string,unknown>)=>{
   if(busy)return;
   setBusy(true);setMessage("");
@@ -93,6 +117,7 @@ export function TelegramLivePanel({view="accounts"}:{view?:"accounts"|"groups"})
 
  return <section className="ui-demo-box" aria-label="Telegram实际连接" style={{marginBottom:16}}>
   <h2>{view==="groups"?"Telegram 群组与手动消息":"Telegram 官方登录"}</h2>
+  {view==="accounts"?<p className="ui-preview-caption">首次使用请到左侧「设置」保存 API ID 和 API Hash。登记多个账号后，可在下方分别点击「连接此账号」。当前一次只连接一个，不会自动群发。</p>:null}
   {!window.chrome?.webview?<StatusPill tone="warning">需要Windows客户端</StatusPill>:
     status.connected?<StatusPill tone="success">Telegram已授权</StatusPill>:
     status.nativeReady?<StatusPill tone="warning">正在等待Telegram认证</StatusPill>:

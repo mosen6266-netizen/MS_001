@@ -5,7 +5,7 @@ using System.Threading.Channels;
 namespace Mosen.GroupScheduler.Telegram;
 
 public enum TdlibControlCommand { GetVersion, GetAuthorizationState }
-public enum TdlibManualOperation { LoadChats, ListChats, GetChat, SendOneText }
+public enum TdlibManualOperation { LoadChats, ListChats, GetChat, SendOneText, GetMe }
 
 public sealed record TdlibEnvelope(int ClientId, string Type, JsonElement Body)
 {
@@ -154,6 +154,7 @@ public sealed class TdlibDispatcher : IAsyncDisposable
             TdlibManualOperation.LoadChats => TdlibManualOperations.LoadChats(id),
             TdlibManualOperation.ListChats => TdlibManualOperations.Chats(id),
             TdlibManualOperation.GetChat => TdlibManualOperations.Chat(id,chatId),
+            TdlibManualOperation.GetMe => TdlibManualOperations.Me(id),
             TdlibManualOperation.SendOneText => TdlibManualOperations.SendOneText(id,chatId,text!),
             _ => throw new ArgumentOutOfRangeException(nameof(command))
         },timeout,cancellationToken);

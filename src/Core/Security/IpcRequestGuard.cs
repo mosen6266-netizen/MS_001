@@ -104,7 +104,17 @@ public static class IpcRequestGuard
                     body is {Length:>=1 and <=2000}&& !string.IsNullOrWhiteSpace(body)&&
                     !body.Any(x=>char.IsControl(x)&&x is not '\n' and not '\r' and not '\t');
             }
-            if(operation is AllowedIpcOperation.TelegramAuthStatus or AllowedIpcOperation.TelegramAuthStart
+            if(operation==AllowedIpcOperation.TelegramAuthStart)
+            {
+                if(ExactFields(root,RootReadFields))return true;
+                return ExactFields(root,RootWriteFields)&&
+                    root.TryGetProperty("payload",out var startPayload)&&
+                    ExactFields(startPayload,new HashSet<string>{"accountId"})&&
+                    startPayload.GetProperty("accountId").ValueKind==JsonValueKind.String&&
+                    Guid.TryParseExact(startPayload.GetProperty("accountId").GetString(),"D",out var accountId)&&
+                    accountId!=Guid.Empty;
+            }
+            if(operation is AllowedIpcOperation.TelegramAuthStatus
                 or AllowedIpcOperation.TelegramAuthStop or AllowedIpcOperation.TelegramChatsRefresh)
                 return ExactFields(root,RootReadFields);
             if(operation==AllowedIpcOperation.ApiConfigSave)

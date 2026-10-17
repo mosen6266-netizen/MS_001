@@ -4,6 +4,7 @@ export type ReadRequest = { protocol: typeof IPC_PROTOCOL; requestId: string; ty
 export type SettingsSaveRequest = { protocol: typeof IPC_PROTOCOL; requestId: string; type: "settings.save"; payload: {expectedRevision:number;preferences:UserPreferences} };
 export type ApiConfigSaveRequest={protocol:typeof IPC_PROTOCOL;requestId:string;type:"telegram.api.save";payload:{apiId:number;apiHash:string}};
 export type TelegramAuthRequest={protocol:typeof IPC_PROTOCOL;requestId:string;type:"telegram.auth.submit";payload:{action:"qr"|"phone"|"code"|"email"|"emailCode"|"password";input:string}};
+export type TelegramAuthStartRequest={protocol:typeof IPC_PROTOCOL;requestId:string;type:"telegram.auth.start";payload:{accountId:string}};
 export type TelegramMessageRequest={protocol:typeof IPC_PROTOCOL;requestId:string;type:"telegram.message.send";payload:{chatId:string;text:string}};
 export type TelegramLiveStatus={nativeReady:boolean;connected:boolean;phase:string;title:string;instruction:string;qrPng:string|null;canStartQr:boolean;canSubmit:boolean;canCancel:boolean;groups:Array<{chatId:string;title:string;canSend:boolean}>;delivery:string;issue:string|null;outboundPending:boolean};
 /** WebView IPC is an untrusted boundary: never cast a transport payload to renderable UI state. */
@@ -49,7 +50,7 @@ export type ScriptSummary={scriptId:string;title:string;revision:number;stepCoun
 export type ScriptRequest={protocol:typeof IPC_PROTOCOL;requestId:string;type:ScriptAction;payload:Record<string,unknown>};
 export type RuntimeDashboardRow={runId:string;chatId:string;topicId:string|null;state:string;phase:string;completedSteps:number;totalSteps:number;completionPercent:number;nextStepNumber:number;remainingMs:number;lastClockUtc:string;isClockActive:boolean;issueCode:string;revision:number};
 export type RuntimeDashboardSnapshot={checkedUtc:string;mode:"offline-simulation-readonly";summary:{total:number;running:number;paused:number;review:number;failed:number;completed:number;stopped:number;ready:number;uncertainMessages:number;corruptRecords:number};items:RuntimeDashboardRow[];pollHintSeconds?:5|15|30};
-export type BridgeRequest = ReadRequest | SettingsSaveRequest | ApiConfigSaveRequest | TelegramAuthRequest | TelegramMessageRequest | AccountRequest | GroupRequest | ScriptRequest | MediaRequest;
+export type BridgeRequest = ReadRequest | SettingsSaveRequest | ApiConfigSaveRequest | TelegramAuthRequest | TelegramAuthStartRequest | TelegramMessageRequest | AccountRequest | GroupRequest | ScriptRequest | MediaRequest;
 export type BridgeResponse = { protocol: typeof IPC_PROTOCOL; requestId:string; ok:boolean; type:string; payload:Record<string,unknown> };
 export type Density = "compact" | "comfortable";
 export type UserPreferences = {density:Density;searchDebounceMs:number;pageSize:10|20|50;desktopNotifications:boolean};
@@ -69,6 +70,12 @@ export function isPreferencesSnapshot(v:unknown):v is PreferencesSnapshot {
 }
 export function isBridgeRequest(v:unknown):v is BridgeRequest {
   if(!isRecord(v)||v.protocol!==IPC_PROTOCOL||typeof v.requestId!=="string"||v.requestId.length===0||v.requestId.length>64)return false;
+  if(v.type==="telegram.auth.start"&&Object.keys(v).length===4){
+    return isRecord(v.payload)&&Object.keys(v.payload).length===1&&
+      typeof v.payload.accountId==="string"&&
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v.payload.accountId)&&
+      v.payload.accountId!=="00000000-0000-0000-0000-000000000000";
+  }
   if(v.type==="telegram.auth.submit"){
     if(Object.keys(v).length!==4||!isRecord(v.payload)||
        Object.keys(v.payload).sort().join(",")!=="action,input")return false;

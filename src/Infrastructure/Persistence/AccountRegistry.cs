@@ -79,6 +79,16 @@ public sealed class AccountRegistry
         AccountEntry entry=Map(rows);
         return entry.Removed&&!includeRemoved?null:entry;
     }
+    public AccountEntry? FindByVerifiedUserId(long telegramUserId)
+    {
+        if(telegramUserId<=0)throw new ArgumentOutOfRangeException(nameof(telegramUserId));
+        using var c=Open();using var cmd=c.CreateCommand();
+        cmd.CommandText=@"SELECT account_id,alias,group_tag,display_name,revision,verified_telegram_user_id,deleted_utc
+                          FROM accounts WHERE verified_telegram_user_id=$uid LIMIT 1;";
+        cmd.Parameters.AddWithValue("$uid",telegramUserId.ToString(CultureInfo.InvariantCulture));
+        using var rows=cmd.ExecuteReader();
+        return rows.Read()?Map(rows):null;
+    }
     public AccountPage Find(string query="",string? group=null,int page=1,int pageSize=20,bool archived=false)
     {
         if(page<1 || pageSize is not (10 or 20 or 50))throw new ArgumentOutOfRangeException(nameof(pageSize));

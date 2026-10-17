@@ -528,8 +528,8 @@ jobs:
         with:
           name: ms001-step27-offline-installer-unsigned
           path: |
-            artifacts/installer/MOSEN-Telegram-Scheduler-Setup-0.29.1-dev.exe
-            artifacts/installer/MOSEN-Telegram-Scheduler-Setup-0.29.1-dev.exe.sha256
+            artifacts/installer/MOSEN-Telegram-Scheduler-Setup-0.29.2-dev.exe
+            artifacts/installer/MOSEN-Telegram-Scheduler-Setup-0.29.2-dev.exe.sha256
           retention-days: 7
           if-no-files-found: error
 

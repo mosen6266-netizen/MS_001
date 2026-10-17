@@ -26,6 +26,7 @@ public partial class MainWindow
         "MOSEN","TelegramScheduler","alerts.json"));
     private EmergencyStopController? _emergency;
     private System.Windows.Forms.NotifyIcon? _tray;
+    private System.Drawing.Icon? _ownedTrayIcon;
     private System.Windows.Forms.ContextMenuStrip? _trayMenu;
     private DispatcherTimer? _alertTimer;
     private Window? _alertWindow;
@@ -58,9 +59,14 @@ public partial class MainWindow
         _trayMenu.Items.Add("全局紧急停止",null,(_,_)=>Dispatcher.BeginInvoke(
             (Action)(()=>EmergencyStopWithConfirmation())));
         _trayMenu.Items.Add("退出程序",null,(_,_)=>Dispatcher.BeginInvoke((Action)Close));
+        // The tray represents the actual session, not the historical offline simulation engine.
+        try {
+            var exe=Environment.ProcessPath;
+            if(!string.IsNullOrWhiteSpace(exe))_ownedTrayIcon=System.Drawing.Icon.ExtractAssociatedIcon(exe);
+        } catch(Exception) { _ownedTrayIcon=null; }
         _tray=new System.Windows.Forms.NotifyIcon {
-            Text="MOSEN Group Scheduler · 仅离线模拟",
-            Icon=System.Drawing.SystemIcons.Warning,
+            Text="MOSEN Telegram Scheduler · Telegram未连接",
+            Icon=_ownedTrayIcon??System.Drawing.SystemIcons.Application,
             ContextMenuStrip=_trayMenu,Visible=true
         };
         _tray.DoubleClick+=OnTrayDoubleClick;
@@ -71,6 +77,18 @@ public partial class MainWindow
         _alertTimer.Tick+=OnAlertTimerTick;
         _webSubscriptions.Track(()=>{if(_alertTimer is not null)_alertTimer.Tick-=OnAlertTimerTick;});
         _alertTimer.Start();
+    }
+    private void UpdateTrayConnectionStatus(bool connected)
+    {
+        if(_closing||_tray is null)return;
+        if(!Dispatcher.CheckAccess())
+        {
+            Dispatcher.BeginInvoke(new Action(()=>UpdateTrayConnectionStatus(connected)));
+            return;
+        }
+        _tray.Text=connected
+            ?"MOSEN Telegram Scheduler · Telegram已连接"
+            :"MOSEN Telegram Scheduler · Telegram未连接";
     }
     private void OnTrayDoubleClick(object? sender,EventArgs e)=>
         Dispatcher.BeginInvoke((Action)BringMainWindowForward);
@@ -239,6 +257,7 @@ public partial class MainWindow
         _notificationPolicy.Shutdown();
         _alertTimer?.Stop();_alertTimer=null;
         _tray?.Dispose();_tray=null;
+        _ownedTrayIcon?.Dispose();_ownedTrayIcon=null;
         _trayMenu?.Dispose();_trayMenu=null;
         _alertWindow?.Close();_alertWindow=null;
         _historyWindow?.Close();_historyWindow=null;

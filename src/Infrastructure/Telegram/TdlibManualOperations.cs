@@ -23,6 +23,9 @@ public static class TdlibManualOperations
             ["limit"]=limit
         });
     }
+    public static string Me(string correlation) => JsonSerializer.Serialize(new Dictionary<string,object>{
+        ["@type"]="getMe",["@extra"]=correlation
+    });
     public static string Chat(string correlation,long id)
     {
         if(id==0)throw new ArgumentOutOfRangeException(nameof(id));
