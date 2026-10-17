@@ -6,6 +6,9 @@ on:
       - "src/**"
       - "tests/**"
       - "license/**"
+      - "installer/**"
+      - "build/**"
+      - "assets/branding/**"
       - ".github/workflows/ci.yml"
       - "Directory.Build.props"
       - ".gitignore"
@@ -26,6 +29,18 @@ jobs:
         run: npm run lint
       - working-directory: apps/ui
         run: npm test
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Generate transparent real app ICO and PNG on build runner
+        run: |
+          python -m pip install --disable-pip-version-check pillow cairosvg
+          python tools/branding/build_icons.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ms001-app-icons
+          path: assets/branding/generated/
+          if-no-files-found: error
       - name: Validate shared theme tokens, dialog order and responsive CSS
         run: node tests/UI/Visual/check-design.mjs
       - working-directory: apps/ui
@@ -49,6 +64,10 @@ jobs:
         with:
           name: ms001-ui-dist
           path: apps/ui/dist/
+      - uses: actions/download-artifact@v4
+        with:
+          name: ms001-app-icons
+          path: assets/branding/generated/
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "10.0.x"
@@ -429,3 +448,64 @@ jobs:
           dotnet-version: "10.0.x"
       - name: Verify P-256 signed license, anti-replay, 1h offline, revocation and per-install device ID
         run: dotnet run --project tests/Licensing/Mosen.GroupScheduler.Licensing.Tests.csproj --configuration Release
+
+  installer-data:
+    name: Install path and safe uninstall regression - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Verify separate user profile, upgrade preserving secrets and default uninstall
+        run: dotnet run --project tests/Installer/Mosen.GroupScheduler.Installer.Tests.csproj --configuration Release
+      - name: Static assert stable AppId, WebView2 bundle, icons, shortcuts and explicit purge
+        run: node --test tests/Installer/contract.test.mjs
+
+  windows-installer:
+    name: Unsigned offline Windows Setup with bundled WebView2 - Windows x64
+    needs: [ui, windows]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: ms001-step03-desktop-build
+          path: artifacts/desktop/
+      - uses: actions/download-artifact@v4
+        with:
+          name: ms001-app-icons
+          path: assets/branding/generated/
+      - name: Download official offline Microsoft WebView2 x64 installer
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          New-Item -ItemType Directory -Force "build/vendor" | Out-Null
+          Invoke-WebRequest -Uri "https://go.microsoft.com/fwlink/p/?LinkId=2124703" -MaximumRedirection 10 -OutFile "build/vendor/MicrosoftEdgeWebView2RuntimeInstallerX64.exe"
+          $file = "build/vendor/MicrosoftEdgeWebView2RuntimeInstallerX64.exe"
+          if ((Get-Item $file).Length -lt 50MB) { throw "WebView2 installer is unexpectedly small" }
+          $signature = Get-AuthenticodeSignature -LiteralPath $file
+          if($signature.Status -ne "Valid" -or $signature.SignerCertificate.Subject -notmatch "Microsoft") {
+            throw "Refusing unsigned or untrusted WebView2 runtime"
+          }
+      - name: Install Inno Setup 6 on BUILD RUNNER only
+        shell: pwsh
+        run: choco install innosetup --yes --no-progress
+      - name: Compile real offline Windows EXE setup and SHA256
+        shell: pwsh
+        run: ./build/Build-Installer.ps1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ms001-step27-offline-installer-unsigned
+          path: |
+            artifacts/installer/MOSEN-Telegram-Scheduler-Setup-0.27.0-dev.exe
+            artifacts/installer/MOSEN-Telegram-Scheduler-Setup-0.27.0-dev.exe.sha256
+          retention-days: 7
+          if-no-files-found: error

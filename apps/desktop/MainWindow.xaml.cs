@@ -9,6 +9,7 @@ using Mosen.GroupScheduler.Core.Shell;
 using Mosen.GroupScheduler.Core.Security;
 using Mosen.GroupScheduler.Core.Telemetry;
 using Mosen.GroupScheduler.ResourceBudget;
+using Mosen.GroupScheduler.Installation;
 
 namespace Mosen.GroupScheduler.Desktop;
 
@@ -85,7 +86,13 @@ public partial class MainWindow : Window
         }
         try
         {
-            await Browser.EnsureCoreWebView2Async();
+            var dataRoot=UserDataPaths.ForCurrentUser();
+            UserDataPaths.AssertNoInstallDirectoryOverlap(AppContext.BaseDirectory,dataRoot);
+            var webView2Profile=UserDataPaths.WebView2(dataRoot);
+            Directory.CreateDirectory(webView2Profile);
+            var environment=await CoreWebView2Environment.CreateAsync(
+                browserExecutableFolder:null,userDataFolder:webView2Profile);
+            await Browser.EnsureCoreWebView2Async(environment);
             if (_closing) return;
             CoreWebView2 core = Browser.CoreWebView2;
             core.Settings.AreDevToolsEnabled = false;
