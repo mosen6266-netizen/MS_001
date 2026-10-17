@@ -47,7 +47,7 @@ SetupLogging=yes
 ; Note: installer intentionally unsigned in dev; signing and trusted update are Step28.
 
 [Languages]
-Name: "chinesesimp"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
+Name: "chinesesimp"; MessagesFile: "lang\ChineseSimplified.isl"
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
