@@ -97,10 +97,10 @@ public static class IpcRequestGuard
                    !ExactFields(msg,new HashSet<string>{"chatId","text"}))return false;
                 if(msg.GetProperty("chatId").ValueKind!=JsonValueKind.String||
                    msg.GetProperty("text").ValueKind!=JsonValueKind.String)return false;
-                var id=msg.GetProperty("chatId").GetString();
+                var targetChatId=msg.GetProperty("chatId").GetString();
                 var body=msg.GetProperty("text").GetString();
-                return id is {Length:>=2 and <=20}&&id.StartsWith("-",StringComparison.Ordinal)&&
-                    long.TryParse(id,out long groupId)&&groupId<0 &&
+                return targetChatId is {Length:>=2 and <=20}&&targetChatId.StartsWith("-",StringComparison.Ordinal)&&
+                    long.TryParse(targetChatId,out long groupId)&&groupId<0 &&
                     body is {Length:>=1 and <=2000}&& !string.IsNullOrWhiteSpace(body)&&
                     !body.Any(x=>char.IsControl(x)&&x is not '\n' and not '\r' and not '\t');
             }
