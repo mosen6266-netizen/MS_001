@@ -7,7 +7,7 @@
   "plan_date": "2026-10-16",
   "current_step": "28",
   "current_step_status": "in_progress",
-  "phase": 5,
+  "phase": 7,
   "total_steps": 32,
   "completed_steps": [
     "01",
@@ -51,7 +51,7 @@
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step28 in progress: pinned P-256 signed manifest, SHA256 and HTTP resume downloader, WPF check-update gate, separate post-exit Authenticode verification and best-effort program-folder backup/rollback, draft-only signed release workflow. Signing trust pins remain UNCONFIGURED; no actual production code signing or GitHub release. Cross-platform CI pending. Progress remains 27/32; no claim of done_dev until all tests pass.",
+  "notes": "Step28 code implemented (not CI-accepted): ECDSA P-256 signed manifest, strict GitHub release asset URL/version/product bounds, resumable SHA256 verified installer download; WPF check updates using embedded trust anchor; separate post-exit PowerShell validates SHA256 and Authenticode, backups program files, validates installed EXE version/signature and restores on failure. Release workflow splits read-only build/sign and independent permission-scoped draft publishing; default trust pins UNCONFIGURED, no real signed release. 17/17 reviewed static assertions pass, but latest 49-job GitHub Actions run 39030669456 is queued, no CI success. Progress stays 27/32 (84.375%) until tests complete.",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
@@ -223,6 +223,16 @@
       "id": "STEP27-UNSIGNED-DEV-RELEASE",
       "status": "DEFERRED",
       "detail": "Step27 outputs unsigned development installer as temporary GitHub Actions artifact (7-day retention). Publisher Authenticode signing, trusted update manifest/recovery and production distribution are Step28, not yet done. Production TDLib live send and licensing still disabled."
+    },
+    {
+      "id": "STEP28-LIVE-CODE-SIGNING",
+      "status": "DEFERRED",
+      "detail": "正式Windows签名证书/PFX、公钥指纹、独立P-256签名私钥均未配置，release.yml未实际成功生成用户可下载签名正式EXE/Release；签名信任默认UNCONFIGURED。"
+    },
+    {
+      "id": "STEP28-REAL-ROLLBACK",
+      "status": "DEFERRED",
+      "detail": "实际Win10/11更新断点下载、Inno安装成功/失败、断电和锁文件、跨版本数据库向后兼容及真实自动回滚尚未实机验证。"
     }
   ],
   "step03_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38921641970",
