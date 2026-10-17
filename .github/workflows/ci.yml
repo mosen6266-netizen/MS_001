@@ -80,6 +80,13 @@ jobs:
         run: dotnet build apps/desktop/Mosen.GroupScheduler.Desktop.csproj --configuration Release
       - name: Publish offline shell for diagnostic purposes
         run: dotnet publish apps/desktop/Mosen.GroupScheduler.Desktop.csproj -c Release -r win-x64 --self-contained true -o artifacts/desktop
+      - name: Ensure Windows installer publishes native tdjson.dll
+        shell: pwsh
+        run: |
+          $library = Get-ChildItem -Path "artifacts/desktop" -Recurse -Filter "tdjson.dll" -File
+          if (-not $library) { throw "Missing TDLib native library in Windows publish output" }
+          $library | ForEach-Object { Write-Host ("TDLib native: " + $_.FullName + " bytes=" + $_.Length) }
+
       - uses: actions/upload-artifact@v4
         with:
           name: ms001-step03-desktop-build
@@ -499,6 +506,17 @@ jobs:
           $signature = Get-AuthenticodeSignature -LiteralPath $file
           if($signature.Status -ne "Valid" -or $signature.SignerCertificate.Subject -notmatch "Microsoft") {
             throw "Refusing unsigned or untrusted WebView2 runtime"
+          }
+      - name: Fetch and verify official Microsoft VC++ x64 runtime for TDLib
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          Invoke-WebRequest -Uri "https://aka.ms/vc14/vc_redist.x64.exe" -MaximumRedirection 10 -OutFile "build/vendor/VC_redist.x64.exe"
+          $file = "build/vendor/VC_redist.x64.exe"
+          if ((Get-Item $file).Length -lt 10MB) { throw "VC++ runtime is unexpectedly small" }
+          $signature = Get-AuthenticodeSignature -LiteralPath $file
+          if($signature.Status -ne "Valid" -or $signature.SignerCertificate.Subject -notmatch "Microsoft") {
+            throw "Refusing unsigned or untrusted Visual C++ runtime"
           }
       - name: Install Inno Setup 6 on BUILD RUNNER only
         shell: pwsh
