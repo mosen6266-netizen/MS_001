@@ -1,6 +1,12 @@
 ; MOSEN Telegram Scheduler, independent from Signal MS002
 #define ProductName "MOSEN Telegram Scheduler"
 #define ProductExe "Mosen.GroupScheduler.Desktop.exe"
+#ifndef ProductVersion
+  #define ProductVersion "0.27.0"
+#endif
+#ifndef OutputTag
+  #define OutputTag "0.27.0-dev"
+#endif
 #ifndef PublishDir
   #define PublishDir "..\artifacts\desktop"
 #endif
@@ -16,7 +22,7 @@
 [Setup]
 AppId={{1DD1DE0A-6F59-4D52-A25E-78CB07A25701}
 AppName={#ProductName}
-AppVersion=0.27.0
+AppVersion={#ProductVersion}
 AppPublisher=MOSEN
 AppPublisherURL=https://github.com/mosen6266-netizen/MS_001
 DefaultDirName={localappdata}\Programs\MOSEN\TelegramScheduler
@@ -32,7 +38,7 @@ Uninstallable=yes
 UninstallDisplayName={#ProductName}
 UninstallDisplayIcon={app}\{#ProductExe}
 OutputDir={#InstallerOutput}
-OutputBaseFilename=MOSEN-Telegram-Scheduler-Setup-0.27.0-dev
+OutputBaseFilename=MOSEN-Telegram-Scheduler-Setup-{#OutputTag}
 SetupIconFile={#BrandingFile}
 Compression=lzma2
 SolidCompression=yes
@@ -44,7 +50,7 @@ ChangesEnvironment=no
 ChangesAssociations=no
 SetupLogging=yes
 ; NEVER delete {localappdata}\MOSEN\TelegramScheduler by default or after upgrading.
-; Note: installer intentionally unsigned in dev; signing and trusted update are Step28.
+; Developer CI package is unsigned. Production Release workflow must sign both installed EXE and Setup.
 
 [Languages]
 Name: "chinesesimp"; MessagesFile: "lang\ChineseSimplified.isl"
