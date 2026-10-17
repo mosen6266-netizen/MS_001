@@ -1,5 +1,4 @@
 import {afterEach,describe,expect,it,vi} from "vitest";
-import {createElement} from "react";
 import {renderToStaticMarkup} from "react-dom/server";
 import {App} from "./App";
 import {isTelegramLiveStatus,type TelegramLiveStatus} from "../../../src/contracts/ipc";
@@ -15,7 +14,7 @@ describe("accounts click blank-page regression",()=>{
   vi.stubGlobal("window",{chrome:{webview:{
    postMessage:()=>{},addEventListener:()=>{},removeEventListener:()=>{}
   }}});
-  const html=renderToStaticMarkup(createElement(App,{initialRoute:"accounts"}));
+  const html=renderToStaticMarkup(<App initialRoute="accounts" />);
   expect(html).toContain("主导航");
   expect(html).toContain("账号管理");
   expect(html).toContain("Telegram 官方登录");
@@ -27,7 +26,7 @@ describe("accounts click blank-page regression",()=>{
   vi.stubGlobal("window",{chrome:{webview:{
    postMessage:()=>{},addEventListener:()=>{},removeEventListener:()=>{}
   }}});
-  const html=renderToStaticMarkup(createElement(App,{initialRoute:"groups"}));
+  const html=renderToStaticMarkup(<App initialRoute="groups" />);
   expect(html).toContain("Telegram 群组与手动消息");
   expect(html).toContain("Telegram 群组与话题目录");
  });
