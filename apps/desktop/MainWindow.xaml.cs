@@ -105,6 +105,8 @@ public partial class MainWindow : Window
             _webSubscriptions.Track(()=>core.NavigationStarting -= OnCoreNavigationStarting);
             core.NavigationCompleted += OnCoreNavigationCompleted;
             _webSubscriptions.Track(()=>core.NavigationCompleted -= OnCoreNavigationCompleted);
+            core.ProcessFailed += OnCoreProcessFailed;
+            _webSubscriptions.Track(()=>core.ProcessFailed -= OnCoreProcessFailed);
             core.SetVirtualHostNameToFolderMapping("ms001.local", folder, CoreWebView2HostResourceAccessKind.DenyCors);
             core.WebMessageReceived += OnWebMessageReceived;
             _webSubscriptions.Track(()=>core.WebMessageReceived -= OnWebMessageReceived);
@@ -146,6 +148,21 @@ public partial class MainWindow : Window
         _appHealth="ready";
         _safeTelemetry.Record(DiagnosticEvent.Ready);
     }
+    private void OnCoreProcessFailed(object? sender,CoreWebView2ProcessFailedEventArgs evt)
+    {
+        // A WebView2 renderer/GPU crash must show a visible recovery screen, not all-black.
+        // Do not log raw JavaScript stacks, Telegram payloads, account IDs or QR values.
+        if(_closing)return;
+        Dispatcher.BeginInvoke(new Action(()=>{
+            if(_closing)return;
+            _appHealth="degraded";
+            _safeTelemetry.Record(DiagnosticEvent.RecoverableError,FailureCategory.Protocol);
+            Diagnostics.Text="界面渲染异常，请退出并重新启动软件。已保存的账号、剧本和设置不会因此被删除。";
+            Browser.Visibility=Visibility.Hidden;
+            StatusPanel.Visibility=Visibility.Visible;
+        }));
+    }
+
     private async void OnWebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs evt)
     {
         if (_closing || !string.Equals(evt.Source, TrustedOrigin + "index.html", StringComparison.OrdinalIgnoreCase)) return;
