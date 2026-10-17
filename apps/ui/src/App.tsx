@@ -8,6 +8,7 @@ import { GroupCatalogPanel } from "./components/GroupCatalogPanel";
 import { ScriptEditorPanel } from "./components/ScriptEditorPanel";
 import { AuthStatusPreview } from "./components/AuthStatusPreview";
 import { DiagnosticsPanel } from "./components/DiagnosticsPanel";
+import { TelegramApiConfigurationPanel } from "./components/TelegramApiConfigurationPanel";
 import { RuntimeDashboardPanel } from "./components/RuntimeDashboardPanel";
 import { usePreferences } from "./hooks/usePreferences";
 import { isBridgeResponse, makeRequest } from "../../../src/contracts/ipc";
@@ -90,7 +91,7 @@ export function App() {
             <article className="notice-tile"><h2 id="panel-title">当前开发范围</h2><p>已实现本地账号登记及只读群组目录；真实 TDLib 同步、账号授权和群组任务尚未接入，当前不会执行发送。</p></article>
           </div> :
           shell.active === "running" ? <RuntimeDashboardPanel /> :
-          shell.active === "settings" ? <><PreferencesPanel {...preferences} /><DiagnosticsPanel /><DesignShowcase /></> :
+          shell.active === "settings" ? <><PreferencesPanel {...preferences} /><TelegramApiConfigurationPanel /><DiagnosticsPanel /><DesignShowcase /></> :
           shell.active === "groups" ? <GroupCatalogPanel preferences={preferences.snapshot.preferences}/> :
           shell.active === "accounts" ? <><AuthStatusPreview />{window.chrome?.webview ? <AccountRegistryPanel preferences={preferences.snapshot.preferences}/> : <MockAccountIndex preferences={preferences.snapshot.preferences} />}</> :
           <div className="blank-panel">
