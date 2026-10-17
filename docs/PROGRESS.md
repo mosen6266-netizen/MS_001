@@ -278,3 +278,9 @@
 - **测试验收**：Windows和Linux分别通过 **22项安装路径/升级/卸载模拟断言及4组安全配置合同测试**。 [CI 39026535003](https://github.com/mosen6266-netizen/MS_001/actions/runs/39026535003) **50/50作业全部SUCCESS**，包含实编译Inno安装器、WebView2签名、Windows WPF和所有旧模块回归。最终主安装源码提交 [`cbb9d9c2`](https://github.com/mosen6266-netizen/MS_001/commit/cbb9d9c26a4186a0ad348184e77e9aa739d4c884)；参考 `docs/INSTALLATION.md`、`docs/STEP_27_TEST_MATRIX.md`、`docs/STEP_27_ACCEPTANCE.md`。
 - **DEFERRED**：干净Win10/11真实VM安装、实际无WebView2的自动部署、真实旧版账号覆盖安装/卸载恢复、图标人工视觉、杀毒软件检查以及正式发行签名/更新回滚未实机执行；第28步完成签名更新机制，后续最终人工整机验收。**Dev安装包未签名，不应充作正式生产发行版；真实TDLib发送与Cloudflare授权服务也未接入。**
 - **开发进度27/32（84.375%），剩余5步；下一步28 签名更新与安全回滚。**
+
+## Step28 — 签名更新、安全下载与程序回滚（2026-10-17，开发中）
+
+- **IN_PROGRESS / 不计完成**：已经实现独立P-256验签与固定产品/GitHub Release路径验证、签名大小/SHA256全文件校验、HTTP Range断点下载并拒绝哈希错误；Windows原生检查更新按钮使用编译期信任根，用户确认后下载再退出程序并启动二阶段安装脚本。旧程序文件备份和失败恢复不触碰LocalAppData私有数据库、TDLib会话、剧本、备注。
+- **安全门禁**：正式证书Thumbprint和P-256公钥目前均为UNCONFIGURED；默认明确禁止更新。独立GitHub Actions release.yml仅接受手动启动、验证两个签名密钥与信任根、签名程序及离线Setup、生成签名update.json，且仅创建待人工审批的草稿Release。**没有配置Secret、没有发布正式签名EXE/Release、也没有修改Signal MS002。**
+- **待核验**：本步Windows/Linux新测试和旧50项CI全量通过、Windows WPF/Inno构建、测试源码错误修正；记录真实Actions Run URL后才能标记done_dev。真实签名、Win10/11安装、断电、重装和SQLite迁移回滚仍列DEFERRED。**总进度仍然27/32（84.375%）。**
