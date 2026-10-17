@@ -25,7 +25,7 @@ public sealed class TdlibAuthConfiguration
             throw new ArgumentException("TDLib session directories must be absolute local paths.");
         if(databaseKey is null || databaseKey.Length!=32)throw new ArgumentException("A 32-byte TDLib database key is required.");
         ApiId=apiId;ApiHash=apiHash;DatabaseDirectory=Path.GetFullPath(databaseDirectory);
-        FilesDirectory=Path.GetFullPath(filesDirectory);DatabaseKey=databaseKey;
+        FilesDirectory=Path.GetFullPath(filesDirectory);DatabaseKey=databaseKey.ToArray(); // private session-owned copy; caller may zero the input
         TestDatacenter=testDatacenter;
     }
     public override string ToString()=>"TdlibAuthConfiguration(REDACTED)";
