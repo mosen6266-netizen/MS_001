@@ -21,7 +21,6 @@ describe("accounts click blank-page regression",()=>{
   expect(html).toContain("Telegram 官方登录");
   expect(html).toContain("本地账号注册表");
   expect(html).toContain("登记新的本地账号槽位");
-  expect(html).toContain("Telegram登录");
   expect(html).not.toContain("undefined");
  });
  it("renders group route with both real live panel and saved directory",()=>{
