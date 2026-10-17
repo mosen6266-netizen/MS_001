@@ -604,9 +604,24 @@ jobs:
           retention-days: 30
           if-no-files-found: error
 
+  security-audit:
+    name: Step31 repository secret scan and signed release blockers
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Detect committed secrets without printing credential values
+        run: node build/audit-repository-secrets.mjs
+      - name: Test release approval gate, tracked source and injected secrets
+        run: node --test tests/SecurityAudit/release-readiness.test.mjs tests/SecurityAudit/source-audit.test.mjs
+
   regression-gate:
     name: Step29 aggregate P0 gate - require every upstream CI job success
-    needs: [ui, windows, migrations, shell, visual-screenshots, settings, security, tdlib-adapter, authorization, session-lifecycle, group-catalog, script-editor, script-timing-media, script-portable, script-preflight, virtual-scheduler, outbound-policy, delivery-dedup, recovery-safety, runtime-dashboard, notifications-stop, history-security, performance-budget, telegram-license-worker, telegram-license-client, installer-data, windows-installer, updater-security, p0-e2e, capacity-synthetic]
+    needs: [ui, windows, migrations, shell, visual-screenshots, settings, security, tdlib-adapter, authorization, session-lifecycle, group-catalog, script-editor, script-timing-media, script-portable, script-preflight, virtual-scheduler, outbound-policy, delivery-dedup, recovery-safety, runtime-dashboard, notifications-stop, history-security, performance-budget, telegram-license-worker, telegram-license-client, installer-data, windows-installer, updater-security, p0-e2e, capacity-synthetic, security-audit]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -617,5 +632,5 @@ jobs:
       - name: Reject cancelled, skipped, failed or missing upstream checks
         env:
           REGRESSION_NEEDS_JSON: ${{ toJson(needs) }}
-          REGRESSION_REQUIRED_JOB_IDS: "ui,windows,migrations,shell,visual-screenshots,settings,security,tdlib-adapter,authorization,session-lifecycle,group-catalog,script-editor,script-timing-media,script-portable,script-preflight,virtual-scheduler,outbound-policy,delivery-dedup,recovery-safety,runtime-dashboard,notifications-stop,history-security,performance-budget,telegram-license-worker,telegram-license-client,installer-data,windows-installer,updater-security,p0-e2e,capacity-synthetic"
+          REGRESSION_REQUIRED_JOB_IDS: "ui,windows,migrations,shell,visual-screenshots,settings,security,tdlib-adapter,authorization,session-lifecycle,group-catalog,script-editor,script-timing-media,script-portable,script-preflight,virtual-scheduler,outbound-policy,delivery-dedup,recovery-safety,runtime-dashboard,notifications-stop,history-security,performance-budget,telegram-license-worker,telegram-license-client,installer-data,windows-installer,updater-security,p0-e2e,capacity-synthetic,security-audit"
         run: node tests/Integration/verify-ci-needs.mjs
