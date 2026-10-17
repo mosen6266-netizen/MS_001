@@ -255,6 +255,13 @@ public partial class MainWindow
     {
         var bridge=_liveTransport??throw new InvalidOperationException("Not connected.");
         if(_liveAuth?.Snapshot.Phase!=AuthPhase.Ready)throw new InvalidOperationException("Not authorized.");
+        // On a fresh TDLib profile getChats can be empty until loadChats is requested.
+        // A 404 error from loadChats only means all chats have already been loaded.
+        try {
+            await bridge.SendManualAsync(_liveClient,TdlibManualOperation.LoadChats,0,null,TimeSpan.FromSeconds(15));
+        } catch(TimeoutException) {
+            // Do not infer success; getChats only uses whatever Telegram actually loaded.
+        }
         var list=await bridge.SendManualAsync(_liveClient,TdlibManualOperation.ListChats,0,null,TimeSpan.FromSeconds(20));
         if(list.Type!="chats"||!list.Body.TryGetProperty("chat_ids",out var ids)||ids.ValueKind!=JsonValueKind.Array)
             throw new IOException("Official Telegram chat listing failed.");
