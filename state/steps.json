@@ -709,7 +709,7 @@
     "step": "30",
     "title": "300 账号/50 群容量和长稳测试",
     "phase": 8,
-    "status": "not_started",
+    "status": "in_progress",
     "acceptance_evidence": [],
     "last_commit_sha": null
   },
