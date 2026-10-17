@@ -627,9 +627,11 @@
     "step": "27",
     "title": "完整 Windows 安装与用户数据独立",
     "phase": 7,
-    "status": "in_progress",
+    "status": "done_dev",
     "acceptance_evidence": [
       "installer/Setup.iss",
+      "installer/lang/ChineseSimplified.isl",
+      "installer/lang/LICENSE",
       "build/Build-Installer.ps1",
       "build/Remove-LocalUserData.ps1",
       "src/Core/Installation/UserDataPaths.cs",
@@ -639,9 +641,16 @@
       "tests/Installer/contract.test.mjs",
       "docs/INSTALLATION.md",
       "docs/STEP_27_TEST_MATRIX.md",
-      "https://github.com/mosen6266-netizen/MS_001/actions/runs/39026040916"
+      "docs/STEP_27_ACCEPTANCE.md",
+      "https://github.com/mosen6266-netizen/MS_001/actions/runs/39026535003"
     ],
-    "last_commit_sha": "765bc7fa789b634533ada7d71a2103a1acb13d1a"
+    "last_commit_sha": "cbb9d9c26a4186a0ad348184e77e9aa739d4c884",
+    "deferred_release_acceptance": [
+      "STEP27-CLEAN-WINDOWS-VM-INSTALL",
+      "STEP27-UNSIGNED-DEV-RELEASE",
+      "TDLIB-NATIVE-BINARY",
+      "LICENSE-WPF-REAL-GATE"
+    ]
   },
   {
     "step": "28",

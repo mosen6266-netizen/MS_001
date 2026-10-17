@@ -5,8 +5,8 @@
   "default_branch": "main",
   "plan_version": "PLAN-1.1",
   "plan_date": "2026-10-16",
-  "current_step": "27",
-  "current_step_status": "in_progress",
+  "current_step": "28",
+  "current_step_status": "not_started",
   "phase": 5,
   "total_steps": 32,
   "completed_steps": [
@@ -35,7 +35,8 @@
     "23",
     "24",
     "25",
-    "26"
+    "26",
+    "27"
   ],
   "development_started": true,
   "functional_code_started": true,
@@ -44,13 +45,13 @@
   "icon_source_received": true,
   "icon_asset_upload_verified": true,
   "exact_timing_contract": "wait preSendDelayMs -> typing typingDurationMs -> send; 30s+5s=35s; no overlap",
-  "last_verified_commit_sha": "c875ff3ca997a43389dc13bded5868334c3a2a3e",
+  "last_verified_commit_sha": "cbb9d9c26a4186a0ad348184e77e9aa739d4c884",
   "last_updated": "2026-10-17",
   "blocking_issues": [
     "真实Win10/11、TDLib原生库及自有账号/群操作已按用户指示延期最终验收",
     "MS_001仍为 public，不得上传任何秘密或会话；发布前商标合规检查"
   ],
-  "notes": "Step27 in progress. Offline Inno Setup Windows x64 installer, user-approved generated app ICO, menu + desktop shortcut, Microsoft signed offline WebView2 runtime, self-contained WPF, stable per-user install with historical LocalAppData data separate and overwrite/default uninstall no data purge. Ubuntu 22 C# + 4 static Node tests passed; Windows actual installer compilation CI 39026040916 not yet completed. Real Win10/11 clean VM installation, antivirus, signed distribution and live TDLib remain DEFERRED. Project still 26/32 until full CI green.",
+  "notes": "Step27 done_dev: Actual unsigned Inno Setup 6.7.1 standalone win-x64 installer built by GitHub CI 39026535003 success 50/50; 269048726-byte EXE SHA256 B89BA706946CC4EE13F100B6917090A487132464EA556DEF67F2D42A09EC1153 uploaded as ms001-step27-offline-installer-unsigned artifact. Microsoft Authenticode-verified x64 offline Evergreen WebView2 installer bundled. End users need neither Python/Java nor .NET SDK. Per-user stable AppId install and shortcuts, verified icon, historical LocalAppData MOSEN/TelegramScheduler app.db and WebView2 profile separated; default uninstall keeps data. Windows/Linux each 22 upgrade/install state assertions and 4 script contract suites. Real clean Windows10/11 VM install/uninstall and production code signing, updates and live TDLib remain DEFERRED. Progress 27/32=84.375%, 5 steps remaining, next Step28 signer/updater.",
   "icon_asset_path": "assets/branding/icon.svg",
   "icon_conversion_builder_path": "tools/branding/build_icons.py",
   "step02_windows_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38919854974",
@@ -212,6 +213,16 @@
       "id": "LICENSE-STEP26-MANUAL-KEY-ROTATION",
       "status": "DEFERRED",
       "detail": "Step26 staged previous-pepper lookup and two pinned public keys implemented/tests green; no actual Cloudflare secret rotation or production device upgrade test performed. Must verify 2-key client deployed before signing switch, real revoke and 1h leases on Windows."
+    },
+    {
+      "id": "STEP27-CLEAN-WINDOWS-VM-INSTALL",
+      "status": "DEFERRED",
+      "detail": "CI compiled real Inno Setup unsigned x64 offline package with bundled Microsoft Authenticode-verified WebView2. Automated tests simulated upgrade and uninstall, but no clean physical Windows10/11 VM install, UI shortcut visual verification, WebView2 absent scenario, actual over-install using real saved accounts, antivirus or long-term coexistence testing. Must validate before final release."
+    },
+    {
+      "id": "STEP27-UNSIGNED-DEV-RELEASE",
+      "status": "DEFERRED",
+      "detail": "Step27 outputs unsigned development installer as temporary GitHub Actions artifact (7-day retention). Publisher Authenticode signing, trusted update manifest/recovery and production distribution are Step28, not yet done. Production TDLib live send and licensing still disabled."
     }
   ],
   "step03_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/38921641970",
@@ -299,6 +310,11 @@
   "step26_total_ci_jobs": 47,
   "step26_worker_scenarios_per_os": 10,
   "step26_client_checks_per_os": 54,
-  "step27_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/39026040916",
-  "step27_source_commit": "765bc7fa789b634533ada7d71a2103a1acb13d1a"
+  "step27_ci_run": "https://github.com/mosen6266-netizen/MS_001/actions/runs/39026535003",
+  "step27_source_commit": "765bc7fa789b634533ada7d71a2103a1acb13d1a",
+  "step27_total_ci_jobs": 50,
+  "step27_installer_bytes": 269048726,
+  "step27_installer_sha256": "B89BA706946CC4EE13F100B6917090A487132464EA556DEF67F2D42A09EC1153",
+  "step27_unit_checks_per_os": 22,
+  "step27_static_contract_scenarios_per_os": 4
 }

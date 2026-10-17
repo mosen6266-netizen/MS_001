@@ -269,3 +269,12 @@
 - 先前CI先后暴露管理路由仍含旧版Bearer直通、Node测试只初始化v1表、无参数D1调用不兼容测试适配器，均修复。最终业务提交 [`c875ff3c`](https://github.com/mosen6266-netizen/MS_001/commit/c875ff3ca997a43389dc13bded5868334c3a2a3e) 通过完整CI。
 - **DEFERRED**：实际Cloudflare专用staging/正式Worker+D1未创建或部署；公网真实TOTP登录、密钥轮换、WAF、防暴力登录规则、Win10/11激活UI、独立公钥发布与真实TDLib发送前全局许可证校验尚待真实联调。**没有修改Signal MS002生产Worker、D1或卡密。**
 - **开发进度26/32（81.25%），剩余6步；下一步27 Windows完整安装包与用户数据独立。**
+
+## Step27 — 完整Windows离线安装包与用户数据独立（2026-10-17）
+
+- **开发阶段 done_dev**：`installer/Setup.iss` 使用Inno Setup 6.7.1创建稳定AppId、当前用户免管理员安装、win-x64自包含程序、Windows桌面/开始菜单快捷方式、覆盖安装防后台运行mutex。按照提供的透明SVG生成应用与安装EXE多尺寸ICO，包含拥有MIT许可的简体中文安装语言文件，可切换英文。
+- **真实安装包已在GitHub Actions实际编译**：离线 Microsoft WebView2 Evergreen Standalone x64 正确官方链接 `linkid=2124701`；Windows CI完成微软Authenticode签名校验与大小检查。首次误用 `LinkId=2124703`（仅在线bootstrapper）已修正，首次Inno缺少简体中文语言包也已修正并将MIT翻译保存仓库。完整离线 EXE名 `MOSEN-Telegram-Scheduler-Setup-0.27.0-dev.exe`，**269,048,726字节**，SHA256 **`B89BA706946CC4EE13F100B6917090A487132464EA556DEF67F2D42A09EC1153`**，SHA256清单同产物保存于GitHub Actions artifact `ms001-step27-offline-installer-unsigned`（7天过期）。
+- **用户数据隔离**：程序安装于 `%LOCALAPPDATA%\Programs\MOSEN\TelegramScheduler`；历史 `%LOCALAPPDATA%\MOSEN\TelegramScheduler` 数据库、备份、账号备注、剧本、密钥与WebView2配置全部保留；新 `UserDataPaths` 拒绝程序安装位置与数据目录交叠。默认卸载只移除程序和快捷方式；如确需彻底删除需事先备份并单独在PowerShell运行有明确中文确认词和ReparsePoint保护的可选脚本；不会触碰MS002。
+- **测试验收**：Windows和Linux分别通过 **22项安装路径/升级/卸载模拟断言及4组安全配置合同测试**。 [CI 39026535003](https://github.com/mosen6266-netizen/MS_001/actions/runs/39026535003) **50/50作业全部SUCCESS**，包含实编译Inno安装器、WebView2签名、Windows WPF和所有旧模块回归。最终主安装源码提交 [`cbb9d9c2`](https://github.com/mosen6266-netizen/MS_001/commit/cbb9d9c26a4186a0ad348184e77e9aa739d4c884)；参考 `docs/INSTALLATION.md`、`docs/STEP_27_TEST_MATRIX.md`、`docs/STEP_27_ACCEPTANCE.md`。
+- **DEFERRED**：干净Win10/11真实VM安装、实际无WebView2的自动部署、真实旧版账号覆盖安装/卸载恢复、图标人工视觉、杀毒软件检查以及正式发行签名/更新回滚未实机执行；第28步完成签名更新机制，后续最终人工整机验收。**Dev安装包未签名，不应充作正式生产发行版；真实TDLib发送与Cloudflare授权服务也未接入。**
+- **开发进度27/32（84.375%），剩余5步；下一步28 签名更新与安全回滚。**
