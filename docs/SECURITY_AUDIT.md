@@ -29,3 +29,7 @@ Date: 2026-10-17. Scope: the Telegram-only MS_001 development repository at main
 **NOT RELEASE READY.** Developer-stage code CI can complete Step31 as done_dev after all new and historic tests pass, but that does **not** clear these release blockers, mark real 72h/native tests complete, issue a signed release or authorize actual Telegram messages. Final Step32 must attach real-world evidence to every readiness requirement; production environments must also require independent authorized reviewers.
 
 No user secrets, wallets, sessions or Signal MS002 credentials have been read, migrated, exported or modified through this audit.
+
+## Step31 CI最终交叉验证（2026-10-17）
+
+[Run 39035133383](https://github.com/mosen6266-netizen/MS_001/actions/runs/39035133383) completed/success，**58/58**；源码commit a40ec24b721b27c605205cc7ae268c6d22ebb71c。SEC31-01 已由Linux/Windows 32项SQLite断言验证；SEC31-03 已由扫描339个跟踪文本文件及8个Node审计测试通过验证；31个上游Job全成功。检查代码在当前开发源码中未发现新增CI层面的阻断错误，但高风险真实发行项目SEC31-02/06/07/08/09/10仍未完成，正式发布决定继续 **BLOCKED**。详见[STEP_31_ACCEPTANCE](STEP_31_ACCEPTANCE.md)。
