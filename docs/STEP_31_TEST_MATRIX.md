@@ -9,8 +9,8 @@
 - [x] Release就绪清单固定13条真人/实机安全证据要求，初始全部DEFERRED且releaseAuthorized=false；任何缺条、重复、未审批、证据缺失都拒绝。
 - [x] Signed Release仅能手动启动；正式签名之前检查readiness与密钥泄漏，draft发布前复核；发布作业需要独立的protected environment和仅该阶段写入权限。无真实签名证书不允许发布。
 - [x] Step31 repository security audit及发布阻断新增8个Node用例全部PASS。
-- [ ] 最新完整GitHub Actions run全绿（在包含Step31改动的代码提交版本上）、最终聚合门禁验证所有上游任务，保存准确Run/Commit SHA。
-- [ ] 手工审计高危代码/权限的最后一轮结果与剩余风险表入docs/SECURITY_AUDIT.md。
+- [x] 最新完整GitHub Actions run全绿（在包含Step31改动的代码提交版本上）、最终聚合门禁验证所有上游任务，保存准确Run/Commit SHA。
+- [x] 手工审计高危代码/权限的最后一轮结果与剩余风险表入docs/SECURITY_AUDIT.md。
 
 ## 严格禁止自动勾选的最终发行检查
 
@@ -22,3 +22,7 @@
 - [ ] 正式出版审批：release/readiness.json全部13条有真实证据和独立人员签名+GitHub环境受保护审批，只有签名Release才可对外提供。
 
 完成开发阶段CI后可以记录Step31=done_dev；以上真实发布阻断项仍必须逐项核验，不应因开发测试通过而自动清空。
+
+## 开发阶段验证结果
+
+[GitHub Actions 39035133383](https://github.com/mosen6266-netizen/MS_001/actions/runs/39035133383) completed/success **58/58作业全部通过**；受测源码commit a40ec24b721b27c605205cc7ae268c6d22ebb71c。安全审计扫描339个git追踪文本文件，8/8新增Node审计测试PASS；Win/Linux SQLite迁移各32项PASS；最终汇总31个上游Job全success。详细见[STEP_31_ACCEPTANCE](STEP_31_ACCEPTANCE.md)。实机和签名/许可清单仍全部保持DEFERRED，不自动勾选。
