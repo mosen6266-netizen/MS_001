@@ -316,3 +316,11 @@
 - 真实**短时**CI耗时 Linux 4.190秒/Windows 20.561秒；工作集最高取样Linux 90MiB、Windows 63MiB；Windows最后句柄267。每平台原始完整JSON在本Run Artifacts，详细实测和局限见[BENCHMARKS](BENCHMARKS.md)、[CAPACITY_LIMITS](CAPACITY_LIMITS.md)、[STEP_30_ACCEPTANCE](STEP_30_ACCEPTANCE.md)。
 - 开发阶段done_dev；**DEFERRED**：300真实原生TDLib账号同时在线、50真实群、真正72小时连续Windows墙钟稳定和网络重连、杀软/磁盘风险/真实资源及生产卡密，均未执行，保留最终实机验收。未改变Signal MS002。
 - **开发进度30/32（93.75%），剩余2步；下一步31安全审计/数据恢复/发布阻断。**
+
+## Step31 — 安全审计、数据恢复与发布阻断（2026-10-17，开发阶段验收）
+
+- AppDatabase.PrepareRestore升级为从备份源与恢复候选双重验证schema_migrations官方SHA，防止结构完好但迁移记录被篡改；SQLite Migrations Windows/Linux各32项断言PASS。
+- 新增git追踪文件高置信度敏感信息扫描、Release Readiness 13项强制真实审查、双阶段签名发布门禁及环境审批；默认releaseAuthorized=false、13项DEFERRED，永不将unsigned CI包冒称正式签名发行。
+- [Actions Run 39035133383](https://github.com/mosen6266-netizen/MS_001/actions/runs/39035133383) **completed/success，58/58作业全绿**（受测代码[a40ec24b](https://github.com/mosen6266-netizen/MS_001/commit/a40ec24b721b27c605205cc7ae268c6d22ebb71c)）。339个git文本文件扫描无匹配，8/8安全Node用例PASS，31上游Job最终总验收通过。
+- [审计问题清单](SECURITY_AUDIT.md) · [第三方审核](THIRD_PARTY_REVIEW.md) · [Step31开发验收](STEP_31_ACCEPTANCE.md)。**DEFERRED**：原生TDLib/Win10/11、72h真实长稳、真实Cloudflare授权、正式签名证书、版权/商标、PowerShell更新helper安全审核。发行状态仍是 **BLOCKED**；未动Signal MS002。
+- **开发进度31/32（96.875%），剩余1步；下一步32——最终文档、安装包和V1.0发布签收；任何真实阻断条件未满足时不发行。**
