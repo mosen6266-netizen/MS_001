@@ -293,3 +293,11 @@
 - [最新 CI Run 39030669456](https://github.com/mosen6266-netizen/MS_001/actions/runs/39030669456) 检查时49个作业全部排队，暂未执行；本步保持 **in_progress**，开发完成度 **27/32（84.375%）**，下一待办是获取真实CI结果并处理编译/单测失败。签名发行证书仍UNCONFIGURED，正式Release/Windows实机自动更新与回滚未执行，Signal MS002无修改。
 
 - Step28后续修正：`updater/Apply-Update.ps1`在成功安装后强制检查文件版本和发布者Authenticode，增加两代滚动程序备份`previous-program`、`previous-program.prior`，从而支持连续版本升级；`previous-program.pending`有残留时拒绝覆盖；合同测试新增断言。最新 [Run 39030893090](https://github.com/mosen6266-netizen/MS_001/actions/runs/39030893090) 截至检查为pending/0 jobs，**不计通过**。当前仍为27/32（84.375%）。
+
+## Step28 — 签名更新、安全下载与回滚（2026-10-17，开发阶段正式验收）
+
+- **done_dev**：升级清单P-256验证、SHA256/断点续传、Windows检查更新按钮、关闭后双重证书校验与两代程序备份/安装后版本校验、失败恢复和用户数据独立；手动签名发行流程只创建草稿Release，权限拆分为只读构建和最小写权限发布。
+- Windows/Linux各22项更新安全断言、各4项发布安全合同测试通过，两个独立 .NET 10 发布签名/验签工具均编译成功；Windows脚本语法、WPF win-x64 Build/Publish及历史回归全部通过。实际Inno离线安装包 269,072,288 bytes / SHA256 E81CA3181840A67603677EBBBD83090B94F85D2269290FD3FEDA747CFE76FFBF（开发unsigned）。
+- [GitHub Actions CI 39031497799](https://github.com/mosen6266-netizen/MS_001/actions/runs/39031497799) **completed/success，52/52成功**，受测开发代码最终commit [716f22ad](https://github.com/mosen6266-netizen/MS_001/commit/716f22ad3a4c707b5b4574cad34b738f2d1c70ff)。源文件、故障修复与限制见[第28步验收](STEP_28_ACCEPTANCE.md)。
+- **DEFERRED**：签名PFX和独立P-256密钥未配置、没有执行发布签名/正式Release；真实Win10/11下载-覆盖-失败-断电回滚、账号/SQLite迁移、原生TDLib和独立Cloudflare许可联调/负载均未实机验收。没有修改Signal MS002。
+- **开发进度28/32（87.5%），剩余4步；下一步29全功能自动化回归。**
