@@ -26,3 +26,13 @@
 - [ ] 第三方软件/版权/商标权利人及具体随包运行时版本审核，参见docs/THIRD_PARTY_REVIEW.md。
 
 即便GitHub CI及未签名开发包构建全绿，也不等于已可将 V1.0 发布为正式软件；缺任何一条真实阻断验收均不可发布。
+
+## Step32开发文档及交接资料（CI已验证；非正式签收）
+
+- [x] 用户指南、问题排查、恢复操作、候选Release Notes、完整最终签收表和未发布声明齐全。
+- [x] GitHub资料交接zip含19文件/逐文件SHA256和zip SHA256，构建、验证和上传均通过。
+- [x] Windows自包含未签名离线Inno开发Setup构建并带SHA256上传。
+- [x] 2026-10-17 [CI Run 39036960159](https://github.com/mosen6266-netizen/MS_001/actions/runs/39036960159) 59/59作业成功，最终门禁32个上游Job全绿。
+- [ ] 正式V1.0签收仍被release/readiness.json 13条真实验收阻断（13/13 DEFERRED、releaseAuthorized=false）。没有签发正式WindowsEXE/公开Release URL；不能发布。
+
+详见 [最终交付验收](STEP_32_ACCEPTANCE.md)；开发32/32不表示真实生产功能/安装可靠性已获得批准。
