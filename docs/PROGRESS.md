@@ -291,3 +291,5 @@
 - `release.yml`拆成仅 `contents: read` 的build-and-sign作业与最小权限 `contents: write` 的publish-draft作业，必须先经GitHub Actions保存并恢复签名工件，再用独立ReleaseVerifier验证P-256清单、SHA256、文件大小、Windows Authenticode证书，再仅创建草稿Release；无自动公开发布。
 - 新增 `updater/ReleaseVerifier`，增强 `tests/Updater/release-contract.test.mjs` 的权限拆分、安装签名和版本门禁核对。通过连接仓库源码直接执行的17项**静态**约束核对：17/17通过，**不能代替编译/CI**。
 - [最新 CI Run 39030669456](https://github.com/mosen6266-netizen/MS_001/actions/runs/39030669456) 检查时49个作业全部排队，暂未执行；本步保持 **in_progress**，开发完成度 **27/32（84.375%）**，下一待办是获取真实CI结果并处理编译/单测失败。签名发行证书仍UNCONFIGURED，正式Release/Windows实机自动更新与回滚未执行，Signal MS002无修改。
+
+- Step28后续修正：`updater/Apply-Update.ps1`在成功安装后强制检查文件版本和发布者Authenticode，增加两代滚动程序备份`previous-program`、`previous-program.prior`，从而支持连续版本升级；`previous-program.pending`有残留时拒绝覆盖；合同测试新增断言。最新 [Run 39030893090](https://github.com/mosen6266-netizen/MS_001/actions/runs/39030893090) 截至检查为pending/0 jobs，**不计通过**。当前仍为27/32（84.375%）。
