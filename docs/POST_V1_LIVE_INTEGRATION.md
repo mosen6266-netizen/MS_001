@@ -24,3 +24,13 @@ SHA256：F6E517CD3C6E29F2B4EA16FCE08AF4D7C9DDA0C0BFCC7E9133689E9F6ADDAEA4
 - 尚无生产许可、真实Win10/11部署与V1.0签名验收。
 - 不允许宣称0.28开发构建为正式全功能版本，也不要以合成回执代替真实投递。
 - 后续继续从此main分支增量维护；不要重写MS_001或改动Signal MS002。
+
+## 2026-10-17 后续集成：0.29.0-dev，Windows TDLib + 登录 + 群组同步 + 手动发送
+
+**最终受测GitHub CI**：[Run 39042347008](https://github.com/mosen6266-netizen/MS_001/actions/runs/39042347008) completed/success，**60/60 Jobs success**，受测SHA `42c662a941e1240161d530f2153150abb3d58681`。
+
+**新的可下载 Windows 10/11 x64 安装包**： [GitHub artifact 12105005964](https://github.com/mosen6266-netizen/MS_001/actions/runs/39042347008/artifacts/12105005964)，文件名 `MOSEN-Telegram-Scheduler-Setup-0.29.0-dev.exe`，295,834,863字节；真实EXE SHA256：`D26451E6F7F03B136B93FA345E9BA22CDD2DB2CEF5B37C4FE7DAB871A2196525`。**仍是未签名开发包，不是正式签名V1.0**。
+
+本次实际代码交付：Windows桌面NuGet包含tdlib.native.win-x64 1.8.67官方TDLib协议原生库，并添加真实Windows Native Smoke，成功加载tdjson.dll返回版本1.8.67；运行时发布目录断言必须存在tdjson.dll。离线安装包嵌入经过微软Authenticode校验的Microsoft Visual C++ x64运行库和WebView2。登录桌面界面连接真正的TDLib状态机，支持扫码二维码（本机离线生成临时PNG）、本人手机号、验证码、邮箱验证码和两步验证；单Windows用户DPAPI保存应用API参数及TDLib数据库密钥。群组页支持TDLib loadChats→getChats→getChat，只显示普通群和超级群，并检查can_send_basic_messages。人工确认后可向**一个已选且有当前权限的群**提交不超过2000字符的文字，等待TDLib updateMessageSendSucceeded/Failed，结果未知不自动重发，手动发送速率限制30秒；不接入多账号批量群发、脚本自动发送或绕过Telegram限制。
+
+剩余验证与限制：**未使用用户真实登录凭据做过网络端到端测试，也没有实际发出真人Telegram消息的验收证据**；必须由用户安装自测确认实际官方授权、群列表、真实发出和回执。一次连接仅一个实际TDLib账号，不等于300真实并发账号。Cloudflare生产卡密、真实72小时物理长稳、正式Windows签名与V1.0发行门禁仍未满足；release/readiness.json仍BLOCKED。请后续在此受测源码SHA基础上增量调试，绝不重新写工程或改Signal MS002。
